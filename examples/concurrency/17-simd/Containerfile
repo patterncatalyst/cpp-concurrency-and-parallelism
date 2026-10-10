@@ -1,0 +1,85 @@
+# concurrency/17-simd — scalar vs std::experimental::simd, AoS vs SoA.
+#
+# Builds one binary:
+#   simd_particles   updates the same pos += vel*dt recurrence three ways
+#                     (array-of-structs scalar, struct-of-arrays scalar,
+#                     struct-of-arrays std::experimental::simd) over the
+#                     same initial particle data, and hashes the final
+#                     positions so the three variants can be compared for
+#                     exact (bit-identical) agreement.
+#
+# One Conan dependency (fmt, output formatting only) -- same weight class as
+# 20-mechanical-sympathy's image. std::experimental::simd is a libstdc++
+# header, not a package to fetch.
+#
+# Deliberately NOT built with -march=native or any explicit -march target
+# beyond the compiler's default x86-64 baseline -- see CMakeLists.txt for
+# why: a binary built against one machine's CPU features is a portability
+# trap in any container that might run on a different one, and the default
+# baseline is also what keeps this example's correctness check exact rather
+# than needing a floating-point tolerance.
+#
+# The runtime stage also installs Lua 5.4: verify.lua is this project's
+# assertion harness and runs IN the container, against the binary it ships.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern every
+# sibling example in this project uses: deps at gnu17, our code at the
+# standard the chapter is actually teaching).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/simd_particles
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. This stage installs only base runtime libs (no dnf plugin
+# needed), so turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/simd_particles /usr/local/bin/simd_particles
+COPY verify.lua ./verify.lua
+
+ENV SIMD_PARTICLES_BIN=/usr/local/bin/simd_particles
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run simd_particles directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

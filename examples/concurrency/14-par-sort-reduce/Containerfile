@@ -1,0 +1,89 @@
+# concurrency/14-par-sort-reduce — seq vs par vs par_unseq, same sort + reduce.
+#
+# Builds one binary:
+#   par_sort_reduce   sorts and transform_reduces the SAME input once per
+#                     execution policy (seq, par, par_unseq), printing a
+#                     correctness hash/sum per policy plus the distinct CPUs
+#                     touched while reducing.
+#
+# This example's one heavyweight Conan dependency is oneTBB, same reason and
+# same known-good recipe as sibling 01-execution-models: GCC's libstdc++
+# implements std::execution::par on a PSTL-over-TBB backend, so code calling
+# std::sort(std::execution::par, ...) or
+# std::transform_reduce(std::execution::par, ...) fails to LINK without it.
+# Building oneTBB from source is the slowest step in this image relative to
+# the sibling 20-mechanical-sympathy image, which only builds fmt.
+#
+# Runtime stage installs Lua 5.4 for verify.lua, same as every sibling demo.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (oneTBB, fmt). Our
+# own target overrides to C++20 in CMakeLists -- the two-layer pattern every
+# sibling example in this project uses: deps at gnu17, our code at the
+# standard the chapter is actually teaching.
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/par_sort_reduce
+
+# Stage the Conan-built shared libs the binary needs at runtime (hwloc is
+# shared per oneTBB's recipe). Copy only .conan2 libs — never system libc.
+RUN mkdir -p /deps && \
+    ldd build/par_sort_reduce | awk '/\.conan2/ {print $3}' \
+      | xargs -r -I{} cp -L {} /deps/ || true
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager plugin
+# prints a harmless "Found 0 entitlement certificates" on each install. This
+# stage installs only base runtime libs (no dnf plugin needed), so turn
+# plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+# Conan-built shared libs (libhwloc.so* pulled in via oneTBB) the binary links.
+COPY --from=builder /deps/ /usr/local/lib/
+ENV LD_LIBRARY_PATH=/usr/local/lib
+
+WORKDIR /demo
+COPY --from=builder /src/build/par_sort_reduce /usr/local/bin/par_sort_reduce
+COPY verify.lua ./verify.lua
+
+ENV PAR_SORT_REDUCE_BIN=/usr/local/bin/par_sort_reduce
+
+# No service, no ports: a batch binary plus its Lua assertion harness. CMD
+# runs verify.lua by default; the demo also allows overriding the command to
+# run par_sort_reduce directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

@@ -1,0 +1,27 @@
+# concurrency/14-par-sort-reduce Conan recipe (Conan 2.x).
+#
+# oneTBB is required -- not optional -- for this example: GCC's libstdc++
+# implements std::execution::par (and par_unseq) on top of a PSTL-over-TBB
+# backend, so std::sort(std::execution::par, ...) and
+# std::transform_reduce(std::execution::par, ...) fail to LINK without it,
+# independent of whether the policy is honored at runtime. This is the
+# project's known-good oneTBB recipe (established by sibling example
+# 01-execution-models): a plain `onetbb/*` requirement without the explicit
+# `shared=False`/hwloc `shared=True` options below fails to build, because
+# oneTBB's own recipe requires its hwloc dependency built shared.
+#
+# fmt is added purely for output formatting, same role it plays in
+# 20-mechanical-sympathy.
+
+[requires]
+onetbb/2021.10.0
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+onetbb/*:shared=False
+hwloc/*:shared=True
+fmt/*:shared=False

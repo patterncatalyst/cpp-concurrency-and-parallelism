@@ -1,0 +1,18 @@
+# concurrency/17-simd Conan recipe (Conan 2.x).
+#
+# One dependency (fmt, for output formatting only -- same role it plays in
+# 20-mechanical-sympathy). std::experimental::simd lives in libstdc++'s own
+# headers (the Parallelism TS v2 implementation), not a Conan package --
+# nothing extra to pull in for the SIMD path itself. No threading library is
+# needed either: this chapter's SIMD parallelizes inside one thread, across
+# data, not across threads.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

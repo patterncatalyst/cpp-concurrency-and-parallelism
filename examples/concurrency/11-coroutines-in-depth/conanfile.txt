@@ -1,0 +1,19 @@
+# concurrency/11-coroutines-in-depth Conan recipe (Conan 2.x).
+#
+# C++20 coroutines (co_await/co_yield/co_return, promise_type, the
+# awaitable protocol, std::coroutine_handle) are a language feature with no
+# standard-library coroutine TYPE -- std::generator doesn't exist until
+# C++23, and this project targets C++20 throughout. Generator<T>, Task<T>,
+# and the HALO probe types in this example are therefore hand-rolled, pure
+# standard library. fmt is the only dependency, used only for formatting
+# the key=value output line, same role it plays in 20-mechanical-sympathy.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

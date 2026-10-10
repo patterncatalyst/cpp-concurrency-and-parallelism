@@ -1,0 +1,84 @@
+# concurrency/13-fiber-worker-pool — fiber vs. thread worker pool, plus the
+# guard-page stack-overflow demonstration.
+#
+# Builds one binary:
+#   fiber_worker_pool   `pool --mode fiber|thread [--workers N] [--items N]`
+#                       runs an identical worker loop over
+#                       boost::fibers::buffered_channel, either as N
+#                       boost::fibers::fiber workers or N std::thread
+#                       workers; `guard-page` forks a child that
+#                       deliberately overflows a protected_fixedsize_stack
+#                       fiber stack and reports whether it faulted as
+#                       expected.
+#
+# Boost (fiber + context, everything else disabled via conanfile.txt's
+# without_* options) is this example's Conan dependency, built static
+# (boost/*:shared=False) specifically so this Containerfile does NOT need
+# the shared-lib runtime-staging pattern from
+# ../01-execution-models/Containerfile (needed there because oneTBB's
+# recipe requires hwloc to be shared) -- the binary built below has no
+# Conan-managed .so to copy into the runtime stage.
+#
+# Runtime stage installs Lua 5.4 for verify.lua, same as every sibling demo.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (Boost, fmt). Our
+# own target overrides to C++20 in CMakeLists -- the two-layer pattern the
+# sibling 20-mechanical-sympathy example also uses: deps at gnu17, our code
+# at the standard the chapter is actually teaching.
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/fiber_worker_pool
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. This stage installs only base runtime libs (no dnf plugin
+# needed), so turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/fiber_worker_pool /usr/local/bin/fiber_worker_pool
+COPY verify.lua ./verify.lua
+
+ENV FIBER_WORKER_POOL_BIN=/usr/local/bin/fiber_worker_pool
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run fiber_worker_pool directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

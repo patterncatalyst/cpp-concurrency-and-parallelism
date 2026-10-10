@@ -1,0 +1,75 @@
+# concurrency/13-fiber-worker-pool Conan recipe (Conan 2.x).
+#
+# Two dependencies: Boost (for Boost.Fiber -- there is no std::fiber in any
+# C++ standard through the current C++26 working draft -- plus
+# Boost.Context, which Boost.Fiber is built on and which supplies
+# protected_fixedsize_stack for the guard-page demonstration) and fmt (for
+# output formatting only, same role it plays in every sibling example).
+#
+# Static linking (boost/*:shared=False) is the simplest choice here: it
+# avoids needing to stage and COPY runtime .so files into the minimal
+# runtime image at all (contrast the shared-lib pattern in
+# ../01-execution-models/Containerfile, needed there because oneTBB's
+# recipe requires hwloc to be shared).
+#
+# Only Boost.Context and Boost.Fiber (plus the small libraries they
+# transitively need: system, exception) are enabled; every other Boost
+# library this recipe knows how to build is turned off via without_* to
+# keep the dependency build to just what this example links against --
+# Boost's full default build compiles dozens of libraries this example
+# never uses.
+
+[requires]
+boost/1.84.0
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+boost/*:shared=False
+fmt/*:shared=False
+
+# Needed: Boost.Fiber (the chapter's subject) and Boost.Context (what
+# Boost.Fiber is built on; also supplies protected_fixedsize_stack for the
+# guard-page demo). system/exception are small, commonly-required
+# supporting libraries left at their default (built).
+boost/*:without_context=False
+boost/*:without_fiber=False
+boost/*:without_system=False
+boost/*:without_exception=False
+
+# Not needed by this example -- disabled to keep the Boost build to just
+# the libraries above instead of Boost's full default set.
+boost/*:without_atomic=True
+boost/*:without_charconv=True
+boost/*:without_chrono=True
+boost/*:without_cobalt=True
+boost/*:without_container=True
+boost/*:without_contract=True
+boost/*:without_coroutine=True
+boost/*:without_date_time=True
+boost/*:without_filesystem=True
+boost/*:without_graph=True
+boost/*:without_graph_parallel=True
+boost/*:without_iostreams=True
+boost/*:without_json=True
+boost/*:without_locale=True
+boost/*:without_log=True
+boost/*:without_math=True
+boost/*:without_mpi=True
+boost/*:without_nowide=True
+boost/*:without_process=True
+boost/*:without_program_options=True
+boost/*:without_python=True
+boost/*:without_random=True
+boost/*:without_regex=True
+boost/*:without_serialization=True
+boost/*:without_stacktrace=True
+boost/*:without_test=True
+boost/*:without_thread=True
+boost/*:without_timer=True
+boost/*:without_type_erasure=True
+boost/*:without_url=True
+boost/*:without_wave=True

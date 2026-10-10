@@ -133,7 +133,10 @@ std::counting_semaphore<8> connection_slots(8);
 
 void handle_request() {
     connection_slots.acquire();
-    auto guard = std::experimental::scope_exit([&] { connection_slots.release(); });
+    struct ReleaseGuard {
+        std::counting_semaphore<8>& sem;
+        ~ReleaseGuard() { sem.release(); }
+    } guard{connection_slots};
     do_work_with_bounded_concurrency();
 }
 ```

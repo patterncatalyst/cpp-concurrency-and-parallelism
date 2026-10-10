@@ -4,7 +4,7 @@ order: 1
 layout: tutorial
 sectionid: docs
 part: foundations
-description: "The two independent axes of concurrency and parallelism, the four execution models that result, and how to measure them honestly."
+description: "The two independent axes of concurrency and parallelism, the four execution models that result, and how to measure them precisely."
 duration: "13 min"
 ---
 

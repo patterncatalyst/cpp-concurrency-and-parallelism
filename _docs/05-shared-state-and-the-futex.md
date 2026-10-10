@@ -47,12 +47,17 @@ precise about why it is cheap: a single atomic instruction, retiring in a few
 nanoseconds, touching one cache line. No system call, no context switch, no
 involvement from the scheduler. This is the path every uncontended
 `lock()`/`unlock()` pair takes, and under light contention it is also the path
-most *contended* acquisitions take, because glibc's implementation spins
-briefly on the word before giving up and calling into the kernel — the
-syscall is the expensive part, so the library tries hard to avoid it even
-when a lock is briefly held elsewhere.
+most *contended* acquisitions take — not because glibc's default mutex spins
+in userspace before falling back (it doesn't: `std::mutex` maps to
+`PTHREAD_MUTEX_NORMAL`, whose glibc implementation performs exactly one
+compare-and-swap and, on failure, goes straight to `__lll_lock_wait`, the
+futex path; adaptive userspace spinning is a property of
+`PTHREAD_MUTEX_ADAPTIVE_NP`, which is not the default `std::mutex` uses).
+Most contended acquisitions still avoid the syscall for a simpler reason:
+critical sections are typically so brief that the lock is usually already
+free again by the time a second thread's compare-and-swap runs.
 
-The slow path begins only when that spin fails: the thread calls
+The slow path begins only when that compare-and-swap also fails: the thread calls
 `futex(FUTEX_WAIT, &word, expected)`, which asks the kernel to suspend the
 calling thread on a wait queue keyed by the physical address of `word`, but
 only if the word's current value still matches `expected`. That
@@ -64,7 +69,7 @@ the parking, the kernel can verify the precondition and commit to sleeping as
 one atomic step, with nothing before it for a stray write to slip into.
 
 On the unlocking side, a thread that finds no one is waiting on the word
-simply clears it and returns — still entirely in user space. Only when the
+clears it and returns — still entirely in user space. Only when the
 unlocking thread knows (or the futex's internal bookkeeping believes) a
 waiter exists does it call `futex(FUTEX_WAKE, &word)`, which moves one parked
 thread back onto the run queue. Condition variables, `std::latch`,
@@ -92,27 +97,29 @@ atomically against the act of sleeping.
 
 ## Uncontended vs Contended Cost
 
-The claim that an uncontended lock is cheap understates it. Measured with
-`strace -c -e trace=futex` across 200,000 `lock_guard` acquisitions and
-releases on a single thread, the futex call count comes back identical to a
+The claim that an uncontended lock is cheap understates it. A `strace -c
+-e trace=futex` across 200,000 `lock_guard` acquisitions and releases on a
+single thread would show the futex call count coming back identical to a
 version of the same program with no mutex at all: both report a single
 `futex` call, and that one call belongs to the dynamic loader starting the
-process, not to any lock operation. The full syscall profile of the
-uncontended run is sixty-one calls total: `execve`, `mmap`, `openat`, `read`,
-and `close`, every one of them process startup. Two hundred thousand
-lock/unlock pairs contributed nothing measurable to it.
+process, not to any lock operation. The full syscall profile of such an
+uncontended run is on the order of sixty calls total: `execve`, `mmap`,
+`openat`, `read`, and `close`, every one of them process startup. Two
+hundred thousand lock/unlock pairs contribute nothing measurable to it.
 
 Split the same 200,000 increments across eight threads sharing one mutex, and
 the picture changes by more than two orders of magnitude. The futex count
 rises into the low thousands, varying run to run with scheduling (one
 reference measurement put it at 2,360), because now the compare-and-swap
 genuinely fails often enough to send threads into the kernel to sleep and
-wake each other. Breaking that count down by operation shows the spin
-mentioned above actually working: of 200,000 lock operations under
-contention, only a few hundred ever reached an actual `FUTEX_WAIT` sleep. The
-rest spun briefly, found the lock free, and never left user space at all.
-Contention raises the cost by orders of magnitude and the kernel still
-handles only a small minority of the operations involved.
+wake each other. Breaking that count down by operation shows the mechanism
+described above actually at work: in that same reference measurement, only
+on the order of a few hundred of the 200,000 lock operations under
+contention ever reached an actual `FUTEX_WAIT` sleep. The rest found the
+compare-and-swap already succeeding — the lock had already been released by
+the time they attempted it — and never left user space at all. Contention
+raises the cost by orders of magnitude and the kernel still handles only a
+small minority of the operations involved.
 
 The number that matters here is the *shape* of the comparison, not any single
 run's count — futex counts under contention are scheduling-dependent and will
@@ -132,10 +139,11 @@ and the thing worth minimizing is contention, not the presence of a lock.
 ## Kernel Space vs User Space
 
 Collecting the boundary in one place: the compare-and-swap that acquires an
-uncontended lock, the compare-and-swap that releases it when no one is
-waiting, and the brief adaptive spin glibc performs before giving up on the
-fast path all run entirely in user space, touching no kernel data structure
-and costing no mode switch. The kernel enters the picture in exactly two
+uncontended lock and the compare-and-swap that releases it when no one is
+waiting both run entirely in user space, touching no kernel data structure
+and costing no mode switch — the default `std::mutex` does not spin in
+userspace beyond that single compare-and-swap attempt before falling to the
+futex path. The kernel enters the picture in exactly two
 calls: `futex(FUTEX_WAIT, ...)` when a thread must sleep, and
 `futex(FUTEX_WAKE, ...)` when an unlocking thread must wake one back up. Both
 exist because descheduling a thread is something only the kernel's scheduler
@@ -186,7 +194,7 @@ increased. But the cause is scheduling pressure from the quota, not a
 change in the workload or the lock itself. Reading `cpu.stat`'s
 `nr_throttled` and `throttled_usec` alongside a futex-count comparison is
 what tells the two apart: a quota-starved container shows both climbing
-together, while a workload that has simply grown more contended shows the
+together, while a workload that has grown more contended on its own shows the
 futex count rising with `nr_throttled` flat at zero.
 
 ## Standards: C++20 / C++23 / C++26
@@ -273,15 +281,18 @@ implementation.
   only on contention. Acquiring a free lock is a single atomic
   compare-and-swap that never leaves user space.
 - The fast path is the common case even under moderate contention, because
-  glibc spins briefly before calling into the kernel — the syscall is the
-  expensive part, so the library avoids it whenever it can.
+  critical sections are typically so brief that the lock is usually already
+  free again by the time a second thread's compare-and-swap runs — not
+  because glibc's default mutex spins in userspace before calling into the
+  kernel (that's `PTHREAD_MUTEX_ADAPTIVE_NP`, not the `std::mutex` default).
 - An uncontended lock's futex call count matches a program with no mutex at
   all; the cost of adding a rarely-contended mutex is one atomic instruction
   and one cache line, not a syscall.
 - Contention is what crosses into the kernel: a contended lock's futex count
   and voluntary-context-switch count both rise by orders of magnitude over
   the uncontended case, even though most contended acquisitions still resolve
-  in user space via the spin.
+  in user space because the critical section was already free again by the
+  time the compare-and-swap ran.
 - Measure the *shape* of a comparison (orders of magnitude), not a single
   run's exact count — contended futex counts are scheduling-dependent and
   will vary between runs on identical hardware.

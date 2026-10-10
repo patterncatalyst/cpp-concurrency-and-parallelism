@@ -124,7 +124,7 @@ The textbook deadlock needs only two mutexes and two threads. Thread one
 locks `a` then `b`; thread two locks `b` then `a`; if each acquires its first
 lock before either attempts its second, each now holds exactly what the
 other is waiting for, and neither can proceed. Nothing about this raises an
-exception, returns an error code, or sets `errno` — the two threads simply
+exception, returns an error code, or sets `errno` — the two threads
 stop, forever, and the only external evidence is that `/proc/<pid>/task/*/wchan`
 reads the kernel's futex-parked function for every thread involved, since
 Chapter 5's mechanism applies to a deadlocked wait exactly as it does to any
@@ -298,7 +298,7 @@ private:
 // C++23 -- shrink the critical section with a deferred, move-only completion
 #include <shared_mutex>
 #include <unordered_map>
-#include <move_only_function>
+#include <functional>
 #include <string>
 
 class Cache {
@@ -308,7 +308,7 @@ public:
         {
             std::unique_lock lock(mu_);
             map_[key] = value;
-            publish = [key = std::move(key), log = std::move(audit_log_)] {
+            publish = [key = std::move(key), log = audit_log_.get()] {
                 log->record(key);             // runs after the lock is released
             };
         }

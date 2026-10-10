@@ -87,7 +87,7 @@ state, and `stop_possible()` reports whether any `stop_source` capable of
 requesting a stop still exists. The two sides share reference-counted state
 behind the scenes, so a `stop_token` remains valid and answerable even after
 every `stop_source` that could have produced it has gone out of scope — it
-simply reports `stop_possible() == false` from then on.
+reports `stop_possible() == false` from then on.
 
 A `jthread` owns a `stop_source` internally and threads a `stop_token` from it
 into the callable's first parameter when one is accepted. `request_stop()` on
@@ -122,7 +122,7 @@ void run_cooperative() {
 // can run, which matters once the callable owns non-copyable state
 #include <thread>
 #include <stop_token>
-#include <move_only_function>
+#include <functional>
 #include <memory>
 
 void run_with_owned_state(std::unique_ptr<int> state) {
@@ -250,12 +250,25 @@ switching, not more throughput. Size pools from `cpu.max` (or, if you control
 the orchestrator, from a fixed, explicitly-injected worker count) rather than
 trusting `hardware_concurrency()` inside a quota-limited container.
 
-A `cpuset` constraint behaves differently and more transparently: pinning a
-container to specific cores with `cpuset.cpus` changes what
-`sched_getaffinity()` reports for every thread in it, and `jthread`s created
-after that point inherit the narrowed mask. `hardware_concurrency()` still
-does not update, so the gap between "what the mask allows" and "what this
-function claims" persists either way — only the mechanism differs.
+A `cpuset` constraint behaves differently, and the two are worth keeping
+separate. Pinning a container to specific cores with `cpuset.cpus` changes
+what `sched_getaffinity()` reports for every thread in it, and `jthread`s
+created after that point inherit the narrowed mask. On glibc 2.36 and newer
+(released 2022), `hardware_concurrency()` tracks this too: libstdc++
+implements it through `get_nprocs()` / `sysconf(_SC_NPROCESSORS_ONLN)`, which
+on current glibc reads the calling thread's affinity mask rather than a raw
+hardware count, so it shrinks to match a `cpuset.cpus` restriction on those
+systems. That is the opposite of the CFS-quota case above: a `cpuset`
+affinity change is visible to `hardware_concurrency()` on modern glibc, while
+a CFS bandwidth quota (`cpu.max`, or `docker --cpus=N`, which is implemented
+as a quota rather than a cpuset) never is, because quota throttling doesn't
+touch the affinity mask at all — every CPU stays reachable, and the quota
+only limits how much wall-clock time the cgroup gets to run on them. The
+practical rule: know which kind of limit a container enforces before
+trusting `hardware_concurrency()` under it, and on an older glibc (pre-2.36,
+where the affinity-tracking behavior described here doesn't exist yet) treat
+`cpuset` restrictions the same way as a quota, as a limit this function
+cannot see.
 
 Clean shutdown is where `jthread` pays for itself under an orchestrator.
 Kubernetes and plain `docker stop` both send `SIGTERM` and then, after a

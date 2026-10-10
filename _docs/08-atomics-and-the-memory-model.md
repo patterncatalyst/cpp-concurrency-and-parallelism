@@ -91,15 +91,15 @@ This pattern shows up most often at the boundary of a lock-free data structure b
 
 ## The Cost of Ordering
 
-On x86-64's Total Store Order (TSO) model, the hardware already orders store-to-store and load-to-load within a core, which is almost exactly what acquire/release needs. The practical consequence: a release store and an acquire load compile to a plain `mov`, with no `lock` prefix and no fence instruction. Disassembling the ring buffer's producer confirms it — the release store to `tail` and the acquire load of `head` are ordinary moves:
+On x86-64's Total Store Order (TSO) model, the hardware already orders store-to-store and load-to-load within a core, which is almost exactly what acquire/release needs. The practical consequence: a release store and an acquire load compile to a plain `mov`, with no `lock` prefix and no fence instruction. A disassembly of the ring buffer's producer shows this pattern — the release store to `tail` and the acquire load of `head` compile to ordinary moves, nothing more:
 
 ```console
-4017c4:	mov    (%rax),%rdx        ; head.load(acquire)
-4017e8:	mov    %rsi,(%rax,%rdx,8) ; buf[t % cap] = value
-4017f4:	mov    %rsi,(%rax)        ; tail.store(t + 1, release)
+mov    (%rax),%rdx        ; head.load(acquire)
+mov    %rsi,(%rax,%rdx,8) ; buf[t % cap] = value
+mov    %rsi,(%rax)        ; tail.store(t + 1, release)
 ```
 
-No `lock`, no `mfence`, anywhere in the function. Sequential consistency is where the cost shows up. A `seq_cst` store on x86-64 cannot be a plain `mov`, because a plain store does not prevent a later load on the same core from executing before the store becomes globally visible — exactly the reordering TSO otherwise permits and `seq_cst`'s total order forbids. The compiler closes that gap with a `lock`-prefixed instruction (commonly `xchg`, which is implicitly locked) or an explicit `mfence`, either of which drains the core's store buffer before any subsequent memory operation proceeds. That single instruction is the entire cost difference. On the identical one-slot ring buffer (the tightest possible contention, every push waiting on the previous pop) measured on an 11th-gen Intel host, acquire/release ordering sustains roughly 6.4M hand-offs/second against the same workload under `seq_cst` at roughly 5.5M/second, a measured difference of roughly 15% paid entirely at the publishing store, not the consuming load, because the load side of both orderings was already a plain `mov`.
+No `lock`, no `mfence`, anywhere in the function. Sequential consistency is where the cost shows up. A `seq_cst` store on x86-64 cannot be a plain `mov`, because a plain store does not prevent a later load on the same core from executing before the store becomes globally visible — exactly the reordering TSO otherwise permits and `seq_cst`'s total order forbids. The compiler closes that gap with a `lock`-prefixed instruction (commonly `xchg`, which is implicitly locked) or an explicit `mfence`, either of which drains the core's store buffer before any subsequent memory operation proceeds. That single instruction is the entire cost difference. On this class of hardware you would typically see acquire/release ordering sustain meaningfully higher throughput than the same one-slot ring buffer (the tightest possible contention, every push waiting on the previous pop) run under `seq_cst` — the gap is commonly on the order of 10-20% — paid almost entirely at the publishing store, not the consuming load, since the load side of both orderings is already a plain `mov`. The Chapter 18 benchmark and this chapter's runnable example measure the exact gap on whatever host actually runs them, rather than a number fixed in the text here.
 
 <!-- EXAMPLE SPEC: examples/concurrency/08-atomics-and-the-memory-model/ builds the same one-slot producer/consumer hand-off three times — seq_cst, acquire/release, and (deliberately, as a negative case gated behind a --broken flag) plain non-atomic counters — and reports a correctness sum plus a throughput figure for each; verified by a Lua verify.lua asserting the seq_cst and acquire/release builds always produce the exact expected sum while the --broken build is permitted (and in practice observed) to diverge from it, built via lgtm-docker-stack. -->
 The example at `examples/concurrency/08-atomics-and-the-memory-model/` builds all three orderings side by side and reports both correctness and throughput.
@@ -120,16 +120,23 @@ Ordering cost is a property of the CPU's cache-coherence protocol, not of any ke
 int legacy_counter = 0;
 std::atomic_ref<int> counter_ref(legacy_counter);
 counter_ref.fetch_add(1, std::memory_order_relaxed);
-```
-```cpp
-// C++23: std::atomic and std::atomic_ref gained freestanding wait()/notify()
-// on more types, and atomic<T>::wait() avoids spurious wakeups in the way
-// condition_variable (Chapter 7) does not — it only wakes on an actual
-// notify_one()/notify_all() or an observed value change, which makes a plain
-// atomic-flag loop a lighter substitute for a condition_variable + mutex
-// when the only shared state is the flag itself.
+
+// C++20 also adds atomic<T>::wait()/notify_one()/notify_all(): wait() avoids
+// spurious wakeups in the way condition_variable (Chapter 7) does not — it
+// only wakes on an actual notify_one()/notify_all() or an observed value
+// change, which makes a plain atomic-flag loop a lighter substitute for a
+// condition_variable + mutex when the only shared state is the flag itself.
 std::atomic<bool> ready{false};
 ready.wait(false);              // blocks until ready != false, no spurious wake
+ready.notify_all();
+```
+```cpp
+// C++23: no new atomic wait/ordering primitive. wait()/notify_one()/
+// notify_all() and the no-spurious-wakeup guarantee are C++20 features (see
+// the C++20 tab), not new here; what C++23 actually adds is freestanding
+// availability of the atomic types, which doesn't change hosted behavior.
+std::atomic<bool> ready{false};
+ready.wait(false);              // identical C++20 contract, unchanged
 ready.notify_all();
 ```
 ```cpp
@@ -148,6 +155,6 @@ state.store(1, std::memory_order_release);
 - `std::atomic<T>` guarantees indivisibility, meaning no thread ever observes a torn read or write — a necessary but separate guarantee from ordering; a hand-off between threads needs both.
 - `memory_order` is a spectrum: `seq_cst` (one global total order) is strictly stronger than `acquire`/`release` (one happens-before edge per pair), which is stronger than `relaxed` (atomicity only, no ordering promise of its own).
 - A standalone `atomic_thread_fence` extends an ordering guarantee to a group of non-atomic operations around an atomic one; it's the right tool at the boundary of a lock-free structure's control fields and payload, not a default substitute for ordering the atomic operation directly.
-- On x86-64 TSO, acquire/release and relaxed both compile to a plain `mov`; `seq_cst`'s extra guarantee costs a locked instruction on the store side, measured here at roughly 15% throughput under the tightest possible contention — real, but not a reason to default away from `seq_cst` without profiling first.
+- On x86-64 TSO, acquire/release and relaxed both compile to a plain `mov`; `seq_cst`'s extra guarantee costs a locked instruction on the store side — a real, measurable cost under tight contention that the Chapter 18 benchmark and runnable example quantify on real hardware, but not a reason to default away from `seq_cst` without profiling first.
 
 Next, [Lock-Free Data Structures]({{ '/docs/09-lock-free-data-structures/' | relative_url }}): the same orderings put to work in ring buffers, the ABA problem, and the reclamation schemes that let a structure's nodes be freed safely while other threads might still be reading them.

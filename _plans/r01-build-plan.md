@@ -11,17 +11,21 @@ order: 1
 > **Fedora is the reference platform** (user directive) — prereqs use `dnf`; demos build in UBI10.
 > All committed on branch `docs/r01-scaffold`. Nothing pushed (Gate A pending).
 >
-> **Phase 3 (examples) — 26 of 27 Docker demos VERIFIED GREEN** on real Docker (Conan+CMake+clang+
+> **Phase 3 (examples) — 27 of 27 Docker demos VERIFIED GREEN** on real Docker (Conan+CMake+clang+
 > UBI10+Lua verify.lua, each `./demo.sh` exit 0): ch1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,20,21,
-> 24,25,27,28,32,33,34. (ch27 debugging + ch28 sanitizers: gdb/TSan/valgrind/ASan fire for REAL, req 24 met.)
-> **2 Phase-3 items REMAIN:**
->   1. **ch29 observing-concurrency** (OTel+LGTM compose) — compile FIXED (added `opentelemetry/sdk/trace/
->      processor.h` + `opentelemetry/sdk/metrics/meter_provider_factory.h`); now a LINK error:
->      `undefined reference to opentelemetry::v1::sdk::common::Base64Escape`. Static otel/abseil link-ORDER
->      issue — fix its CMakeLists to link the Conan aggregate target `opentelemetry-cpp::opentelemetry-cpp`
->      (correct transitive order) OR wrap otel libs in `-Wl,--start-group/--end-group` (as ch25's grpc does).
->      Then it also brings up a grafana/otel-lgtm compose stack (heavy, ~1-2min start) — budget time.
->   2. **ch16 NUMA** — needs the KVM lab. HOST SETUP DONE: virt-install installed; user ran cloud-utils+
+> 24,25,27,28,29,32,33,34. (ch27 debugging + ch28 sanitizers: gdb/TSan/valgrind/ASan fire for REAL, req 24 met.)
+> **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
+> (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
+> `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel
+> components as INTERFACE targets, so the group markers are dropped and CMake reports a self-cycle); (b) lgtm
+> healthcheck used wget but the grafana/otel-lgtm image (RHEL9) ships only curl → switched to curl; (c)
+> exit-time SIGSEGV in MeterContext::Shutdown() from the global Provider's static shared_ptr torn down during
+> exit() static destruction → clear the global trace/meter providers before main returns (as opentelemetry-cpp's
+> own examples do). verify.lua PASSES live: 24 traces in Tempo w/ correct cross-thread span nesting (root→3
+> children each), pool_queue_depth saturation metric in Mimir (max 54). Diagnosed the segfault with a throwaway
+> Release+`-g` gdb image (the real build strips); backtrace pinned it to __run_exit_handlers.
+> **1 Phase-3 item REMAINS:**
+>   1. **ch16 NUMA** — needs the KVM lab. HOST SETUP DONE: virt-install installed; user ran cloud-utils+
 >      libvirtd+default-net line (verify `virsh net-list` shows default active). Provision a 2-NUMA-node
 >      guest (qemu `-numa`/virt-install `--cpu`), build+run the NUMA demo there via lgtm-systems-programming
 >      (`~/Dev/linux-systems-programming/scripts/lab/provision-vm.sh`); NEVER mutate host NUMA/governor.

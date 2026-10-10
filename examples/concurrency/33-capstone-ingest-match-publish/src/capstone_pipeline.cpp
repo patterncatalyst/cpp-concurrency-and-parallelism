@@ -194,9 +194,15 @@ public:
     // high-water mark) -- never used for a correctness decision, only
     // for what gets printed.
     std::uint64_t occupancy() const {
-        std::uint64_t e = enqueue_pos_.load(std::memory_order_relaxed);
-        std::uint64_t d = dequeue_pos_.load(std::memory_order_relaxed);
-        return e >= d ? e - d : 0;
+        std::uint64_t e = enqueue_pos_.load(std::memory_order_acquire);
+        std::uint64_t d = dequeue_pos_.load(std::memory_order_acquire);
+        std::uint64_t occ = e >= d ? e - d : 0;
+        std::uint64_t cap = mask_ + 1;
+        // Two separate relaxed/acquire loads are a snapshot, not a transaction:
+        // a producer's enqueue can be observed before the matching consumer's
+        // dequeue, transiently reading one past capacity. The ring is truly
+        // bounded (a push is rejected when full), so clamp the reported value.
+        return occ < cap ? occ : cap;
     }
 
     bool empty() const { return occupancy() == 0; }

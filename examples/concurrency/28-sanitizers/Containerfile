@@ -1,0 +1,135 @@
+# concurrency/28-sanitizers — the same data race caught two independent
+# ways (ThreadSanitizer vs. Valgrind Helgrind), plus a real heap-use-
+# after-free caught by AddressSanitizer.
+#
+# Builds two programs, four binaries:
+#   racy_counter_plain   racy_counter.cpp, built normally -- the binary
+#                        Helgrind runs against (Valgrind needs no rebuild
+#                        or compiler cooperation at all, just debug info).
+#   racy_counter_tsan    the SAME source, rebuilt with -fsanitize=thread.
+#                        Best-effort (see 27-debugging-races-deadlocks):
+#                        this UBI10 image may or may not carry a working
+#                        ThreadSanitizer runtime (libtsan).
+#   detached_uaf_plain   detached_uaf.cpp, built normally.
+#   detached_uaf_asan    the SAME source, rebuilt with -fsanitize=address.
+#                        Best-effort for the same reason as the TSan leg,
+#                        though AddressSanitizer's runtime (libasan) is
+#                        more consistently available than libtsan's.
+#
+# UNLIKE 20-mechanical-sympathy's runtime stage, this one is the FULL
+# ubi10/ubi image, not ubi-minimal: Valgrind needs a real userspace
+# (translation caches, standard libc layout) well beyond ubi-minimal's
+# microdnf package set, and every binary here keeps its debug info so
+# Helgrind and ASan can both name a source line -- nothing in this
+# directory is ever stripped. gdb is intentionally NOT installed in this
+# image: this chapter's verify.lua never attaches a debugger (that's
+# 27-debugging-races-deadlocks' job) -- see this project's scope-
+# discipline convention against shipping tooling a demo doesn't use.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+# ThreadSanitizer's and AddressSanitizer's runtimes (libtsan, libasan) are
+# separate packages from the base gcc/gcc-c++ install and aren't guaranteed
+# present in every UBI10 repo set/arch combination. Best-effort, non-fatal:
+# if either install fails, the matching -fsanitize= build attempt below
+# fails too (no -ltsan/-lasan to link against) and is caught by that step's
+# own SOFT-skip guard.
+RUN (dnf install -y --quiet --setopt=install_weak_deps=False libtsan libasan \
+        && dnf clean all && rm -rf /var/cache/dnf/*) \
+    || echo "libtsan/libasan not fully available from this UBI10 repo set -- affected leg(s) will SOFT-skip"
+
+RUN pip install --quiet "conan~=2.0"
+
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+# ── plain leg (always built: racy_counter_plain + detached_uaf_plain) ────
+RUN cmake -S . -B build/plain -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build/plain -j"$(nproc)"
+# Deliberately NOT stripped: Helgrind needs racy_counter_plain's symbols to
+# name a source line in its report.
+
+# ── TSan leg (best-effort: only racy_counter needs it) ────────────────────
+RUN (cmake -S . -B build/tsan -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-fsanitize=thread" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=thread" \
+            -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+        && cmake --build build/tsan --target racy_counter -j"$(nproc)") \
+    || echo "racy_counter TSan leg failed to build in this image -- SOFT skip"
+
+# ── ASan leg (best-effort: only detached_uaf needs it) ────────────────────
+RUN (cmake -S . -B build/asan -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address" \
+            -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+        && cmake --build build/asan --target detached_uaf -j"$(nproc)") \
+    || echo "detached_uaf ASan leg failed to build in this image -- SOFT skip"
+
+# Guarantee every expected binary path exists either way, so the runtime
+# stage's COPY instructions never fail: any leg that didn't produce a real
+# binary above gets a placeholder that prints an UNAVAILABLE marker and
+# exits 3. verify.lua treats that marker as a SOFT skip, not a crash --
+# same convention as 27-debugging-races-deadlocks and
+# 34-appendix-build-and-toolchain.
+RUN mkdir -p build/tsan build/asan && \
+    if [ ! -x build/tsan/racy_counter ]; then \
+        printf '#!/bin/sh\necho "UNAVAILABLE: racy_counter TSan leg not built in this image"\nexit 3\n' \
+            > build/tsan/racy_counter && chmod +x build/tsan/racy_counter; \
+    fi && \
+    if [ ! -x build/asan/detached_uaf ]; then \
+        printf '#!/bin/sh\necho "UNAVAILABLE: detached_uaf ASan leg not built in this image"\nexit 3\n' \
+            > build/asan/detached_uaf && chmod +x build/asan/detached_uaf; \
+    fi
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — the FULL ubi10/ubi image (not ubi-minimal): Valgrind needs a
+# real userspace, and Helgrind/ASan both need the binaries' debug info
+# intact to name a source line.
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS runtime
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        valgrind \
+        lua \
+        libtsan \
+        libasan \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+WORKDIR /demo
+COPY --from=builder /src/build/plain/racy_counter   /usr/local/bin/racy_counter_plain
+COPY --from=builder /src/build/tsan/racy_counter    /usr/local/bin/racy_counter_tsan
+COPY --from=builder /src/build/plain/detached_uaf   /usr/local/bin/detached_uaf_plain
+COPY --from=builder /src/build/asan/detached_uaf    /usr/local/bin/detached_uaf_asan
+COPY verify.lua ./verify.lua
+
+ENV RACY_COUNTER_PLAIN_BIN=/usr/local/bin/racy_counter_plain
+ENV RACY_COUNTER_TSAN_BIN=/usr/local/bin/racy_counter_tsan
+ENV DETACHED_UAF_PLAIN_BIN=/usr/local/bin/detached_uaf_plain
+ENV DETACHED_UAF_ASAN_BIN=/usr/local/bin/detached_uaf_asan
+
+# No service, no ports: four batch binaries plus their Lua assertion
+# harness, which itself shells out to `valgrind --tool=helgrind`.
+CMD ["lua", "verify.lua"]

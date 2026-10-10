@@ -1,0 +1,16 @@
+# concurrency/27-debugging-races-deadlocks Conan recipe (Conan 2.x).
+#
+# Same pattern as 20-mechanical-sympathy: one dependency, fmt, used only
+# for output formatting. The substance of both programs in this demo
+# (jthread, atomics, mutex, latch, scoped_lock) is pure standard library --
+# fmt carries no load in the bugs themselves.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

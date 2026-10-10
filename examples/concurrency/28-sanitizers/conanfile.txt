@@ -1,0 +1,15 @@
+# concurrency/28-sanitizers Conan recipe (Conan 2.x).
+#
+# Same pattern as 20-mechanical-sympathy and 27-debugging-races-deadlocks:
+# one dependency, fmt, used only for output formatting. The substance of
+# both programs (jthread, atomics, shared_ptr) is pure standard library.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

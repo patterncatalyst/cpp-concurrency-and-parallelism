@@ -1,0 +1,126 @@
+# concurrency/27-debugging-races-deadlocks — a real data race (caught by
+# ThreadSanitizer) and a real, forced AB/BA deadlock (caught live by gdb).
+#
+# Builds two programs, three binaries:
+#   racy_counter_plain   racy_counter.cpp, built normally. --mode racy|fixed.
+#   racy_counter_tsan    the SAME source, rebuilt with -fsanitize=thread.
+#                        Best-effort: this UBI10 image may or may not carry
+#                        a working ThreadSanitizer runtime (libtsan). If the
+#                        build fails, the runtime stage still gets a
+#                        placeholder binary (see below) and verify.lua
+#                        reports a SOFT skip rather than failing the demo.
+#   ab_ba_deadlock       --mode deadlock forces a real AB/BA deadlock with a
+#                        std::latch; --mode fixed is the identical pattern
+#                        via std::scoped_lock.
+#
+# UNLIKE 20-mechanical-sympathy, this demo's runtime stage is the FULL
+# ubi10/ubi image, not ubi-minimal, and nothing here is ever stripped:
+# gdb needs a real debugger-capable userspace (dynamic linker, terminfo,
+# standard libc layout) well beyond what ubi-minimal's microdnf package
+# set provides, and both gdb and ThreadSanitizer need their target's debug
+# symbols intact to name a frame or a source line at all. Lua 5.4 (this
+# project's verify.lua interpreter) is installed here for the same reason
+# every sibling example installs it. Valgrind is intentionally NOT
+# installed in this image: this chapter's verify.lua never runs it (that's
+# the sibling 28-sanitizers image's job, which builds the identical
+# racy_counter.cpp shape and runs it under valgrind --tool=helgrind) --
+# see this project's scope-discipline convention against shipping tooling
+# a demo doesn't use.
+#
+# gdb attaching to an already-running process needs ptrace(2) permission,
+# which a container does NOT have by default -- see this directory's
+# demo.sh for the --cap-add=SYS_PTRACE / --security-opt seccomp=unconfined
+# this image must be RUN with (not something the image itself can grant).
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+# ThreadSanitizer's runtime (libtsan) is a separate package from the base
+# gcc/gcc-c++ install and is not guaranteed to be present in every UBI10
+# repo set/arch combination. Best-effort, non-fatal: if this install fails,
+# the -fsanitize=thread build attempt below fails too (no -ltsan to link
+# against) and is caught by that step's own SOFT-skip guard.
+RUN (dnf install -y --quiet --setopt=install_weak_deps=False libtsan \
+        && dnf clean all && rm -rf /var/cache/dnf/*) \
+    || echo "libtsan not available from this UBI10 repo set -- TSan leg will SOFT-skip"
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern
+# 20-mechanical-sympathy and 06-lock-ordering also use).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+# ── plain leg (always built: racy_counter_plain + ab_ba_deadlock) ─────────
+RUN cmake -S . -B build/plain -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build/plain -j"$(nproc)"
+# Deliberately NOT stripped (see header comment): gdb needs ab_ba_deadlock's
+# symbols to name a frame, and racy_counter_plain is run only for its
+# informational (non-asserted) plain-build output -- stripping it would
+# buy nothing either way.
+
+# ── TSan leg (best-effort: only racy_counter needs it) ────────────────────
+RUN (cmake -S . -B build/tsan -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-fsanitize=thread" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=thread" \
+            -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+        && cmake --build build/tsan --target racy_counter -j"$(nproc)") \
+    || echo "racy_counter TSan leg failed to build in this image -- SOFT skip"
+
+# Guarantee the expected binary path exists either way, so the runtime
+# stage's COPY never fails: a leg that didn't produce a real binary above
+# gets a placeholder that prints an UNAVAILABLE marker and exits 3.
+# verify.lua treats that marker as a SOFT skip, not a crash.
+RUN mkdir -p build/tsan && \
+    if [ ! -x build/tsan/racy_counter ]; then \
+        printf '#!/bin/sh\necho "UNAVAILABLE: racy_counter TSan leg not built in this image"\nexit 3\n' \
+            > build/tsan/racy_counter && chmod +x build/tsan/racy_counter; \
+    fi
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — the FULL ubi10/ubi image (not ubi-minimal): gdb needs a real
+# userspace, and both gdb and TSan need the binaries' debug info intact.
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS runtime
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gdb \
+        lua \
+        libtsan \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+WORKDIR /demo
+COPY --from=builder /src/build/plain/racy_counter   /usr/local/bin/racy_counter_plain
+COPY --from=builder /src/build/tsan/racy_counter    /usr/local/bin/racy_counter_tsan
+COPY --from=builder /src/build/plain/ab_ba_deadlock /usr/local/bin/ab_ba_deadlock
+COPY verify.lua ./verify.lua
+
+ENV RACY_COUNTER_PLAIN_BIN=/usr/local/bin/racy_counter_plain
+ENV RACY_COUNTER_TSAN_BIN=/usr/local/bin/racy_counter_tsan
+ENV AB_BA_DEADLOCK_BIN=/usr/local/bin/ab_ba_deadlock
+
+# No service, no ports: three batch binaries plus their Lua assertion
+# harness, which itself shells out to `gdb -p <pid>` and `timeout`.
+CMD ["lua", "verify.lua"]

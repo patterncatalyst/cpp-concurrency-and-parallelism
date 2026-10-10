@@ -1,0 +1,75 @@
+# concurrency/02-machine-underneath — cache-hierarchy latency probe.
+#
+# Builds one binary:
+#   cache_latency   single-threaded pointer-chase benchmark; walks a
+#                   random single-cycle permutation over increasing
+#                   working-set sizes (L1 -> L2 -> L2/L3 -> L3 -> DRAM)
+#                   and reports the minimum observed ns/access at each.
+#
+# Same Conan + CMakeDeps/CMakeToolchain pattern the 20-mechanical-sympathy
+# example establishes (one dependency, fmt, for output formatting only).
+#
+# The runtime stage also installs Lua 5.4: verify.lua is this project's
+# assertion harness and runs IN the container, against the binary it
+# ships, so the same image that proves the build also proves the behavior.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern the
+# sibling 20-mechanical-sympathy example also uses).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/cache_latency
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. This stage installs only base runtime libs (no dnf plugin
+# needed), so turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/cache_latency /usr/local/bin/cache_latency
+COPY verify.lua ./verify.lua
+
+ENV CACHE_LATENCY_BIN=/usr/local/bin/cache_latency
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run cache_latency directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

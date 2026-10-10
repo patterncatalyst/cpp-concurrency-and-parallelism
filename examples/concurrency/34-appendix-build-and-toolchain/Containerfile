@@ -1,0 +1,161 @@
+# concurrency/34-appendix-build-and-toolchain — the appendix's own
+# reference slice of the book's build harness.
+#
+# The full appendix describes five CMake presets (clang-debug, clang-asan,
+# clang-tsan, clang-release, gcc-parity -- shipped as CMakePresets.json in
+# this directory for reference) run against every example in the book,
+# plus a GCC/clang parity check. A single minimal runtime container can't
+# easily run all five -- clang, the sanitizer runtimes, and the full
+# preset matrix are more than this slice needs to make its point -- so
+# this Containerfile builds a REDUCED but REAL representative slice of
+# the same program against the same CMakeLists.txt:
+#
+#   shared_counter (g++)        -- always built; the "gcc-parity" leg,
+#                                   and the one HARD requirement: it must
+#                                   build, run, and produce the correct
+#                                   count.
+#   shared_counter (clang++)    -- best-effort: this UBI10 image may or
+#                                   may not carry a clang package. If it
+#                                   does, its (non-racy) output is
+#                                   compared byte-for-byte against the
+#                                   g++ build -- the chapter's "parity"
+#                                   claim, checked directly. If clang
+#                                   isn't available, the build degrades to
+#                                   a placeholder and verify.lua reports a
+#                                   SOFT skip rather than failing.
+#   shared_counter (clang++,    -- best-effort: same availability caveat,
+#     -fsanitize=thread)           plus ThreadSanitizer's runtime must
+#                                   actually initialize inside this
+#                                   container. If it does, verify.lua
+#                                   hard-asserts the race is flagged ONLY
+#                                   behind --inject-race. If TSan can't
+#                                   run here, SOFT skip.
+#
+# Whichever legs are unavailable in this particular build still leave a
+# placeholder binary at the expected path (never missing a COPY source),
+# so the runtime image always builds; verify.lua tells real absence
+# apart from a real result by checking for the placeholder's own
+# "UNAVAILABLE" marker.
+#
+# Same Conan + CMakeDeps/CMakeToolchain pattern 20-mechanical-sympathy
+# establishes, extended here to also generate and ship conan.lock --
+# the lockfile workflow this appendix documents.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+# clang is best-effort: this book's examples build primarily with gcc in
+# CI (see 20-mechanical-sympathy and every sibling example), and this
+# UBI10 repo set may or may not carry a clang package or a working
+# ThreadSanitizer runtime. A failed install here must not fail the whole
+# image -- the clang-release/clang-tsan legs below check `command -v
+# clang++` themselves and degrade to a documented SOFT skip.
+RUN (dnf install -y --quiet --setopt=install_weak_deps=False clang \
+        && dnf clean all && rm -rf /var/cache/dnf/*) \
+    || echo "clang not available from this UBI10 repo set -- clang/tsan legs will SOFT-skip"
+
+RUN pip install --quiet "conan~=2.0"
+
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+
+# The lockfile workflow this appendix documents, generated at image-build
+# time (this repo doesn't commit a conan.lock, since the exact resolved
+# graph depends on when the image is built) and shipped into the runtime
+# image so verify.lua can confirm it pins the version conanfile.txt asked
+# for.
+RUN conan lock create conanfile.txt --lockfile-out=conan.lock
+RUN conan install conanfile.txt --lockfile=conan.lock \
+        --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt CMakePresets.json ./
+COPY src/ ./src/
+
+# ── gcc-parity leg (always built: the one hard requirement) ───────────
+RUN cmake -S . -B build/gcc -G Ninja \
+        -DCMAKE_CXX_COMPILER=g++ \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build/gcc -j"$(nproc)" \
+    && strip --strip-all build/gcc/shared_counter
+
+# ── clang-release + clang-tsan legs (best-effort) ──────────────────────
+RUN if command -v clang++ >/dev/null 2>&1; then \
+        echo "clang++ found -- attempting clang-release leg"; \
+        (cmake -S . -B build/clang -G Ninja \
+                -DCMAKE_CXX_COMPILER=clang++ \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_CXX_FLAGS="-O2 -fno-omit-frame-pointer" \
+                -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+            && cmake --build build/clang -j"$(nproc)" \
+            && strip --strip-all build/clang/shared_counter) \
+        || echo "clang-release leg failed to build -- SOFT skip"; \
+        echo "attempting clang-tsan leg"; \
+        (cmake -S . -B build/tsan -G Ninja \
+                -DCMAKE_CXX_COMPILER=clang++ \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_CXX_FLAGS="-fsanitize=thread -fno-omit-frame-pointer" \
+                -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=thread" \
+                -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+            && cmake --build build/tsan -j"$(nproc)") \
+        || echo "clang-tsan leg failed to build -- SOFT skip"; \
+    else \
+        echo "clang++ not available in this image -- clang-release/clang-tsan legs SOFT-skip"; \
+    fi
+
+# Guarantee every expected binary path exists so the runtime stage's COPY
+# instructions never fail: any leg that didn't produce a real binary
+# above gets a tiny placeholder script that prints an UNAVAILABLE marker
+# and exits nonzero. verify.lua treats that marker as a SOFT skip, not a
+# crash or a hard failure.
+RUN mkdir -p build/clang build/tsan && \
+    if [ ! -x build/clang/shared_counter ]; then \
+        printf '#!/bin/sh\necho "UNAVAILABLE: clang-release leg not built in this image"\nexit 3\n' \
+            > build/clang/shared_counter && chmod +x build/clang/shared_counter; \
+    fi && \
+    if [ ! -x build/tsan/shared_counter ]; then \
+        printf '#!/bin/sh\necho "UNAVAILABLE: clang-tsan leg not built in this image"\nexit 3\n' \
+            > build/tsan/shared_counter && chmod +x build/tsan/shared_counter; \
+    fi
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/gcc/shared_counter   /usr/local/bin/shared_counter_gcc
+COPY --from=builder /src/build/clang/shared_counter /usr/local/bin/shared_counter_clang
+COPY --from=builder /src/build/tsan/shared_counter  /usr/local/bin/shared_counter_tsan
+COPY --from=builder /src/conanfile.txt /demo/conanfile.txt
+COPY --from=builder /src/conan.lock    /demo/conan.lock
+COPY verify.lua ./verify.lua
+
+ENV SHARED_COUNTER_GCC_BIN=/usr/local/bin/shared_counter_gcc
+ENV SHARED_COUNTER_CLANG_BIN=/usr/local/bin/shared_counter_clang
+ENV SHARED_COUNTER_TSAN_BIN=/usr/local/bin/shared_counter_tsan
+ENV CONAN_LOCK_FILE=/demo/conan.lock
+
+# No service, no ports: three batch binaries (one guaranteed, two
+# best-effort) plus their Lua assertion harness.
+CMD ["lua", "verify.lua"]

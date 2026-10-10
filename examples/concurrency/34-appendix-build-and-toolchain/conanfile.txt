@@ -1,0 +1,20 @@
+# concurrency/34-appendix-build-and-toolchain Conan recipe (Conan 2.x).
+#
+# One pinned dependency (fmt), the same pattern 20-mechanical-sympathy
+# establishes -- used here to demonstrate the lockfile workflow this
+# appendix documents ("conan lock create" / "conan install --lockfile=")
+# end to end, not because shared_counter.cpp needs anything beyond
+# <atomic> and <thread>. The Containerfile generates conan.lock from this
+# file at image-build time and ships it into the runtime image so
+# verify.lua can confirm the resolved lock pins the exact version
+# requested here.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

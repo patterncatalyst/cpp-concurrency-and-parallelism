@@ -1,0 +1,49 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "clang-debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/clang-debug",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_STANDARD": "20",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "clang-asan",
+      "inherits": "clang-debug",
+      "binaryDir": "${sourceDir}/build/clang-asan",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined"
+      }
+    },
+    {
+      "name": "clang-tsan",
+      "inherits": "clang-debug",
+      "binaryDir": "${sourceDir}/build/clang-tsan",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-fsanitize=thread -fno-omit-frame-pointer",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=thread"
+      }
+    },
+    {
+      "name": "clang-release",
+      "inherits": "clang-debug",
+      "binaryDir": "${sourceDir}/build/clang-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_FLAGS": "-O2 -fno-omit-frame-pointer"
+      }
+    },
+    {
+      "name": "gcc-parity",
+      "inherits": "clang-release",
+      "binaryDir": "${sourceDir}/build/gcc-parity",
+      "cacheVariables": { "CMAKE_CXX_COMPILER": "g++" }
+    }
+  ]
+}

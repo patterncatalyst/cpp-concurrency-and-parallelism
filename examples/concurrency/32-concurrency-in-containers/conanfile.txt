@@ -1,0 +1,17 @@
+# concurrency/32-concurrency-in-containers Conan recipe (Conan 2.x).
+#
+# One dependency (fmt), the same pattern 20-mechanical-sympathy and
+# 18-benchmarking-without-deception establish: fmt is used only for
+# output formatting. The substance of this example -- reading
+# /sys/fs/cgroup/cpu.max, sched_getaffinity, and a small CPU-bound
+# pool-bench -- is pure standard library plus <sched.h>.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

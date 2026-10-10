@@ -1,0 +1,81 @@
+# concurrency/32-concurrency-in-containers — cgroup-probe + pool-bench.
+#
+# Builds one binary:
+#   cgroup_probe   reads /sys/fs/cgroup/cpu.max (cgroup v2 CPU quota),
+#                  compares it against std::thread::hardware_concurrency(),
+#                  derives a pool size from the tighter of the quota and
+#                  the cpuset-visible core count, and runs a small
+#                  CPU-bound pool-bench at that size.
+#
+# Same Conan + CMakeDeps/CMakeToolchain pattern 20-mechanical-sympathy
+# establishes, and the same Lua 5.4 runtime-verification pattern: verify.lua
+# ships in the runtime image and runs against the binary that same image
+# built.
+#
+# Under a plain `docker run` (no --cpus/--cpuset-cpus), cpu.max reads
+# "max" -- this is the fallback/unlimited path verify.lua asserts as a
+# hard requirement. See README.md for running the image with --cpus=N to
+# observe the quota path instead.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern
+# 20-mechanical-sympathy establishes: deps at gnu17, our code at the
+# standard the chapter is actually teaching).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/cgroup_probe
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. This stage installs only base runtime libs (no dnf plugin
+# needed), so turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/cgroup_probe /usr/local/bin/cgroup_probe
+COPY verify.lua ./verify.lua
+
+ENV CGROUP_PROBE_BIN=/usr/local/bin/cgroup_probe
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run cgroup_probe directly for ad hoc inspection (e.g.
+# `docker run --rm --cpus=1 <image> cgroup_probe` to see the quota path).
+CMD ["lua", "verify.lua"]

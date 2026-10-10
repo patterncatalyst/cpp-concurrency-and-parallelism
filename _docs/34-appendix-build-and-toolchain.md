@@ -3,7 +3,7 @@ title: "Appendix: Build and Toolchain"
 order: 34
 layout: tutorial
 sectionid: docs
-part: Appendix
+part: appendix
 description: "The project's build and verification toolchain: clang and gdb, CMake presets, Conan lockfiles, the Lua verify.lua harness, and GCC/clang parity checks."
 duration: "14 min"
 ---

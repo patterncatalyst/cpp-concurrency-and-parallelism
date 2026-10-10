@@ -32,8 +32,11 @@ services:
   lgtm:
     image: docker.io/grafana/otel-lgtm:0.36.0
     mem_limit: 2g
+    # The grafana/otel-lgtm image (RHEL 9 based) ships curl, not wget, so the
+    # healthcheck probes Grafana's health endpoint with curl. -sf makes curl
+    # exit non-zero on an HTTP error, which is what a healthcheck needs.
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      test: ["CMD", "curl", "-sf", "http://localhost:3000/api/health"]
       interval: 5s
       timeout: 3s
       retries: 30

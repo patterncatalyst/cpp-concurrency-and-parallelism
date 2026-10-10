@@ -11,6 +11,20 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_compile_options(-O2)
 
+# The static opentelemetry-cpp archives reference each other circularly: the
+# OTLP recordable/exporter archives reference symbols defined in
+# libopentelemetry_common.a (e.g. opentelemetry::sdk::common::Base64Escape)
+# and common references symbols back in the exporter set. A single-pass link
+# cannot satisfy that from any one ordering. Conan exposes each component as an
+# INTERFACE target (so CMake's $<LINK_GROUP:RESCAN,...> does not apply), so we
+# wrap the whole link line in -Wl,--start-group/--end-group via the link
+# command itself and let the linker rescan until no new symbols resolve. This
+# is the identical fix the gRPC example (25) uses for the grpc/protobuf/abseil
+# trio.
+set(CMAKE_CXX_LINK_EXECUTABLE
+    "<CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> \
+     <OBJECTS> -o <TARGET> -Wl,--start-group <LINK_LIBRARIES> -Wl,--end-group")
+
 find_package(fmt REQUIRED)
 find_package(Threads REQUIRED)
 find_package(opentelemetry-cpp REQUIRED)
@@ -20,7 +34,8 @@ add_executable(instrumented_pool src/instrumented_pool.cpp)
 # Component names match opentelemetry-cpp's Conan package_info() exactly
 # (one CMake target per library); CMakeDeps resolves the transitive deps
 # each component declares (libcurl, openssl, protobuf, abseil, nlohmann_json)
-# automatically -- nothing else needs to be linked explicitly here.
+# automatically. The --start-group wrapper set above resolves the circular
+# references among these static archives.
 target_link_libraries(instrumented_pool PRIVATE
     opentelemetry-cpp::opentelemetry_trace
     opentelemetry-cpp::opentelemetry_metrics

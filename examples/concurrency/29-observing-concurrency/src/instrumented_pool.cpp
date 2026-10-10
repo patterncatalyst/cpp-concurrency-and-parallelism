@@ -193,6 +193,20 @@ void shutdown_telemetry(Telemetry& t) {
         ->ForceFlush(std::chrono::seconds(5));
     static_cast<trace_sdk::TracerProvider*>(t.tracer_provider.get())->Shutdown();
     static_cast<metrics_sdk::MeterProvider*>(t.meter_provider.get())->Shutdown();
+
+    // Clear the global providers BEFORE main returns. opentelemetry's global
+    // Provider holds a static nostd::shared_ptr to each SDK provider; if we
+    // leave it set, that static is destroyed during exit()'s static-destruction
+    // phase -- after libc/curl/abseil global state the provider's teardown
+    // depends on may already be gone, which segfaults in
+    // MeterContext::Shutdown(). Resetting them here drops the global's ref so
+    // the SDK providers are destroyed while the process is still fully alive
+    // (the local Telemetry still holds a ref until this function's caller
+    // returns). This is what opentelemetry-cpp's own OTLP examples do.
+    trace_api::Provider::SetTracerProvider(
+        std::shared_ptr<trace_api::TracerProvider>{});
+    metrics_api::Provider::SetMeterProvider(
+        std::shared_ptr<metrics_api::MeterProvider>{});
 }
 
 // ───────────────────────────── instrumented pool ────────────────────────

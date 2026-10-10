@@ -1,0 +1,20 @@
+# concurrency/33-capstone-ingest-match-publish Conan recipe (Conan 2.x).
+#
+# Same single dependency as every other example in this project: fmt, for
+# output formatting only. The capstone integrates the book's concurrency
+# and lock-free messaging patterns, but deliberately stays achievable as
+# one container build -- it does not pull in gRPC, Boost.Beast, or an OTel
+# SDK just because the chapter text mentions where those would plug in for
+# a production deployment. Ingest/match/publish are all pure standard
+# library (threads, atomics); the order book, the rings, and the matching
+# logic have no dependency beyond libstdc++.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

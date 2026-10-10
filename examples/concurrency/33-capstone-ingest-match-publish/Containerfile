@@ -1,0 +1,77 @@
+# concurrency/33-capstone-ingest-match-publish — the book's capstone
+# pipeline: ingest -> match -> publish, in one process, one container.
+#
+# Builds one binary:
+#   capstone_pipeline   several ingest threads generate NEW/CANCEL order
+#                       messages (a simulated feed -- no real gRPC/REST
+#                       server, keeping this a one-container build), hand
+#                       them off over a bounded lock-free ring to a single
+#                       pinned matching thread running a zero-per-order-
+#                       allocation price-time-priority order book, which
+#                       hands outcomes off over a second ring to a small
+#                       publish thread pool. Prints one EVENT line per
+#                       accepted order and a final SUMMARY line with
+#                       p50/p99/p99.9 end-to-end latency.
+#
+# Same Conan + CMakeDeps/CMakeToolchain pattern 20-mechanical-sympathy
+# establishes (fmt, for output formatting only) -- this example does not
+# add gRPC, REST, or an OTel SDK dependency; see the README for how the
+# chapters that use those map onto this simplified, single-process build.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern
+# 20-mechanical-sympathy establishes: deps at gnu17, our code at the
+# standard the chapter is actually teaching).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/capstone_pipeline
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/capstone_pipeline /usr/local/bin/capstone_pipeline
+COPY verify.lua ./verify.lua
+
+ENV CAPSTONE_PIPELINE_BIN=/usr/local/bin/capstone_pipeline
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run capstone_pipeline directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

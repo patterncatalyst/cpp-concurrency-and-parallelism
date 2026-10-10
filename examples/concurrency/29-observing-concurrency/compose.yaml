@@ -1,0 +1,80 @@
+# concurrency/29-observing-concurrency — service + LGTM stack.
+#
+# Two always-on pieces plus one on-demand verifier:
+#
+#   lgtm       grafana/otel-lgtm: Grafana + Tempo + Mimir + Loki + an
+#              embedded OTel Collector, all in one image. The service sends
+#              OTLP/HTTP straight to this collector (lgtm:4318) -- the
+#              simplest of the two topologies lgtm-docker-stack documents,
+#              chosen over a standalone Collector in front of separate
+#              Tempo/Mimir containers to keep this, the series' most
+#              complex demo, to the fewest moving parts that still prove
+#              the point.
+#   service    the instrumented thread pool (see src/instrumented_pool.cpp).
+#              Not a server: it drives its own workload on startup, flushes
+#              its telemetry, and exits. Nothing depends on it being
+#              "healthy" in the usual sense -- demo.sh waits for the
+#              container to EXIT, then checks its exit code.
+#   verifier   profile-gated (`verify`) so a plain `docker compose up -d`
+#              never starts it. demo.sh runs it explicitly with
+#              `docker compose run --rm verifier` once the service has
+#              finished and had a moment to let its telemetry land.
+#
+# No ports are published to the host: the verifier queries Tempo and the
+# Prometheus-compatible API in front of Mimir from INSIDE the compose
+# network (service-name DNS: http://lgtm:3200, http://lgtm:9090), so there
+# is nothing for a host port mapping to do here. If you want to poke around
+# in Grafana while this is running, add `ports: ["3000:3000"]` under `lgtm`
+# yourself -- deliberately left out of the default so this demo never
+# collides with a port some other project's stack is already holding.
+
+services:
+  lgtm:
+    image: docker.io/grafana/otel-lgtm:0.36.0
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
+
+  service:
+    build:
+      context: .
+      dockerfile: Containerfile
+      target: runtime
+    depends_on:
+      lgtm:
+        condition: service_healthy
+    mem_limit: 256m
+    environment:
+      - OTEL_SERVICE_NAME=observing-concurrency-service
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://lgtm:4318
+      - OBS_WORKERS=2
+      - OBS_REQUESTS=24
+      - OBS_TASKS_PER_REQUEST=3
+      - OBS_TASK_WORK_MS=60
+
+  verifier:
+    build:
+      context: .
+      dockerfile: Containerfile
+      target: verify
+    depends_on:
+      lgtm:
+        condition: service_healthy
+    mem_limit: 128m
+    environment:
+      - TEMPO_URL=http://lgtm:3200
+      - PROM_URL=http://lgtm:9090
+      - OTEL_SERVICE_NAME=observing-concurrency-service
+      - OBS_REQUESTS=24
+      - OBS_TASKS_PER_REQUEST=3
+      - VERIFY_TIMEOUT_S=90
+      - VERIFY_POLL_INTERVAL_S=3
+    profiles: ["verify"]
+
+networks:
+  default:
+    name: observing-concurrency

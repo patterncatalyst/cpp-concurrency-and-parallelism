@@ -1,0 +1,98 @@
+# concurrency/29-observing-concurrency — instrumented thread pool + LGTM stack.
+#
+# Three independent stages, selected via `--target` in compose.yaml:
+#
+#   builder   compiles instrumented_pool against opentelemetry-cpp (OTLP/HTTP
+#             only) + fmt, via Conan + CMake -- same two-layer cppstd pattern
+#             as 20-mechanical-sympathy (deps at gnu17, this project's own
+#             code at C++20).
+#   runtime   the service: ubi-minimal + libstdc++ only. Every Conan
+#             dependency is built static (see conanfile.txt), so the
+#             runtime image needs no libcurl/openssl/protobuf shared
+#             libraries at all.
+#   verify    the verifier: ubi-minimal + lua + curl, running verify.lua
+#             against Tempo and the Prometheus-compatible API in front of
+#             Mimir. Does not depend on the builder stage -- BuildKit builds
+#             it in parallel with builder/runtime, not after.
+#
+# Conan build-risk (see README): opentelemetry-cpp's OTLP/HTTP path still
+# needs protobuf + abseil + libcurl + openssl, none of which Conan Center
+# reliably ships prebuilt binaries for against an arbitrary UBI10/gcc
+# profile -- expect `--build=missing` to compile most of that dependency
+# closure from source on a first build. Budget real time for it; it is not
+# a sign anything is wrong.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        git perl make which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (protobuf, abseil,
+# libcurl, openssl, opentelemetry-cpp itself). Our own target overrides to
+# C++20 in CMakeLists -- the same two-layer pattern 20-mechanical-sympathy
+# and the sibling statelessness tutorial both use.
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/instrumented_pool
+
+# ════════════════════════════════════════════════════════════════════════
+# runtime — the instrumented service. libstdc++ only: every Conan
+# dependency above is linked statically (conanfile.txt: *:shared=False).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /app
+COPY --from=builder /src/build/instrumented_pool /usr/local/bin/instrumented_pool
+
+ENV OTEL_SERVICE_NAME=observing-concurrency-service
+ENV OTEL_EXPORTER_OTLP_ENDPOINT=http://lgtm:4318
+
+# No HTTP port: this is a batch run, not a server. It drives its own
+# workload against the pool and exits; compose.yaml's `service` entry has
+# nothing to publish and nothing for other containers to call.
+CMD ["instrumented_pool"]
+
+# ════════════════════════════════════════════════════════════════════════
+# verify — the verifier. Independent of `builder`/`runtime`: BuildKit
+# builds this stage in parallel, not after the C++ compile.
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS verify
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        lua curl \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /verify
+COPY verify.lua ./verify.lua
+
+CMD ["lua", "verify.lua"]

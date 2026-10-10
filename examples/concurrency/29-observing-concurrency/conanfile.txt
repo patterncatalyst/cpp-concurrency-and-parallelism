@@ -1,0 +1,38 @@
+# concurrency/29-observing-concurrency Conan recipe (Conan 2.x).
+#
+# opentelemetry-cpp pulls in protobuf + grpc if the gRPC OTLP exporter is
+# enabled -- this example deliberately stays on OTLP/HTTP only
+# (with_otlp_grpc=False, the recipe's default) to keep the dependency tree
+# lighter: OTLP/HTTP still needs protobuf + opentelemetry-proto (the wire
+# format is protobuf either way) plus libcurl, openssl, nlohmann_json, and
+# abseil, but skips grpc and its own transitive closure entirely.
+#
+# with_zipkin / with_prometheus / with_elasticsearch are turned off
+# explicitly even though some default to off already upstream -- pinning
+# them here means a future opentelemetry-cpp release changing its defaults
+# doesn't silently pull in exporters this example never uses (notably
+# with_zipkin defaults to True upstream, adding an unused exporter + its
+# own nlohmann_json/libcurl use for no benefit here).
+#
+# fmt is used only for console output formatting, matching the convention
+# 20-mechanical-sympathy established for this project.
+
+[requires]
+opentelemetry-cpp/1.14.2
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+# Fully static linking keeps the runtime image to libstdc++ only -- no
+# libcurl.so/libssl.so version matching between the builder stage and the
+# ubi-minimal runtime stage to worry about.
+*:shared=False
+
+opentelemetry-cpp/*:with_otlp_http=True
+opentelemetry-cpp/*:with_otlp_grpc=False
+opentelemetry-cpp/*:with_zipkin=False
+opentelemetry-cpp/*:with_prometheus=False
+opentelemetry-cpp/*:with_elasticsearch=False

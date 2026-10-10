@@ -33,8 +33,15 @@ for name in "${names[@]}"; do
   echo "BUILD+VERIFY  $name"
   echo "============================================================"
   log="$RESULTS/$name.log"
-  ( cd "$dir" && DEMO_NO_PAUSE=1 ./demo.sh ) >"$log" 2>&1
+  # Hard ceiling so a hung demo (e.g. a pipeline deadlock) can never burn a
+  # core indefinitely or block the queue. Heavy Conan graphs (gRPC, OTel,
+  # Boost) can legitimately take a while to build, so the ceiling is generous.
+  DEMO_TIMEOUT="${DEMO_TIMEOUT:-2700}"
+  ( cd "$dir" && DEMO_NO_PAUSE=1 timeout --signal=KILL "$DEMO_TIMEOUT" ./demo.sh ) >"$log" 2>&1
   rc=$?
+  if [ "$rc" -eq 137 ]; then
+    echo "    (killed by ${DEMO_TIMEOUT}s timeout — treating as FAIL)" >>"$log"
+  fi
   if [ "$rc" -eq 0 ]; then
     echo "PASS $name"; pass+=("$name")
   else

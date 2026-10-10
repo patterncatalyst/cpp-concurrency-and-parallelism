@@ -700,7 +700,25 @@ int main(int argc, char** argv) {
 
     auto start = std::chrono::steady_clock::now();
 
-    // Start match first so it's ready to drain the instant ingest begins.
+    // Start the publish consumers FIRST so the publish ring is always being
+    // drained while the match stage pushes into it. The match stage does a
+    // BLOCKING push (it must never drop an already-accepted order's outcome),
+    // so with no consumer running yet it would spin forever on a full publish
+    // ring while main blocked on match_thread.join() — a deadlock. The
+    // consumers busy-poll an empty ring until match_done, so starting them
+    // early is safe.
+    std::vector<std::vector<PublishedLine>> publish_buffers(cfg.publish_threads);
+    std::vector<std::thread> publish_threads;
+    publish_threads.reserve(cfg.publish_threads);
+    for (std::uint64_t t = 0; t < cfg.publish_threads; ++t) {
+        publish_threads.emplace_back(publish_worker, std::ref(publish_ring),
+                                      std::ref(match_done), std::ref(publish_buffers[t]));
+        if (pin && cpus.size() > 1) {
+            pin_to_cpu(publish_threads.back(), cpus[(t % (cpus.size() - 1)) + 1]);
+        }
+    }
+
+    // Start match (drains the ingest ring, pushes outcomes to the publish ring).
     std::thread match_thread(match_worker, std::ref(engine), std::ref(ingest_ring),
                               std::ref(publish_ring), std::ref(producers_done),
                               std::ref(events_produced), std::ref(match_tid_out));
@@ -722,17 +740,6 @@ int main(int argc, char** argv) {
 
     match_thread.join();
     match_done.store(true, std::memory_order_release);
-
-    std::vector<std::vector<PublishedLine>> publish_buffers(cfg.publish_threads);
-    std::vector<std::thread> publish_threads;
-    publish_threads.reserve(cfg.publish_threads);
-    for (std::uint64_t t = 0; t < cfg.publish_threads; ++t) {
-        publish_threads.emplace_back(publish_worker, std::ref(publish_ring),
-                                      std::ref(match_done), std::ref(publish_buffers[t]));
-        if (pin && cpus.size() > 1) {
-            pin_to_cpu(publish_threads.back(), cpus[(t % (cpus.size() - 1)) + 1]);
-        }
-    }
     for (auto& t : publish_threads) t.join();
 
     auto end = std::chrono::steady_clock::now();

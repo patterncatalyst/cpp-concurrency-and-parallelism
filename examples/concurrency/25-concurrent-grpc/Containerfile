@@ -1,0 +1,113 @@
+# concurrency/25-concurrent-grpc — raw async CompletionQueue gRPC server,
+# bounded in-flight admission, under concurrent server-streaming load.
+#
+# Builds two binaries:
+#   async_server       the chapter's CallData pattern against
+#                       grpc::ServerCompletionQueue, with a bounded
+#                       in-flight cap (--cap) returning RESOURCE_EXHAUSTED
+#                       past it.
+#   concurrent_client   opens --calls simultaneous ServerStreamEcho RPCs.
+#
+# This is the heaviest Conan graph in the project: gRPC + protobuf +
+# abseil, plus everything gRPC's own recipe pulls in transitively
+# (c-ares, re2, zlib, OpenSSL/boringssl -- boringssl's build uses
+# perl-generated asm, hence the perl packages below). Expect a genuinely
+# long cold build: the sibling statelessness tutorial's 10-grpc-
+# microservices example (this project's verified reference for the same
+# trio+version combination) notes ~5 min cold against Conan's own
+# binaries where one is available for this profile; building the trio
+# fully from source, which --build=missing may do here if no matching
+# prebuilt binary exists for this exact UBI10/gcc/Conan-version
+# combination, is considerably slower than that. A warm Conan layer cache
+# makes every rebuild after the first fast again.
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build git python3-pip \
+        pkgconf-pkg-config \
+        perl-FindBin perl-IPC-Cmd perl-Data-Dumper perl-Pod-Html \
+        perl-Pod-Usage perl-File-Compare perl-File-Copy perl-File-Path \
+        perl-Time-Piece perl-Getopt-Long perl-Digest-SHA \
+        perl-threads perl-threads-shared perl-Thread-Queue \
+        perl-Term-ANSIColor \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+# Some of grpc's transitive Conan recipes bundle upstream CMakeLists that
+# declare a cmake_minimum_required() below what a current CMake accepts
+# outright; this policy floor is the same compatibility shim the
+# statelessness tutorial's gRPC example needs.
+ENV CMAKE_POLICY_VERSION_MINIMUM=3.5
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (grpc, protobuf,
+# and abseil all build fine at gnu17). Our own target overrides to C++20
+# in CMakeLists -- the two-layer pattern every sibling example in this
+# project uses: deps at gnu17, our code at the standard the chapter
+# actually teaches.
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.py ./
+# Static throughout (grpc/protobuf/abseil and everything they pull in
+# transitively): a static build needs nothing beyond libstdc++ in the
+# runtime stage, the same minimal-runtime shape every sibling example in
+# this project uses. --build=missing because this exact trio+version,
+# built against UBI10/gcc through Conan, has no guarantee of a matching
+# prebuilt binary.
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY proto/ ./proto/
+COPY src/   ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/async_server build/concurrent_client
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# Everything from Conan is statically linked above, so unlike
+# 01-execution-models' ldd/copy step for oneTBB's shared hwloc, there is
+# no /deps staging here at all.
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. This stage installs only base runtime libs (no dnf plugin
+# needed), so turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/async_server      /usr/local/bin/async_server
+COPY --from=builder /src/build/concurrent_client /usr/local/bin/concurrent_client
+COPY verify.lua ./verify.lua
+
+ENV ASYNC_SERVER_BIN=/usr/local/bin/async_server
+ENV CONCURRENT_CLIENT_BIN=/usr/local/bin/concurrent_client
+ENV ECHO_ADDR=127.0.0.1:50051
+
+# No EXPOSE: server and client both run INSIDE this one container, dialing
+# each other over loopback -- nothing outside the container ever connects.
+# CMD runs verify.lua, which starts async_server in the background, drives
+# concurrent_client against it through an under-cap and an over-cap phase,
+# then signals the server to drain and exit; the demo also allows
+# overriding the command to run either binary directly for ad hoc
+# inspection.
+CMD ["lua", "verify.lua"]

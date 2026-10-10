@@ -1,0 +1,35 @@
+// concurrency/25-concurrent-grpc — the chapter's companion service.
+//
+// The chapter's inline CallData example is a unary Echo RPC (CREATE ->
+// PROCESS -> FINISH, the simplest shape a completion queue drives). The
+// runnable demo narrows to ServerStreamEcho specifically, because that's
+// the RPC shape the chapter's own closing line calls for: "a runnable
+// companion ... builds the raw async server and completion-queue pattern
+// above against a server-streaming RPC under concurrent load." A unary
+// call completes in one round trip -- too fast to reliably hold many
+// concurrent callers open against a small in-flight cap. A stream's
+// longer, multi-event lifecycle (one CallData owns several live Write
+// tags in turn) is what makes the bounded-admission test meaningful.
+
+syntax = "proto3";
+
+package echo.v1;
+
+service Echo {
+  // Streams `repeat_count` EchoResponse messages back, each carrying the
+  // request's message plus a sequence number, then finishes OK -- unless
+  // the server's in-flight cap is already at capacity when the call is
+  // accepted, in which case it finishes immediately with
+  // RESOURCE_EXHAUSTED and streams nothing.
+  rpc ServerStreamEcho(EchoRequest) returns (stream EchoResponse);
+}
+
+message EchoRequest {
+  string message = 1;
+  int32 repeat_count = 2;
+}
+
+message EchoResponse {
+  string message = 1;
+  int32 sequence = 2;
+}

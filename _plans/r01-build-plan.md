@@ -5,6 +5,18 @@ order: 1
 
 # Build plan — `cpp-concurrency-and-parallelism`
 
+> **STATUS 2026-10-10:** Phases 0 (scaffold), 1 (TOC), and 2a–2d (all 34 chapters) are
+> DONE, each Opus-validated + repaired, committed on branch `docs/r01-scaffold`. Site builds
+> clean. Phase 3 (examples) IN PROGRESS: 12 demos built+verified green on real Docker
+> (ch1,3,4,5,6,7,8,9,10,15,18,20 — Conan+CMake+clang+UBI10+Lua verify.lua). Convention =
+> `examples/concurrency/NN-slug/` (src/, conanfile, CMakeLists, Containerfile, verify.lua,
+> demo.sh, README) + `scripts/test-concurrency-demo-NN.sh` + aggregator `scripts/verify-demos.sh`.
+> Builds run SEQUENTIALLY (shared Conan cache/Docker/ports). TBB demos: conanfile needs
+> `hwloc/*:shared=True` + Containerfile copies `.conan2` .so into runtime + LD_LIBRARY_PATH.
+> ubi-minimal has coreutils-single (timeout), not full coreutils. NEXT: build wave B
+> (ch2,14,17,21,32,34 authored), then wave C (ch11,12,13,24,25,27,28,29,33), then ch16 NUMA in
+> KVM lab. Snippet-only (no demo): ch19,22,23,26,30,31. Nothing pushed (Gate A pending).
+
 Approved via lgtm-relay (Opus plan → user review gate → execution). This file is the
 resume artifact: update the phase table as work lands. Iteration branches (`docs/rNN-*`),
 checkpoint commits, **never commit to `main`**.

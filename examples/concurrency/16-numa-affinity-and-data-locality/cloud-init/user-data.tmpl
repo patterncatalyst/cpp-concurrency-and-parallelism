@@ -1,0 +1,39 @@
+#cloud-config
+# Minimal cloud-init for the ch16 NUMA lab guest. Unlike the systems-programming
+# lab's full observation toolset, this guest needs only a C++ toolchain, Lua for
+# verify.lua, and libnuma -- just enough to build and run the NUMA benchmark.
+# Placeholders __HOSTNAME__ / __SSH_PUBKEY__ are filled by provision-numa-vm.sh.
+hostname: __HOSTNAME__
+fqdn: __HOSTNAME__.lab
+
+users:
+  - name: fedora
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: [wheel]
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - __SSH_PUBKEY__
+
+growpart:
+  mode: auto
+  devices: ['/']
+
+package_update: true
+packages:
+  - gcc
+  - gcc-c++
+  - cmake
+  - ninja-build
+  - lua
+  - numactl             # numactl --hardware, and the runtime libnuma
+  - numactl-devel       # numa.h / numaif.h / libnuma.so for the build
+  - git
+
+runcmd:
+  # Readiness stamp: demo.sh polls for this file to know cloud-init finished
+  # installing the toolchain, rather than guessing with a fixed sleep.
+  - [ bash, -c, "numactl --hardware > /var/log/lab-ready 2>&1 || echo 'numactl: MISSING' > /var/log/lab-ready" ]
+  - [ bash, -c, "echo CH16_LAB_READY >> /var/log/lab-ready" ]
+
+final_message: "ch16 numa lab guest __HOSTNAME__ is up after $UPTIME seconds"

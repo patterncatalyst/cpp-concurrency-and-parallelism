@@ -1,0 +1,79 @@
+# concurrency/20-mechanical-sympathy — false sharing vs. cache-line padding.
+#
+# Builds one binary:
+#   false_sharing   two threads, each incrementing its own atomic<uint64_t>
+#                   counter N times, pinned to separate CPUs; run with
+#                   --pad on|off to compare an unpadded (shared cache line)
+#                   layout against one padded with
+#                   alignas(std::hardware_destructive_interference_size).
+#
+# This is the project's first example to pull a Conan dependency (fmt, for
+# output formatting only) -- establishing the Conan + CMakeDeps/
+# CMakeToolchain pattern the rest of the tutorial's examples reuse.
+#
+# The runtime stage also installs Lua 5.4: verify.lua is this project's
+# assertion harness (in place of the bash-assert convention another sibling
+# project uses) and runs IN the container, against the binary it ships, so
+# the same image that proves the build also proves the behavior.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern the sibling
+# statelessness tutorial also uses: deps at gnu17, our code at the standard
+# the chapter is actually teaching).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/false_sharing
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. This stage installs only base runtime libs (no dnf plugin
+# needed), so turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/false_sharing /usr/local/bin/false_sharing
+COPY verify.lua ./verify.lua
+
+ENV FALSE_SHARING_BIN=/usr/local/bin/false_sharing
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run false_sharing directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

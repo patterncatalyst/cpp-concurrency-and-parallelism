@@ -59,7 +59,7 @@ local function run_once()
 
     local models = {}
     for model, distinct_cpus, max_inflight, interleaves in
-        output:gmatch("model=(%a+) distinct_cpus=(%d+) max_inflight=(%d+) interleaves=(%d+)") do
+        output:gmatch("model=([%a_]+) distinct_cpus=(%d+) max_inflight=(%d+) interleaves=(%d+)") do
         models[model] = {
             distinct_cpus = tonumber(distinct_cpus),
             max_inflight = tonumber(max_inflight),

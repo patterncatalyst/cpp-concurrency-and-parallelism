@@ -53,6 +53,12 @@ RUN cmake -S . -B build -G Ninja \
     && cmake --build build -j"$(nproc)" \
     && strip --strip-all build/execution_models
 
+# Stage the Conan-built shared libs the binary needs at runtime (hwloc is
+# shared per oneTBB's recipe). Copy only .conan2 libs — never system libc.
+RUN mkdir -p /deps && \
+    ldd build/execution_models | awk '/\.conan2/ {print $3}' \
+      | xargs -r -I{} cp -L {} /deps/ || true
+
 # ════════════════════════════════════════════════════════════════════════
 # Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
 # ════════════════════════════════════════════════════════════════════════
@@ -68,6 +74,10 @@ RUN microdnf install -y --setopt=install_weak_deps=0 \
         lua \
     && microdnf clean all \
     && rm -rf /var/cache/yum
+
+# Conan-built shared libs (libhwloc.so* pulled in via oneTBB) the binary links.
+COPY --from=builder /deps/ /usr/local/lib/
+ENV LD_LIBRARY_PATH=/usr/local/lib
 
 WORKDIR /demo
 COPY --from=builder /src/build/execution_models /usr/local/bin/execution_models

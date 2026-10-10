@@ -17,3 +17,5 @@ CMakeToolchain
 
 [options]
 onetbb/*:shared=False
+# oneTBB's recipe requires its hwloc dependency to be built shared.
+hwloc/*:shared=True

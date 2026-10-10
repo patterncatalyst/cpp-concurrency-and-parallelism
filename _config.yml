@@ -2,8 +2,8 @@
 title: "C++ Concurrency and Parallelism"
 description: >-
     A reference on concurrency and parallelism for low-latency,
-    high-throughput C++ services on Linux. C++20/23/26, runnable Docker
-    examples, and three companion decks.
+    high-throughput C++ services on Linux, across C++20, C++23, and
+    C++26, with runnable Docker examples.
 author: cpp-concurrency-and-parallelism contributors
 brand_emoji: "🧵"
 

@@ -711,9 +711,8 @@ pre code { background: transparent; padding: 0; color: inherit; font-size: .92em
 }
 
 /* ── multi-language code tabs (codetabs.js) ───────────────────────────── */
-/* Token names adapted from lsp's codetabs CSS to this site's variable
-   scheme (--rule/--fg-muted/--bg-card/--accent-soft/--t-fast etc. rather
-   than lsp's --border-strong/--ink-muted/--font-body/--transition). */
+/* Token names use this site's variable scheme
+   (--rule/--fg-muted/--bg-card/--accent-soft/--t-fast etc.). */
 .codetabs-wrap{ margin: 2rem 0; border: 1px solid var(--rule);
   border-radius: var(--radius); overflow: hidden; }
 .codetabs-bar{ display: flex; flex-wrap: wrap; background: var(--bg-soft);

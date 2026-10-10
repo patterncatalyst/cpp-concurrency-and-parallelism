@@ -1,14 +1,14 @@
-/* Multi-language code tabs for the Cloud-Native Design Patterns book.
+/* Multi-standard code tabs for the C++ Concurrency and Parallelism book.
  *
  * No framework, no plugin, GitHub-Pages-safe. For each <div class="codetabs">
  * marker emitted by _includes/codetabs.html, absorb the following N Rouge
  * code blocks (N = number of pipe-separated labels) into a tab group.
- * Selecting a language syncs every group on the page and is remembered in
- * localStorage so a reader who picks ".NET" keeps seeing .NET everywhere.
+ * Selecting a standard syncs every group on the page and is remembered in
+ * localStorage so a reader who picks "C++26" keeps seeing C++26 everywhere.
  */
 (function () {
   "use strict";
-  var KEY = "lsp-lang";
+  var KEY = "cpp-conc-lang";
   var groups = [];
 
   function isCodeBlock(el) {

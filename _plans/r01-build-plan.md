@@ -5,17 +5,40 @@ order: 1
 
 # Build plan — `cpp-concurrency-and-parallelism`
 
-> **STATUS 2026-10-10:** Phases 0 (scaffold), 1 (TOC), and 2a–2d (all 34 chapters) are
-> DONE, each Opus-validated + repaired, committed on branch `docs/r01-scaffold`. Site builds
-> clean. Phase 3 (examples) IN PROGRESS: 12 demos built+verified green on real Docker
-> (ch1,3,4,5,6,7,8,9,10,15,18,20 — Conan+CMake+clang+UBI10+Lua verify.lua). Convention =
-> `examples/concurrency/NN-slug/` (src/, conanfile, CMakeLists, Containerfile, verify.lua,
-> demo.sh, README) + `scripts/test-concurrency-demo-NN.sh` + aggregator `scripts/verify-demos.sh`.
-> Builds run SEQUENTIALLY (shared Conan cache/Docker/ports). TBB demos: conanfile needs
-> `hwloc/*:shared=True` + Containerfile copies `.conan2` .so into runtime + LD_LIBRARY_PATH.
-> ubi-minimal has coreutils-single (timeout), not full coreutils. NEXT: build wave B
-> (ch2,14,17,21,32,34 authored), then wave C (ch11,12,13,24,25,27,28,29,33), then ch16 NUMA in
-> KVM lab. Snippet-only (no demo): ch19,22,23,26,30,31. Nothing pushed (Gate A pending).
+ > **STATUS 2026-10-10 (checkpoint before compact):** Phases 0,1,2 DONE (34 chapters, Opus-validated).
+> **NEW: added `_docs/00-prerequisites.md`** (Fedora-focused setup chapter, order 0, orientation part;
+> renders+builds clean) and an **Editors note in ch34** (any CMake editor; **CLion preferred**).
+> **Fedora is the reference platform** (user directive) — prereqs use `dnf`; demos build in UBI10.
+> All committed on branch `docs/r01-scaffold`. Nothing pushed (Gate A pending).
+>
+> **Phase 3 (examples) — 26 of 27 Docker demos VERIFIED GREEN** on real Docker (Conan+CMake+clang+
+> UBI10+Lua verify.lua, each `./demo.sh` exit 0): ch1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,20,21,
+> 24,25,27,28,32,33,34. (ch27 debugging + ch28 sanitizers: gdb/TSan/valgrind/ASan fire for REAL, req 24 met.)
+> **2 Phase-3 items REMAIN:**
+>   1. **ch29 observing-concurrency** (OTel+LGTM compose) — compile FIXED (added `opentelemetry/sdk/trace/
+>      processor.h` + `opentelemetry/sdk/metrics/meter_provider_factory.h`); now a LINK error:
+>      `undefined reference to opentelemetry::v1::sdk::common::Base64Escape`. Static otel/abseil link-ORDER
+>      issue — fix its CMakeLists to link the Conan aggregate target `opentelemetry-cpp::opentelemetry-cpp`
+>      (correct transitive order) OR wrap otel libs in `-Wl,--start-group/--end-group` (as ch25's grpc does).
+>      Then it also brings up a grafana/otel-lgtm compose stack (heavy, ~1-2min start) — budget time.
+>   2. **ch16 NUMA** — needs the KVM lab. HOST SETUP DONE: virt-install installed; user ran cloud-utils+
+>      libvirtd+default-net line (verify `virsh net-list` shows default active). Provision a 2-NUMA-node
+>      guest (qemu `-numa`/virt-install `--cpu`), build+run the NUMA demo there via lgtm-systems-programming
+>      (`~/Dev/linux-systems-programming/scripts/lab/provision-vm.sh`); NEVER mutate host NUMA/governor.
+> Snippet-only chapters (no demo, intentional): ch19,22,23,26,30,31.
+>
+> **Build mechanics:** builds run SEQUENTIALLY (shared Conan cache/Docker/port 50051). Aggregator
+> `scripts/verify-demos.sh <names...>` now has a hard per-demo `timeout` (DEMO_TIMEOUT, default 2700s).
+> Template to copy = `examples/concurrency/20-mechanical-sympathy/`. Lessons baked in: TBB needs
+> `hwloc/*:shared=True` + runtime .so copy; Boost.Fiber needs context+filesystem+atomic+system enabled;
+> gRPC uses the cpp-statelessness static recipe + start-group linker; ubi-minimal = coreutils-single (timeout);
+> demos that run a server/signal must target the server PID directly (not a wrapping subshell); verify.lua
+> runs INSIDE the container, correctness HARD / timing SOFT.
+>
+> **AFTER Phase 3:** Phase 4 diagrams (~40 DIAGRAM SPEC comments embedded in chapters; bespoke palette),
+> 5 decks (100/101/201), 6 professional-voice sweep (em-dash thinning + stray "simply"), 7 hub linkage,
+> GATE A (repo create/push — needs explicit OK), 8 source extract-and-re-point from linux-systems-programming
+> (GATE B). User cadence: check in at each phase boundary.
 
 Approved via lgtm-relay (Opus plan → user review gate → execution). This file is the
 resume artifact: update the phase table as work lands. Iteration branches (`docs/rNN-*`),

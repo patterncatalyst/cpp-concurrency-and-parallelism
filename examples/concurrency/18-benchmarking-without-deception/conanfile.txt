@@ -1,0 +1,17 @@
+# concurrency/18-benchmarking-without-deception Conan recipe (Conan 2.x).
+#
+# One dependency (fmt), the same pattern 20-mechanical-sympathy establishes:
+# fmt is used only for output formatting. The harness itself -- warmup,
+# per-iteration steady_clock timing, percentiles, and the coordinated-
+# omission backfill -- is pure standard library (<atomic>, <chrono>,
+# <algorithm>).
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

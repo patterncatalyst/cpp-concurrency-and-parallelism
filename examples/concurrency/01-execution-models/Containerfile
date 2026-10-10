@@ -1,0 +1,81 @@
+# concurrency/01-execution-models — the four execution models, counted.
+#
+# Builds one binary:
+#   execution_models   runs the same instrumented process() workload under
+#                       all four execution models from Chapter 1 (sequential,
+#                       concurrent-pinned, parallel-via-execution-policy,
+#                       oversubscribed) and prints distinct_cpus,
+#                       max_inflight, and interleaves per model instead of a
+#                       duration.
+#
+# This example's one Conan dependency is oneTBB: GCC's libstdc++ implements
+# std::execution::par (the "parallel" model) on top of a PSTL-over-TBB
+# backend, so the parallel model LINK-fails without it, independent of
+# whether the policy is honored at runtime. Building oneTBB from source (no
+# prebuilt binary is likely to match this exact UBI10/gcc profile) is the
+# slowest step in this image relative to the sibling 20-mechanical-sympathy
+# image, which only builds fmt.
+#
+# Runtime stage installs Lua 5.4 for verify.lua, same as every sibling demo.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (oneTBB). Our own
+# target overrides to C++20 in CMakeLists -- the two-layer pattern the
+# sibling 20-mechanical-sympathy example also uses: deps at gnu17, our code
+# at the standard the chapter is actually teaching.
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/execution_models
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager plugin
+# prints a harmless "Found 0 entitlement certificates" on each install. This
+# stage installs only base runtime libs (no dnf plugin needed), so turn
+# plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/execution_models /usr/local/bin/execution_models
+COPY verify.lua ./verify.lua
+
+ENV EXECUTION_MODELS_BIN=/usr/local/bin/execution_models
+
+# No service, no ports: a batch binary plus its Lua assertion harness. CMD
+# runs verify.lua by default; the demo also allows overriding the command to
+# run execution_models directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

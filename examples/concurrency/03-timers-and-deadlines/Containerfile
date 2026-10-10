@@ -1,0 +1,80 @@
+# concurrency/03-timers-and-deadlines — deadline propagation across a call chain.
+#
+# Builds two binaries:
+#   deadline_chain   the chapter's four-function chain (handle_request ->
+#                     checkout_and_execute -> execute_query ->
+#                     run_with_deadline), sharing one steady_clock deadline.
+#                     --delay-hop/--delay-ms inject a deadline-aware
+#                     artificial delay at one hop; --direct calls one hop
+#                     directly with an already-expired deadline.
+#   clockprobe        reads steady_clock::now() a few thousand times (vDSO,
+#                     no syscall) then makes one sleep_for call (a real
+#                     syscall) -- the subject of a strace-based check.
+#
+# No Conan dependency: both binaries are pure standard library plus POSIX
+# sleep underneath. conanfile.txt still runs through CMakeDeps/CMakeToolchain
+# to keep the pattern identical to every sibling example.
+#
+# strace is intentionally NOT installed in the runtime image: it is not
+# guaranteed to be present in ubi10-minimal's enabled repo set, and the
+# chapter's EXAMPLE SPEC explicitly marks the strace-based clock_gettime
+# check as optional -- "if strace isn't in the minimal image, skip it and
+# note it; don't hard-fail." verify.lua checks for `strace` on PATH at run
+# time and prints a WARN (not a FAIL) when it's absent, rather than forcing
+# an image dependency that might not resolve.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/deadline_chain build/clockprobe
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/deadline_chain /usr/local/bin/deadline_chain
+COPY --from=builder /src/build/clockprobe /usr/local/bin/clockprobe
+COPY verify.lua ./verify.lua
+
+ENV DEADLINE_CHAIN_BIN=/usr/local/bin/deadline_chain
+ENV CLOCKPROBE_BIN=/usr/local/bin/clockprobe
+
+# No service, no ports: two batch binaries plus their Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run either binary directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

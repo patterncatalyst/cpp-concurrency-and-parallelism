@@ -1,0 +1,75 @@
+# concurrency/09-lock-free-data-structures — SPSC ring buffer, padded vs.
+# unpadded cursors.
+#
+# Builds one binary:
+#   spsc_ring   one producer + one consumer move N items through a bounded
+#               ring buffer; --pad on|off controls whether head/tail share
+#               a cache line, --capacity sets the backing buffer size
+#               (down to 1 for maximum contention).
+#
+# Same Conan + CMakeDeps/CMakeToolchain pattern 20-mechanical-sympathy
+# establishes (fmt, for output formatting only).
+#
+# This example does not build the C++26 std::hazard_pointer / std::rcu
+# sketches from the chapter -- no shipping compiler implements them (see
+# the chapter's own "experimental" callout), so they stay illustrative-only
+# in the chapter text and are never part of this runnable, built-and-run
+# example.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern
+# 20-mechanical-sympathy establishes: deps at gnu17, our code at the
+# standard the chapter is actually teaching).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/spsc_ring
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/spsc_ring /usr/local/bin/spsc_ring
+COPY verify.lua ./verify.lua
+
+ENV SPSC_RING_BIN=/usr/local/bin/spsc_ring
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run spsc_ring directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

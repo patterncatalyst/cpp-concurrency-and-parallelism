@@ -1,0 +1,19 @@
+# concurrency/01-execution-models Conan recipe (Conan 2.x).
+#
+# One dependency: oneTBB, because GCC's libstdc++ implements the C++17
+# parallel execution policies (std::execution::par, used by the "parallel"
+# model below) on top of the PSTL-over-TBB backend -- without it, code that
+# calls std::for_each(std::execution::par, ...) fails to LINK, not just to
+# run in parallel. No other model in this example needs an external
+# dependency at all; threads, atomics, and affinity are pure standard
+# library plus POSIX.
+
+[requires]
+onetbb/2021.10.0
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+onetbb/*:shared=False

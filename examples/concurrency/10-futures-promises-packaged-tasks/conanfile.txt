@@ -1,0 +1,16 @@
+# concurrency/10-futures-promises-packaged-tasks Conan recipe (Conan 2.x).
+#
+# One dependency (fmt), the same pattern 20-mechanical-sympathy established:
+# fmt is used only for output formatting -- launch_policy and worker_pool's
+# substance (futures, promises, packaged_task, a hand-rolled thread pool) is
+# pure standard library.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

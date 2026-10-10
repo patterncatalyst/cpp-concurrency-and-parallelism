@@ -1,0 +1,79 @@
+# concurrency/08-atomics-and-the-memory-model — one-slot hand-off under
+# seq_cst, acquire/release, and a deliberately-broken plain-variable case.
+#
+# Builds one binary:
+#   ring_handoff   one producer thread + one consumer thread move N values
+#                  through a single-slot hand-off; --mode seqcst|acqrel|broken
+#                  selects the ordering (or its deliberate absence).
+#
+# Same Conan + CMakeDeps/CMakeToolchain pattern 20-mechanical-sympathy
+# establishes (fmt, for output formatting only).
+#
+# ThreadSanitizer: this example does NOT build a TSan variant. Chapter 28
+# ("Sanitizers and Dynamic Analysis") owns that mechanism end to end with
+# its own dedicated demo (examples/concurrency/28-sanitizers/, not yet
+# built) -- adding a second, narrower TSan build here would duplicate that
+# chapter's job rather than this one's. This example's --mode broken case
+# demonstrates the memory-model bug a different way: a deliberately
+# non-atomic, non-volatile busy-wait that -O2 reliably turns into a stall
+# on a register-cached value (see src/ring_handoff.cpp and README.md),
+# which is deterministic per build and needs no sanitizer runtime to
+# observe.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern
+# 20-mechanical-sympathy establishes: deps at gnu17, our code at the
+# standard the chapter is actually teaching).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/ring_handoff
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/ring_handoff /usr/local/bin/ring_handoff
+COPY verify.lua ./verify.lua
+
+ENV RING_HANDOFF_BIN=/usr/local/bin/ring_handoff
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run ring_handoff directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

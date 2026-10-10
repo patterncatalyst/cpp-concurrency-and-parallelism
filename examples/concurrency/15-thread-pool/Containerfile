@@ -1,0 +1,74 @@
+# concurrency/15-thread-pool — single shared queue vs. work-stealing deques,
+# plus a cgroup CPU-quota probe.
+#
+# Builds two binaries:
+#   pool_bench      a single-shared-queue pool and a work-stealing-deque
+#                   pool, both running the same CPU-bound task mix;
+#                   --kind single|stealing, --workers, --tasks, --work-iters
+#                   select the run. Reports throughput and average queue-
+#                   wait latency.
+#   cgroup_probe    reads cpu.max (falling back to cpu.cfs_quota_us /
+#                   cpu.cfs_period_us) and prints the derived CPU-equivalent
+#                   count against hardware_concurrency().
+#
+# Same Conan + CMakeDeps/CMakeToolchain + Lua verify.lua pattern
+# 20-mechanical-sympathy establishes: fmt for output formatting only, a
+# gnu17 profile for dependency builds, our own code targeting C++20.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/pool_bench build/cgroup_probe
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/pool_bench /usr/local/bin/pool_bench
+COPY --from=builder /src/build/cgroup_probe /usr/local/bin/cgroup_probe
+COPY verify.lua ./verify.lua
+
+ENV POOL_BENCH_BIN=/usr/local/bin/pool_bench
+ENV CGROUP_PROBE_BIN=/usr/local/bin/cgroup_probe
+
+# No service, no ports: two batch binaries plus their Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run either binary directly for ad hoc inspection, including
+# under `docker run --cpus=N` to watch cgroup_probe's derived count track
+# the limit.
+CMD ["lua", "verify.lua"]

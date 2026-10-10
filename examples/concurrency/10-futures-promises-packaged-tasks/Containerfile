@@ -1,0 +1,72 @@
+# concurrency/10-futures-promises-packaged-tasks — launch policies and a
+# packaged_task worker pool.
+#
+# Builds two binaries:
+#   launch_policy   submits the same N trivial tasks under std::launch::async,
+#                   std::launch::deferred, and the default policy, in three
+#                   rounds, reporting each task's executing thread id against
+#                   the submitter's own id.
+#   worker_pool     a small fixed-size thread pool built around
+#                   std::packaged_task; --fail-at I makes one task throw, to
+#                   show the exception surfacing at that task's own
+#                   future::get() and nowhere else.
+#
+# Same Conan + CMakeDeps/CMakeToolchain + Lua verify.lua pattern
+# 20-mechanical-sympathy establishes: fmt for output formatting only, a
+# gnu17 profile for dependency builds, our own code targeting C++20.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/launch_policy build/worker_pool
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/launch_policy /usr/local/bin/launch_policy
+COPY --from=builder /src/build/worker_pool /usr/local/bin/worker_pool
+COPY verify.lua ./verify.lua
+
+ENV LAUNCH_POLICY_BIN=/usr/local/bin/launch_policy
+ENV WORKER_POOL_BIN=/usr/local/bin/worker_pool
+
+# No service, no ports: two batch binaries plus their Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run either binary directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

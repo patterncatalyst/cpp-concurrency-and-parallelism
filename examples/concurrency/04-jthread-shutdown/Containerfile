@@ -1,0 +1,74 @@
+# concurrency/04-jthread-shutdown — SIGTERM -> request_stop() -> clean exit.
+#
+# Builds one binary:
+#   jthread_shutdown   N jthread workers polling a stop_token; a SIGTERM
+#                       handler sets a lock-free flag, the main thread
+#                       requests a stop on every worker and joins them all,
+#                       then returns 0.
+#
+# No Conan dependency: jthread/stop_token/signal handling are all standard
+# library plus the C runtime. conanfile.txt still runs through
+# CMakeDeps/CMakeToolchain to keep the pattern identical to every sibling
+# example.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/jthread_shutdown
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/jthread_shutdown /usr/local/bin/jthread_shutdown
+COPY verify.lua ./verify.lua
+
+ENV JTHREAD_SHUTDOWN_BIN=/usr/local/bin/jthread_shutdown
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# verify.lua itself spawns jthread_shutdown as a child process, sends it a
+# real SIGTERM, and asserts a clean, in-grace-period exit -- see the
+# comments there for why the signal is driven from inside the harness
+# rather than relying on an external `docker stop`/`docker kill` against
+# this container's own PID 1: the exact same std::jthread/stop_token
+# shutdown path runs either way, and this keeps the demo self-contained and
+# consistent with every sibling example's "CMD runs verify.lua, verify.lua
+# is the whole test" convention. CMD still allows overriding the command to
+# run jthread_shutdown directly for ad hoc inspection (e.g. to send it a
+# SIGTERM from `docker exec` or `docker stop` yourself).
+CMD ["lua", "verify.lua"]

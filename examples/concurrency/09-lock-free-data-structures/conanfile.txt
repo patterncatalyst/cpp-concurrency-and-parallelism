@@ -1,0 +1,15 @@
+# concurrency/09-lock-free-data-structures Conan recipe (Conan 2.x).
+#
+# One dependency (fmt), same pattern 20-mechanical-sympathy establishes --
+# fmt is used only for output formatting; the demo's substance (threads,
+# atomics, alignas) is pure standard library.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

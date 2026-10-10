@@ -1,0 +1,16 @@
+# concurrency/15-thread-pool Conan recipe (Conan 2.x).
+#
+# One dependency (fmt), the same pattern 20-mechanical-sympathy establishes:
+# fmt is used only for output formatting. Both binaries' substance --
+# mutex/condition_variable queues, a mutex-per-deque work-stealing pool, and
+# reading cgroup pseudo-files -- is pure standard library plus POSIX.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

@@ -1,0 +1,68 @@
+# concurrency/18-benchmarking-without-deception — the chapter's own
+# benchmark harness, applied to an atomic fetch_add workload.
+#
+# Builds one binary:
+#   bench   --iters/--warmup run the full harness (warmup discarded,
+#           per-iteration timing, min/median/p99/max, coordinated-omission
+#           backfill -> co_p99/co_n, checksum correctness); --naive skips
+#           warmup and times the whole loop as one unwarmed wall-clock
+#           sample, printing no percentile field at all.
+#
+# Same Conan + CMakeDeps/CMakeToolchain + Lua verify.lua pattern
+# 20-mechanical-sympathy establishes: fmt for output formatting only, a
+# gnu17 profile for dependency builds, our own code targeting C++20.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/bench
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/bench /usr/local/bin/bench
+COPY verify.lua ./verify.lua
+
+ENV BENCH_BIN=/usr/local/bin/bench
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run bench directly for ad hoc inspection (e.g. under
+# `taskset -c 0` vs. unpinned, per the chapter's container section).
+CMD ["lua", "verify.lua"]

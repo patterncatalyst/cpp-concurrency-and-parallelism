@@ -1,0 +1,10 @@
+# concurrency/04-jthread-shutdown Conan recipe (Conan 2.x).
+#
+# No external dependencies: jthread, stop_token, and POSIX signal handling
+# are all standard library plus the C runtime. conanfile.txt is still
+# present, empty [requires] and all, to keep this example's layout identical
+# to the project convention even when there's nothing to fetch.
+
+[generators]
+CMakeDeps
+CMakeToolchain

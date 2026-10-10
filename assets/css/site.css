@@ -1,0 +1,734 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   cpp-container-optimization-tutorial — site.css
+
+   Class system mirrors patterncatalyst/hummingbird-tutorial so the visual
+   language is consistent across the patterncatalyst Jekyll family. Every
+   selector here is tied to a structural class produced by the layouts and
+   includes in this repo; nothing styles raw HTML beyond minimal resets.
+
+   Color tokens follow a light/dark system that respects OS preference.
+   ────────────────────────────────────────────────────────────────────── */
+
+:root {
+    /* Light theme tokens. Site stays light regardless of OS preference —
+       matches hummingbird-tutorial's behaviour. To opt back into auto
+       dark mode, see the commented block at the bottom of this file. */
+    color-scheme: light;
+
+    --bg:           #fdfbf7;
+    --bg-soft:      #f4efe6;
+    --bg-card:     #ffffff;
+    --fg:          #1a1a1a;
+    --fg-muted:    #4a4a4a;
+    --fg-faint:    #767676;
+    --accent:      #c0392b;       /* deep red — performance/heat */
+    --accent-soft: #f4d2cd;
+    --accent-fg:   #ffffff;
+    --rule:        #e6dfd2;
+    --code-bg:     #2b2a26;
+    --code-fg:     #f7f3ec;
+    --shadow-sm:   0 1px 2px rgba(0, 0, 0, .04), 0 1px 3px rgba(0, 0, 0, .06);
+    --shadow-md:   0 4px 8px rgba(0, 0, 0, .06), 0 2px 4px rgba(0, 0, 0, .04);
+    --shadow-lg:   0 10px 30px rgba(0, 0, 0, .08), 0 6px 14px rgba(0, 0, 0, .06);
+    --radius:      8px;
+    --radius-lg:   14px;
+    --maxw:        1080px;
+    --maxw-prose:  720px;
+    --t-fast:      150ms ease;
+    --t-normal:    250ms ease;
+    --font-sans:   -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+                   Arial, "Noto Sans", sans-serif;
+    --font-mono:   ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+                   "Liberation Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.6 var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover, a:focus { text-decoration: underline; }
+
+img, svg, object { max-width: 100%; height: auto; display: block; }
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+
+/* ── Layout primitives ───────────────────────────────────────────────── */
+
+.container {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.container-prose {
+    max-width: var(--maxw-prose);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.section        { padding: 4rem 0; }
+.section-tight  { padding: 2rem 0; }
+
+.section-heading {
+    font-size: 1.75rem;
+    margin: 0 0 .5rem;
+    letter-spacing: -.01em;
+}
+
+.section-sub {
+    color: var(--fg-muted);
+    font-size: 1.05rem;
+    max-width: var(--maxw-prose);
+    margin: 0 0 2rem;
+}
+
+/* ── Site chrome (header, footer) ────────────────────────────────────── */
+
+.site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--rule);
+}
+.site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .85rem 0;
+}
+.site-header__brand {
+    font-weight: 600;
+    color: var(--fg);
+    font-size: 1.05rem;
+}
+.site-header__brand:hover { text-decoration: none; color: var(--accent); }
+.site-header__brand-emoji { margin-right: .35rem; }
+
+.site-nav {
+    display: flex; gap: 1.25rem; align-items: center;
+}
+.site-nav a {
+    color: var(--fg-muted);
+    font-size: .95rem;
+    border-bottom: 2px solid transparent;
+    padding: .25rem 0;
+    transition: color var(--t-fast), border-color var(--t-fast);
+}
+.site-nav a:hover { color: var(--fg); text-decoration: none; }
+.site-nav a.is-current {
+    color: var(--fg); border-bottom-color: var(--accent);
+}
+.site-nav__spacer { flex: 1; }
+
+.site-footer {
+    border-top: 1px solid var(--rule);
+    margin-top: 4rem;
+    padding: 2.5rem 0 3rem;
+    color: var(--fg-muted);
+    font-size: .92rem;
+}
+.site-footer__inner {
+    display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between;
+}
+.site-footer a { color: var(--fg-muted); }
+.site-footer a:hover { color: var(--accent); }
+
+/* ── Hero (homepage and listing pages) ───────────────────────────────── */
+
+.hero {
+    padding: 5rem 0 3.5rem;
+    background:
+        radial-gradient(circle at 80% -10%, var(--accent-soft) 0%, transparent 35%),
+        var(--bg);
+}
+.hero--compact { padding: 3rem 0 2rem; }
+
+.hero__eyebrow {
+    display: inline-block;
+    padding: .25rem .65rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.hero h1 {
+    font-size: clamp(2rem, 4vw + .5rem, 3.4rem);
+    line-height: 1.1;
+    letter-spacing: -.025em;
+    margin: 0 0 1.25rem;
+    max-width: 18ch;
+}
+
+.hero__lead {
+    font-size: 1.15rem;
+    color: var(--fg-muted);
+    max-width: 60ch;
+    margin: 0 0 2rem;
+}
+
+.hero__chips {
+    display: flex; flex-wrap: wrap; gap: .5rem; margin: 0 0 2rem;
+}
+.chip {
+    display: inline-block;
+    padding: .3rem .75rem;
+    background: var(--bg-soft);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    font-size: .85rem;
+    color: var(--fg-muted);
+}
+.chip--accent {
+    background: var(--accent-soft);
+    border-color: transparent;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.hero__cta { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .7rem 1.2rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: .95rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background var(--t-fast), color var(--t-fast),
+                border-color var(--t-fast), transform var(--t-fast);
+}
+.btn:hover { text-decoration: none; transform: translateY(-1px); }
+.btn--primary {
+    background: var(--accent);
+    color: var(--accent-fg);
+}
+.btn--primary:hover { background: color-mix(in srgb, var(--accent) 85%, black); }
+.btn--secondary {
+    background: var(--bg-card);
+    color: var(--fg);
+    border-color: var(--rule);
+}
+.btn--secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ── Stats strip on the homepage ─────────────────────────────────────── */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+.stat { text-align: center; }
+.stat__value {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--fg);
+    line-height: 1;
+}
+.stat__label {
+    display: block;
+    color: var(--fg-muted);
+    font-size: .85rem;
+    margin-top: .35rem;
+}
+
+/* ── Card grid (homepage tutorial sections, examples list) ───────────── */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+}
+.card {
+    display: block;
+    padding: 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    color: inherit;
+    transition: border-color var(--t-fast), box-shadow var(--t-fast),
+                transform var(--t-fast);
+}
+.card:hover {
+    text-decoration: none;
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+.card__eyebrow {
+    color: var(--fg-faint);
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: .5rem;
+}
+.card__eyebrow strong { color: var(--accent); font-weight: 700; }
+.card__title { margin: 0 0 .4rem; font-size: 1.1rem; }
+.card__num {
+    /* Two-digit zero-padded section number prefix, in the accent red,
+       monospace so the column edge always lines up between cards. */
+    display: inline-block;
+    margin-right: .5em;
+    color: var(--accent);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-weight: 700;
+}
+.card__desc  { margin: 0; color: var(--fg-muted); font-size: .94rem; }
+.card__meta {
+    display: flex; gap: 1rem; margin-top: .85rem;
+    color: var(--fg-faint); font-size: .85rem;
+}
+
+/* doc-card variant (for the "reference" cards on homepage) */
+.doc-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    color: inherit;
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.doc-card:hover {
+    text-decoration: none;
+    border-color: var(--accent);
+    box-shadow: var(--shadow-sm);
+}
+.doc-card__icon {
+    font-size: 1.4rem;
+    width: 2rem;
+    flex-shrink: 0;
+    text-align: center;
+}
+.doc-card__title { display: block; font-weight: 600; margin-bottom: .15rem; }
+.doc-card__desc {
+    display: block; color: var(--fg-muted);
+    font-size: .92rem; line-height: 1.45;
+}
+
+/* ── Tutorial layout (single doc page, sidebar-free) ─────────────────── */
+
+/* Tutorial pages render against a pure white background, distinct
+   from the warm cream hero/landing surfaces, matching hummingbird-
+   tutorial's reading-page convention. The .tutorial wrapper paints
+   white edge-to-edge under the page; the body's --bg cream peeks
+   through only on landing/gallery pages. */
+.tutorial {
+    padding: 2.5rem 0;
+    background: #ffffff;
+}
+
+.tutorial__main { min-width: 0; }      /* prevent overflow on long lines */
+
+.tutorial__header {
+    margin: 0 0 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--rule);
+}
+
+/* Breadcrumb above the title: small, gray, "/"-separated.
+   Reads "Home / Tutorial / [page title]". */
+.tutorial__breadcrumb {
+    color: var(--fg-faint);
+    font-size: 0.85rem;
+    margin: 0 0 1.5rem;
+}
+.tutorial__breadcrumb ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.tutorial__breadcrumb li:not(:last-child)::after {
+    content: '/';
+    margin-left: 0.5rem;
+    color: var(--fg-faint);
+}
+.tutorial__breadcrumb a {
+    color: var(--fg-muted);
+}
+.tutorial__breadcrumb a:hover {
+    color: var(--accent);
+}
+
+/* Title row: big red 2-digit section number on the left, page
+   title (h1) flexes alongside it on the right. The number is
+   monospace so the column edge always lines up between sections. */
+.tutorial__title {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin: 0;
+}
+.tutorial__num {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    flex-shrink: 0;
+}
+.tutorial__title h1 {
+    font-size: 2rem;
+    margin: 0;
+    letter-spacing: -.015em;
+    flex: 1;
+}
+
+.tutorial__lead {
+    color: var(--fg-muted);
+    font-size: 1.1rem;
+    margin: 1rem 0 0;
+}
+
+/* Pill row: rounded chips for duration and section number,
+   sitting just above the bottom rule of the header. */
+.tutorial__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1.5rem 0 0;
+}
+.tutorial__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background: var(--bg-soft);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+}
+
+/* Inline section headings inside tutorial prose stay black; the
+   accent shows up as a small red rule above each h2, matching
+   hummingbird-tutorial. h3 stays plain black bold so the visual
+   hierarchy still reads at a glance. */
+.tutorial__main h2 {
+    margin-top: 3rem;
+    font-size: 1.4rem;
+    letter-spacing: -.01em;
+    color: var(--fg);
+}
+.tutorial__main h2::before {
+    content: '';
+    display: block;
+    width: 2.5rem;
+    height: 3px;
+    background: var(--accent);
+    margin-bottom: 1rem;
+}
+.tutorial__main h3 {
+    margin-top: 2rem;
+    font-size: 1.15rem;
+    color: var(--fg);
+}
+
+.tutorial__main p,
+.tutorial__main ul,
+.tutorial__main ol { line-height: 1.65; }
+
+.tutorial__main blockquote {
+    margin: 1.5rem 0;
+    padding: .9rem 1.2rem;
+    background: var(--bg-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: var(--fg-muted);
+}
+
+.tutorial__main table {
+    width: 100%; border-collapse: collapse; margin: 1.25rem 0;
+    font-size: .95rem;
+}
+.tutorial__main th, .tutorial__main td {
+    border: 1px solid var(--rule);
+    padding: .55rem .75rem;
+    text-align: left;
+    vertical-align: top;
+}
+.tutorial__main th { background: var(--bg-soft); font-weight: 600; }
+
+.tutorial__pager {
+    display: flex; justify-content: space-between; gap: 1rem;
+    margin: 3rem 0 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+}
+.tutorial__pager a {
+    flex: 1;
+    padding: 1rem 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    color: var(--fg);
+    transition: border-color var(--t-fast);
+}
+.tutorial__pager a:hover { border-color: var(--accent); text-decoration: none; }
+.tutorial__pager a.is-prev { text-align: left; }
+.tutorial__pager a.is-next { text-align: right; }
+.tutorial__pager .label   { display: block; color: var(--fg-faint); font-size: .8rem; }
+.tutorial__pager .title   { display: block; font-weight: 600; margin-top: .25rem; }
+
+/* ── Code blocks ─────────────────────────────────────────────────────── */
+
+code {
+    font: .9em var(--font-mono);
+    background: var(--bg-soft);
+    padding: .12em .35em;
+    border-radius: 4px;
+}
+pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1.1rem 1.25rem;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    line-height: 1.5;
+    margin: 1.25rem 0;
+    box-shadow: var(--shadow-sm);
+}
+pre code { background: transparent; padding: 0; color: inherit; font-size: .92em; }
+.highlight pre { margin: 1.25rem 0; }
+
+/* ── Diagram includes (inline .excalidraw partial) ───────────────────── */
+
+.excalidraw-figure {
+    margin: 2rem 0;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+.excalidraw-figure__svg {
+    background: var(--bg);
+    padding: 1.5rem;
+}
+.excalidraw-figure__svg img,
+.excalidraw-figure__svg object { margin: 0 auto; }
+.excalidraw-figure__caption {
+    padding: .75rem 1.25rem;
+    font-size: .92rem;
+    color: var(--fg-muted);
+    border-top: 1px solid var(--rule);
+    background: var(--bg-soft);
+    display: flex; justify-content: space-between; gap: 1rem;
+    align-items: center;
+}
+.excalidraw-figure__caption a { font-weight: 500; }
+
+/* ── Diagram gallery (diagrams.html) ─────────────────────────────────── */
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+.gallery-card {
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+.gallery-card__viewer {
+    cursor: pointer;
+    background: var(--bg);
+    padding: 1rem;
+    min-height: 180px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--t-fast);
+}
+.gallery-card__viewer:hover { background: var(--accent-soft); }
+.gallery-card__viewer:focus { outline: 2px solid var(--accent); outline-offset: -4px; }
+.gallery-card__body {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--rule);
+}
+.gallery-card__section {
+    color: var(--accent); font-weight: 700; font-size: .85rem;
+    letter-spacing: .04em; text-transform: uppercase;
+}
+.gallery-card__title { margin: .25rem 0; font-size: 1rem; }
+.gallery-card__caption {
+    margin: 0; color: var(--fg-muted); font-size: .9rem;
+    line-height: 1.45;
+}
+.gallery-card__actions {
+    margin-top: .85rem; display: flex; gap: .75rem;
+    font-size: .85rem;
+}
+
+/* ── Modal (fullscreen diagram viewer) ───────────────────────────────── */
+
+.modal[hidden] { display: none; }
+.modal {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, .85);
+    z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem;
+}
+.modal__close {
+    position: absolute; top: 1rem; right: 1.5rem;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.modal__inner {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    max-width: 95vw;
+    max-height: 90vh;
+    width: 1100px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+.modal__header { padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--rule); }
+.modal__title  { margin: 0; font-size: 1.1rem; }
+.modal__caption { margin: .25rem 0 0; color: var(--fg-muted); font-size: .92rem; }
+.modal__viewer {
+    overflow: auto;
+    padding: 1.5rem;
+    background: var(--bg);
+}
+.modal__svg { width: 100%; height: 100%; min-height: 50vh; }
+.modal__actions {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-soft);
+    display: flex; gap: .75rem;
+}
+
+/* ── Plan layout (reconciliation) ────────────────────────────────────── */
+
+.plan { padding: 2.5rem 0 4rem; }
+.plan h1 { font-size: 1.75rem; margin: 0 0 1rem; }
+.plan__notice {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: .75rem 1.25rem;
+    border-radius: var(--radius);
+    margin: 0 0 2rem;
+    font-size: .92rem;
+}
+
+/* ── Utilities ───────────────────────────────────────────────────────── */
+
+.visually-hidden {
+    position: absolute !important;
+    height: 1px; width: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ── Opt-back-in dark mode ───────────────────────────────────────────────
+   Uncomment this block (and remove `color-scheme: light` from :root above)
+   to follow the operating system's theme preference. We default to
+   light-only because hummingbird-tutorial does, and visual consistency
+   across the patterncatalyst family is more important than theme parity
+   with the OS.
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme:   dark;
+        --bg:           #15171c;
+        --bg-soft:      #1d2026;
+        --bg-card:      #22262d;
+        --fg:           #ececec;
+        --fg-muted:     #b8b8b8;
+        --fg-faint:     #828282;
+        --accent:       #ff7568;
+        --accent-soft:  #3a1f1c;
+        --rule:         #2a2f37;
+        --code-bg:      #0f1115;
+        --code-fg:      #e6e2da;
+    }
+}
+*/
+
+
+/* Bibliography cross-reference matrix */
+.biblio-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95em;
+}
+.biblio-matrix th,
+.biblio-matrix td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--rule, #e5e1d6);
+}
+.biblio-matrix thead th {
+    background: var(--bg-soft, #f5f0e0);
+    border-bottom: 2px solid var(--rule, #e5e1d6);
+}
+.biblio-matrix tbody td:not(:first-child) {
+    text-align: center;
+    width: 14%;
+    color: var(--accent, #b54a2c);
+    font-weight: 600;
+}
+.biblio-matrix tbody tr td:first-child {
+    width: 44%;
+}
+
+/* ── multi-language code tabs (codetabs.js) ───────────────────────────── */
+/* Token names adapted from lsp's codetabs CSS to this site's variable
+   scheme (--rule/--fg-muted/--bg-card/--accent-soft/--t-fast etc. rather
+   than lsp's --border-strong/--ink-muted/--font-body/--transition). */
+.codetabs-wrap{ margin: 2rem 0; border: 1px solid var(--rule);
+  border-radius: var(--radius); overflow: hidden; }
+.codetabs-bar{ display: flex; flex-wrap: wrap; background: var(--bg-soft);
+  border-bottom: 1px solid var(--rule); }
+.codetabs-tab{ appearance: none; border: 0; background: transparent; cursor: pointer;
+  font-family: var(--font-sans); font-size: .82rem; font-weight: 600;
+  color: var(--fg-muted); padding: .55rem .9rem;
+  border-bottom: 2px solid transparent; transition: var(--t-fast); }
+.codetabs-tab:hover{ color: var(--fg); background: var(--accent-soft); }
+.codetabs-tab.is-active{ color: var(--fg); background: var(--bg-card);
+  border-bottom-color: var(--accent); }
+.codetabs-tab:focus-visible{ outline: 2px solid var(--accent); outline-offset: -2px; }
+.codetabs-panel{ margin: 0; }
+.codetabs-panel[hidden]{ display: none; }
+.codetabs-panel .highlighter-rouge,
+.codetabs-panel .highlight{ margin: 0 !important; border-radius: 0 !important; }
+/* graceful no-JS fallback: show every block, labelled nothing-lost */
+.no-js .codetabs{ display: none; }

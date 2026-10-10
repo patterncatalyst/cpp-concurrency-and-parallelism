@@ -1,0 +1,18 @@
+---
+layout: default
+---
+<section class="plan">
+    <div class="container container-prose">
+        <p class="plan__notice">
+            This page tracks the project's verification state. Read it
+            if something doesn't behave the way the docs say.
+        </p>
+
+        <h1>{{ page.title }}</h1>
+        {%- if page.description -%}
+        <p class="tutorial__lead">{{ page.description }}</p>
+        {%- endif -%}
+
+        {{ content }}
+    </div>
+</section>

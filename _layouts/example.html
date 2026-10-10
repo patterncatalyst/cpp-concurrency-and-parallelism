@@ -1,0 +1,54 @@
+---
+layout: default
+---
+{%- comment -%}
+  Layout for a single demo page in the `examples` collection.
+  Similar shape to the `tutorial` layout but:
+    - breadcrumb points to /examples/ rather than the tutorial outline
+    - no prev/next pager (demos aren't read sequentially)
+    - title pill shows "Demo NN" rather than "Section NN"
+    - frontmatter `github_path` produces an explicit "View source on
+      GitHub" link, since the body of the page is a rendering of the
+      demo's README — the canonical source still lives in
+      `examples/<demo_dir>/`.
+{%- endcomment -%}
+
+<article class="tutorial">
+    <div class="container container-prose">
+        <header class="tutorial__header">
+            <nav class="tutorial__breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="{{ '/' | relative_url }}">Home</a></li>
+                    <li><a href="{{ '/examples/' | relative_url }}">Examples</a></li>
+                    <li>{{ page.title }}</li>
+                </ol>
+            </nav>
+            <div class="tutorial__title">
+                <span class="tutorial__num">{{ page.order | prepend: '0' | slice: -2, 2 }}</span>
+                <h1>{{ page.title }}</h1>
+            </div>
+            {%- if page.description -%}
+            <p class="tutorial__lead">{{ page.description }}</p>
+            {%- endif -%}
+            <p class="tutorial__meta">
+                <span class="tutorial__pill">Demo {{ page.order | prepend: '0' | slice: -2, 2 }}</span>
+                {%- if page.github_path -%}
+                <a class="tutorial__pill"
+                   href="https://github.com/{{ site.github_username }}/{{ site.github_repo }}/tree/main/{{ page.github_path }}"
+                   rel="noopener">Source on GitHub ↗</a>
+                {%- endif -%}
+            </p>
+        </header>
+
+        <div class="tutorial__main">
+            {{ content }}
+        </div>
+
+        <nav class="tutorial__pager tutorial__pager--back" aria-label="Back to examples">
+            <a class="is-back" href="{{ '/examples/' | relative_url }}">
+                <span class="label">← All demos</span>
+                <span class="title">Back to the demo gallery</span>
+            </a>
+        </nav>
+    </div>
+</article>

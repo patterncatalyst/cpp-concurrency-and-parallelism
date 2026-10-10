@@ -1,0 +1,35 @@
+<header class="site-header">
+    <div class="container site-header__inner">
+        <a class="site-header__brand" href="{{ '/' | relative_url }}">
+            <span class="site-header__brand-emoji" aria-hidden="true">{{ site.brand_emoji | default: '⚡' }}</span>
+            {{ site.title }}
+        </a>
+
+        <div class="site-nav__spacer"></div>
+
+        <nav class="site-nav" aria-label="Primary">
+            <a href="{{ '/' | relative_url }}"
+               {% if page.url == '/' %}class="is-current"{% endif %}>
+                Home
+            </a>
+            <a href="{{ '/docs/00-index/' | relative_url }}"
+               {% if page.layout == 'tutorial' or page.layout == 'part_index' %}class="is-current"{% endif %}>
+                Chapters
+            </a>
+            <a href="{{ '/examples/' | relative_url }}"
+               {% if page.url contains '/examples' %}class="is-current"{% endif %}>
+                Examples
+            </a>
+            <a href="{{ '/diagrams/' | relative_url }}"
+               {% if page.url contains '/diagrams' %}class="is-current"{% endif %}>
+                Diagrams
+            </a>
+            <a href="{{ '/bibliography/' | relative_url }}"
+               {% if page.url contains '/bibliography' %}class="is-current"{% endif %}>
+                Bibliography
+            </a>
+            <a href="https://github.com/{{ site.github_username }}/{{ site.github_repo }}"
+               rel="noopener">GitHub ↗</a>
+        </nav>
+    </div>
+</header>

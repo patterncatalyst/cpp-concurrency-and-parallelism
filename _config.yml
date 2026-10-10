@@ -1,0 +1,103 @@
+# ── Site identity ─────────────────────────────────────────────────────────────
+title: "C++ Concurrency and Parallelism"
+description: >-
+    A reference on concurrency and parallelism for low-latency,
+    high-throughput C++ services on Linux. C++20/23/26, runnable Docker
+    examples, and three companion decks.
+author: cpp-concurrency-and-parallelism contributors
+brand_emoji: "🧵"
+
+# Set this to your GitHub username/org once the repo is pushed; the
+# header/footer use it to build the "GitHub ↗" link and the
+# examples/ and diagrams/ directory cross-links.
+github_username: patterncatalyst
+github_repo: cpp-concurrency-and-parallelism
+
+# ── URL configuration ─────────────────────────────────────────────────────────
+# Set baseurl to match the repository name when published on GitHub Pages.
+# Override locally with: bundle exec jekyll serve --baseurl ""
+baseurl: "/cpp-concurrency-and-parallelism"
+url: "https://patterncatalyst.github.io"
+
+# ── Build settings ────────────────────────────────────────────────────────────
+markdown: kramdown
+highlighter: rouge
+permalink: /:path/:basename/
+
+kramdown:
+    input: GFM
+    syntax_highlighter: rouge
+    toc_levels: 2..3
+    hard_wrap: false
+
+# ── Collections ───────────────────────────────────────────────────────────────
+# `docs` is the compendium body, grouped into `parts` for two-level
+# navigation (Home → Part → Chapter). `examples` are the runnable Docker
+# demos. `plans` is project-management material — included in the build so
+# it can be cross-linked, but not advertised in the main nav.
+collections:
+    docs:
+        output: true
+        permalink: /docs/:name/
+    parts:
+        output: true
+        permalink: /parts/:name/
+    examples:
+        output: true
+        permalink: /examples/:name/
+    plans:
+        output: true
+        permalink: /plans/:name/
+
+defaults:
+    - scope:
+          path: ""
+          type: docs
+      values:
+          layout: tutorial
+          sectionid: docs
+    - scope:
+          path: ""
+          type: parts
+      values:
+          layout: part_index
+          sectionid: parts
+    - scope:
+          path: ""
+          type: examples
+      values:
+          layout: example
+          sectionid: examples
+    - scope:
+          path: ""
+          type: plans
+      values:
+          layout: plan
+          sectionid: plans
+
+# ── Plugins ───────────────────────────────────────────────────────────────────
+plugins:
+    - jekyll-seo-tag
+    - jekyll-sitemap
+    - jekyll-redirect-from
+
+# ── Build excludes ────────────────────────────────────────────────────────────
+exclude:
+    - Gemfile
+    - Gemfile.lock
+    - vendor
+    - node_modules
+    - README.md
+    - .gitignore
+    - LICENSE
+    - scripts/
+    - observability/
+    # examples/ holds runnable demo code that the tutorial references but is
+    # not part of the rendered site. The trailing slash is critical — without
+    # it, Jekyll's exclude matches both the examples/ directory AND the
+    # examples.html page that lists the cards, causing /examples/ on the
+    # live site to 404. Keep the slash.
+    - examples/
+    - presentation/
+    - tools/
+    - diagrams/README.md

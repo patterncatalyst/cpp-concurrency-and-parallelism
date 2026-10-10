@@ -1,0 +1,104 @@
+---
+layout: default
+title: Excalidraw diagrams
+description: Architecture and flow diagrams for the C++ concurrency and parallelism book. Each diagram renders inline; click for a fullscreen view, or download the .excalidraw source to edit.
+permalink: /diagrams/
+---
+
+<section class="hero hero--compact">
+    <div class="container">
+        <span class="hero__eyebrow">Reference</span>
+        <h1>Excalidraw diagrams.</h1>
+        <p class="hero__lead">
+            Architecture and flow diagrams for the book. Click any
+            diagram to open it fullscreen. Each is also available as
+            <code>.excalidraw</code> source — open it on
+            <a href="https://excalidraw.com" rel="noopener">excalidraw.com</a>
+            to edit.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="gallery">
+            {%- comment -%}
+            No diagrams have been drawn yet. Each figure is added here
+            with a diagram-card.html include once it exists under
+            diagrams/<name>.svg + diagrams/<name>.excalidraw — see
+            diagrams/README.md for the palette and naming convention.
+            {%- endcomment -%}
+        </div>
+    </div>
+</section>
+
+{%- comment -%}
+Fullscreen modal — populated by JS when a card is clicked.
+Identical pattern to hummingbird-tutorial; kept verbatim so future
+scripted updates can apply the same patches in both places.
+{%- endcomment -%}
+<div id="diagram-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal__close" type="button" aria-label="Close fullscreen">×</button>
+    <div class="modal__inner">
+        <div class="modal__header">
+            <h2 class="modal__title" id="modal-title"></h2>
+            <p class="modal__caption"></p>
+        </div>
+        <div class="modal__viewer">
+            <object class="modal__svg" type="image/svg+xml" aria-label="Diagram"></object>
+        </div>
+        <div class="modal__actions">
+            <a class="btn btn--secondary modal__download" download>Download .excalidraw</a>
+            <a class="btn btn--secondary"
+               href="https://excalidraw.com" target="_blank" rel="noopener">Open excalidraw.com</a>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var modal = document.getElementById('diagram-modal');
+    if (!modal) return;
+    var modalSvg   = modal.querySelector('.modal__svg');
+    var modalTitle = modal.querySelector('.modal__title');
+    var modalCap   = modal.querySelector('.modal__caption');
+    var modalDl    = modal.querySelector('.modal__download');
+    var closeBtn   = modal.querySelector('.modal__close');
+
+    function open(card) {
+        var svg     = card.dataset.svg;
+        var src     = card.dataset.source;
+        var title   = card.dataset.title;
+        var caption = card.dataset.caption;
+        modalSvg.setAttribute('data', svg);
+        modalDl.setAttribute('href', src);
+        modalTitle.textContent = title;
+        modalCap.textContent   = caption || '';
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+    }
+    function close() {
+        modal.hidden = true;
+        modalSvg.setAttribute('data', '');           // unload to free memory
+        document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.gallery-card__viewer').forEach(function (el) {
+        el.addEventListener('click', function () { open(el.closest('.gallery-card')); });
+        el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                open(el.closest('.gallery-card'));
+            }
+        });
+    });
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) close();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !modal.hidden) close();
+    });
+})();
+</script>

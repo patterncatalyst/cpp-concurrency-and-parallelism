@@ -1,0 +1,32 @@
+{%- comment -%}
+Inline diagram embed. Use inside a doc section like:
+
+  {% include excalidraw.html name="06-allocator-stack"
+        caption="The allocator stack: app → PMR → mimalloc → cgroup memory.high → host" %}
+
+Conventions:
+- SVG renders inline at:           /diagrams/<name>.svg
+- Excalidraw source download at:   /diagrams/<name>.excalidraw
+- If neither file exists yet, the figure shows a placeholder note so
+  the layout doesn't break before diagrams are drawn.
+
+For a fullscreen-clickable gallery view, see /diagrams/.
+{%- endcomment -%}
+
+{%- assign svg_url = include.name | prepend: '/diagrams/' | append: '.svg' | relative_url -%}
+{%- assign src_url = include.name | prepend: '/diagrams/' | append: '.excalidraw' | relative_url -%}
+
+<figure class="excalidraw-figure" id="diagram-{{ include.name }}">
+    <div class="excalidraw-figure__svg">
+        <object data="{{ svg_url }}" type="image/svg+xml" aria-label="{{ include.caption | escape }}">
+            <p>
+                <em>Diagram <code>{{ include.name }}</code> hasn't been drawn yet.</em>
+                See <code>diagrams/README.md</code> for the conventions.
+            </p>
+        </object>
+    </div>
+    <figcaption class="excalidraw-figure__caption">
+        <span>{{ include.caption | default: include.name }}</span>
+        <a href="{{ src_url }}" download>Download .excalidraw</a>
+    </figcaption>
+</figure>

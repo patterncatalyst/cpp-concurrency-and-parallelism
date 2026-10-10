@@ -1,0 +1,69 @@
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          # Keep in sync with the Gemfile: jekyll ~> 4.3 supports Ruby 3.1-3.4+,
+          # and the Gemfile shims (csv/bigdecimal/base64/logger/webrick) cover
+          # the default-gem removals on 3.4+. 3.3 is a stable LTS-track runner
+          # default with full bundler-cache support.
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build site
+        env:
+          JEKYLL_ENV: production
+          # configure-pages@v5 sometimes returns an empty base_path
+          # despite this being a project-pages deployment. When that
+          # happens, an empty --baseurl="" on the command line OVERRIDES
+          # _config.yml's baseurl, producing URLs without the repo-name
+          # prefix and breaking every relative_url filter in the site.
+          # Fall back to the _config.yml value when configure-pages
+          # gives us nothing.
+          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: |
+          if [ -n "$PAGES_BASE_PATH" ]; then
+              echo "Pages base_path=$PAGES_BASE_PATH (using it)"
+              bundle exec jekyll build --baseurl "$PAGES_BASE_PATH"
+          else
+              echo "::warning::configure-pages returned empty base_path; deferring to _config.yml baseurl"
+              bundle exec jekyll build
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

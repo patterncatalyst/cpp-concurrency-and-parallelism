@@ -1,0 +1,102 @@
+---
+layout: default
+title: Home
+---
+
+<section class="hero">
+    <div class="container">
+        <span class="hero__eyebrow">{{ site.brand_emoji }} Reference compendium</span>
+        <h1>C++ concurrency and&nbsp;parallelism,&nbsp;for&nbsp;low-latency&nbsp;services.</h1>
+        <p class="hero__lead">
+            A reference on writing correct, fast concurrent and parallel
+            C++ for Linux services that care about tail latency and
+            throughput — from the futex underneath a mutex to lock-free
+            messaging on the fast path, in C++20, C++23, and C++26. Read
+            it straight through, or jump to the part that answers the
+            question you have right now.
+        </p>
+        <div class="hero__chips">
+            <span class="chip chip--accent">C++20 / C++23 / C++26</span>
+            <span class="chip">Linux</span>
+            <span class="chip">clang / gdb</span>
+            <span class="chip">Docker</span>
+            <span class="chip">Low latency</span>
+            <span class="chip">High throughput</span>
+        </div>
+        <div class="hero__cta">
+            <a class="btn btn--primary"
+               href="{{ '/parts/00-orientation/' | relative_url }}">
+                Start with orientation →
+            </a>
+            <a class="btn btn--secondary"
+               href="{{ '/parts/01-foundations/' | relative_url }}">
+                Skip to foundations
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-heading">The parts</h2>
+        <p class="section-sub">
+            Nine parts, read in order the first time. Each part page
+            lists its chapters; each chapter stands on its own for a
+            reader jumping in to solve one problem. The orientation part
+            is the map — start there if you only have time for one page.
+        </p>
+        <div class="cards">
+            {%- assign parts_sorted = site.parts | sort: "order" -%}
+            {%- for part in parts_sorted -%}
+                {%- assign part_docs = site.docs | where: "part", part.part_name -%}
+                <a class="card" href="{{ part.url | relative_url }}">
+                    <div class="card__eyebrow">Part {{ part.order }}</div>
+                    <h3 class="card__title">{{ part.title }}</h3>
+                    {%- if part.blurb -%}
+                        <p class="card__desc">{{ part.blurb }}</p>
+                    {%- endif -%}
+                    <div class="card__meta">
+                        {%- if part_docs.size > 0 -%}
+                            <span>{{ part_docs.size }} chapter{% if part_docs.size != 1 %}s{% endif %}</span>
+                        {%- endif -%}
+                        <span>Explore →</span>
+                    </div>
+                </a>
+            {%- endfor -%}
+        </div>
+    </div>
+</section>
+
+<section class="section" style="background: var(--bg-soft);">
+    <div class="container">
+        <h2 class="section-heading">Everything else on the site</h2>
+        <p class="section-sub">
+            The chapters are the core; these round it out as the book
+            fills in — runnable proof for the claims, the diagrams that
+            explain the architecture, and the books behind the opinions.
+        </p>
+        <div class="cards">
+            <a class="doc-card" href="{{ '/examples/' | relative_url }}">
+                <span class="doc-card__icon" aria-hidden="true">📦</span>
+                <span>
+                    <span class="doc-card__title">Runnable examples</span>
+                    <span class="doc-card__desc">Self-contained Docker demos, each proving a claim the chapters make.</span>
+                </span>
+            </a>
+            <a class="doc-card" href="{{ '/diagrams/' | relative_url }}">
+                <span class="doc-card__icon" aria-hidden="true">📐</span>
+                <span>
+                    <span class="doc-card__title">Diagrams</span>
+                    <span class="doc-card__desc">Architecture and flow diagrams in an embedded gallery — click for fullscreen, download the .excalidraw source to edit.</span>
+                </span>
+            </a>
+            <a class="doc-card" href="{{ '/bibliography/' | relative_url }}">
+                <span class="doc-card__icon" aria-hidden="true">📚</span>
+                <span>
+                    <span class="doc-card__title">Bibliography</span>
+                    <span class="doc-card__desc">The books behind the opinions, and where each one extends the chapters.</span>
+                </span>
+            </a>
+        </div>
+    </div>
+</section>

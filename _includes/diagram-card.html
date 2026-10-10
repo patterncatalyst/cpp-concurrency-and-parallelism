@@ -1,0 +1,33 @@
+{%- comment -%}
+Diagram gallery card. Used by /diagrams/. Required parameters:
+
+  file     — basename without extension; resolves to
+             /diagrams/<file>.svg + /diagrams/<file>.excalidraw
+  section  — short label like "§3"
+  title    — short title for card and modal heading
+  caption  — one-line description shown under the card and in the modal
+{%- endcomment -%}
+
+{%- assign svg_url = include.file | prepend: '/diagrams/' | append: '.svg' | relative_url -%}
+{%- assign src_url = include.file | prepend: '/diagrams/' | append: '.excalidraw' | relative_url -%}
+
+<article class="gallery-card"
+         data-svg="{{ svg_url }}"
+         data-source="{{ src_url }}"
+         data-title="{{ include.title | escape }}"
+         data-caption="{{ include.caption | escape }}">
+    <div class="gallery-card__viewer" role="button" tabindex="0"
+         aria-label="Open {{ include.title | escape }} fullscreen">
+        <object data="{{ svg_url }}" type="image/svg+xml" aria-hidden="true">
+            <span class="visually-hidden">{{ include.title | escape }}</span>
+        </object>
+    </div>
+    <div class="gallery-card__body">
+        <div class="gallery-card__section">{{ include.section }}</div>
+        <h3 class="gallery-card__title">{{ include.title }}</h3>
+        <p class="gallery-card__caption">{{ include.caption }}</p>
+        <div class="gallery-card__actions">
+            <a href="{{ src_url }}" download>Download .excalidraw</a>
+        </div>
+    </div>
+</article>

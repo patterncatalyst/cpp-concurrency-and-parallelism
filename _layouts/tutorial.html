@@ -1,0 +1,60 @@
+---
+layout: default
+---
+{%- assign docs = site.docs | sort: "order" -%}
+
+{%- assign prev_doc = nil -%}
+{%- assign next_doc = nil -%}
+{%- assign found = false -%}
+{%- for d in docs -%}
+    {%- if found and next_doc == nil -%}
+        {%- assign next_doc = d -%}
+    {%- endif -%}
+    {%- if d.url == page.url -%}{%- assign found = true -%}{%- endif -%}
+    {%- unless found -%}{%- assign prev_doc = d -%}{%- endunless -%}
+{%- endfor -%}
+
+<article class="tutorial">
+    <div class="container container-prose">
+        <header class="tutorial__header">
+            <nav class="tutorial__breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="{{ '/' | relative_url }}">Home</a></li>
+                    <li><a href="{{ '/' | relative_url }}#sections">Tutorial</a></li>
+                    <li>{{ page.title }}</li>
+                </ol>
+            </nav>
+            <div class="tutorial__title">
+                <span class="tutorial__num">{{ page.order | prepend: '0' | slice: -2, 2 }}</span>
+                <h1>{{ page.title }}</h1>
+            </div>
+            {%- if page.description -%}
+            <p class="tutorial__lead">{{ page.description }}</p>
+            {%- endif -%}
+            <p class="tutorial__meta">
+                {%- if page.duration -%}<span class="tutorial__pill">⏱ {{ page.duration }}</span>{%- endif -%}
+                <span class="tutorial__pill">Section {{ page.order }}</span>
+            </p>
+        </header>
+
+        <div class="tutorial__main">
+            {{ content }}
+        </div>
+
+        <nav class="tutorial__pager" aria-label="Section pagination">
+            {%- if prev_doc -%}
+            <a class="is-prev" href="{{ prev_doc.url | relative_url }}">
+                <span class="label">← §{{ prev_doc.order }}</span>
+                <span class="title">{{ prev_doc.title }}</span>
+            </a>
+            {%- else -%}<span></span>{%- endif -%}
+
+            {%- if next_doc -%}
+            <a class="is-next" href="{{ next_doc.url | relative_url }}">
+                <span class="label">§{{ next_doc.order }} →</span>
+                <span class="title">{{ next_doc.title }}</span>
+            </a>
+            {%- else -%}<span></span>{%- endif -%}
+        </nav>
+    </div>
+</article>

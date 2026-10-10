@@ -1,0 +1,13 @@
+{%- comment -%}
+Usage in Markdown body:
+    {% include section.html n=4 %}
+Renders as:
+    <a href="/cpp-container-optimization-tutorial/docs/04-image-strategy/">§4</a>
+
+Looks the doc up by its `order` front-matter so this stays
+resilient to a doc being renamed. Falls back to the plain
+"§N" string if no doc with that order exists, so prose still
+reads correctly during stub phases.
+{%- endcomment -%}
+{%- assign target = site.docs | where: "order", include.n | first -%}
+{%- if target -%}<a href="{{ target.url | relative_url }}">§{{ include.n }}</a>{%- else -%}§{{ include.n }}{%- endif -%}

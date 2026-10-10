@@ -1,0 +1,62 @@
+---
+layout: default
+title: Example demos
+description: Runnable companion demos for the C++ concurrency and parallelism book. Each runs via ./demo.sh on Fedora 44.
+permalink: /examples/
+---
+
+<section class="hero hero--compact">
+    <div class="container">
+        <span class="hero__eyebrow">Example demos</span>
+        <h1>Runnable companions to the book.</h1>
+        <p class="hero__lead">
+            Every claim made in the book has a demo behind it. Each demo
+            is a self-contained Docker project with its own
+            <code>./demo.sh</code> and its own Containerfile(s). Read the
+            matching chapter for context, then run the demo from its
+            directory.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-heading">Runnable examples</h2>
+        <p class="section-lead">
+            Runnable companions to the book. Each one makes a single
+            pattern concrete and runnable with one command. Each card
+            links to the demo's page on this site (a rendering of the
+            README with cross-references), and each page links to the
+            source on GitHub. Each demo also stands alone — run it
+            without reading the book first if you'd rather poke at it
+            directly.
+        </p>
+        <div class="cards">
+        {%- assign sorted_examples = site.examples | sort: "order" -%}
+        {%- for e in sorted_examples -%}
+            <a class="card" href="{{ e.url | relative_url }}">
+                <div class="card__eyebrow">{{ e.card_eyebrow }}</div>
+                <h3 class="card__title">{{ e.card_title }}</h3>
+                <p class="card__desc">{{ e.card_blurb }}</p>
+                <div class="card__meta"><span>Read page &rarr;</span></div>
+            </a>
+        {%- endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section" style="background: var(--bg-soft);">
+    <div class="container container-prose">
+        <h2 class="section-heading">Running every demo</h2>
+        <p>
+            Clone the repo and invoke each <code>demo.sh</code> from its
+            directory. The scripts assume Docker and a
+            handful of host tools (<code>hey</code>, <code>jq</code>,
+            <code>curl</code>).
+        </p>
+<pre><code>git clone https://github.com/{{ site.github_username }}/{{ site.github_repo }}.git
+cd {{ site.github_repo }}/examples/&lt;chapter-slug&gt;
+./demo.sh
+</code></pre>
+    </div>
+</section>

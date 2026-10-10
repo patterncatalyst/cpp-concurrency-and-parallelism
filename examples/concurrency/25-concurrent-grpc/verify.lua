@@ -62,12 +62,15 @@ end
 -- ── Start the server in the background, capturing its PID and (later)
 --    its own exit code to files -- plain shell, no Lua process library
 --    needed. ──
+-- Background the server DIRECTLY (so the recorded PID is the server itself,
+-- not a wrapping subshell that wouldn't forward SIGTERM), then a waiter in the
+-- same backgrounded shell records the server's own exit code once it drains.
 os.execute(string.format(
-    "rm -f %s %s %s; (%s --listen %s --cap %d --pacing-ms %d " ..
-    ">%s 2>&1; echo $? >%s) & echo $! >%s",
+    "rm -f %s %s %s; sh -c '%s --listen %s --cap %d --pacing-ms %d >%s 2>&1 & " ..
+    "p=$!; echo $p >%s; wait $p; echo $? >%s' &",
     SERVER_PID_FILE, SERVER_EXIT_FILE, SERVER_LOG_FILE,
     SERVER_BIN, ADDR, CAP, PACING_MS,
-    SERVER_LOG_FILE, SERVER_EXIT_FILE, SERVER_PID_FILE))
+    SERVER_LOG_FILE, SERVER_PID_FILE, SERVER_EXIT_FILE))
 
 local function read_file(path)
     local f = io.open(path, "r")
@@ -77,7 +80,12 @@ local function read_file(path)
     return c
 end
 
-local server_pid = (read_file(SERVER_PID_FILE) or ""):match("%d+")
+local server_pid
+for _ = 1, 50 do
+    server_pid = (read_file(SERVER_PID_FILE) or ""):match("%d+")
+    if server_pid then break end
+    os.execute("sleep 0.1")
+end
 if not server_pid then
     fail("could not read server PID from " .. SERVER_PID_FILE)
     print("RESULT: FAIL (1 correctness/execution failure(s))")

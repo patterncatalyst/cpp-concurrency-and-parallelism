@@ -42,7 +42,9 @@ boost/*:without_exception=False
 
 # Not needed by this example -- disabled to keep the Boost build to just
 # the libraries above instead of Boost's full default set.
-boost/*:without_atomic=True
+# Boost.Fiber's dependency chain needs these: fiber -> context, filesystem;
+# filesystem -> atomic, system. Leave them all enabled.
+boost/*:without_atomic=False
 boost/*:without_charconv=True
 boost/*:without_chrono=True
 boost/*:without_cobalt=True

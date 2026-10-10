@@ -16,6 +16,7 @@ duration: "15 min"
 - Document the CMake presets used to configure each example consistently.
 - Document the Conan lockfiles that pin third-party dependency versions across the book.
 - Document the Lua verify.lua harness that checks an example actually produces its observable effect, and the GCC-versus-clang parity checks that run alongside it.
+- Note the editor assumption: every example is a plain CMake project that opens in any editor, with JetBrains CLion as the preferred one.
 
 Every runnable example in this book shares one build and verification toolchain, and this appendix is the reference for it: which compiler and debugger versions it targets, how CMake is configured so every example builds the same way, how Conan pins the handful of third-party dependencies a lock-free ring or an OTel exporter needs, and how the Lua harness that gates every chapter's claims actually works. Nothing here is new material — it is the scaffolding the rest of the book's code samples assumed was already in place.
 
@@ -29,6 +30,12 @@ GDB's `.gdbinit` for this project loads libc++'s own pretty-printers where avail
 
 <!-- DIAGRAM SPEC: cream #fdfbf7 background, left-to-right pipeline of five boxes connected by arrows. Box 1 (blue #4a73b8) "source + conanfile.txt/conan.lock". Arrow labeled "conan install --lockfile=conan.lock" into Box 2 (orange #a06030) "CMake + Ninja, 5 presets: clang-debug / clang-asan / clang-tsan / clang-release / gcc-parity". Arrow fans out into two parallel boxes: Box 3a (green #5a8870) "clang-release binary" and Box 3b (green #5a8870) "gcc-parity binary", with a double-headed red #c0392b arrow between them labeled "PARITY CHECK: identical verify.lua pass count required". Both 3a and 3b feed into Box 4 (blue) "lua verify.lua -- checks.expect_equal / checks.expect_match against real observable output". Box 4 feeds into Box 5 (orange) "PASS N / FAIL 0 (or SKIP for an unreachable optional backend)". A small gdb icon sits beside Box 3a labeled "attached directly to the RelWithDebInfo binary when a number looks wrong -- never a stripped Release build". -->
 {% include excalidraw.html name="34-toolchain-pipeline" caption="Figure 34.1 — one source tree, a pinned Conan lockfile, five CMake presets including a GCC parity leg, and one Lua harness gating every binary against the same observable-effect checks" %}
+
+## Editors and IDEs
+
+Every example is a plain CMake project with a Conan-generated toolchain file, so it opens in any editor without project-specific setup. The presets enable `CMAKE_EXPORT_COMPILE_COMMANDS`, which writes a `compile_commands.json` that a clangd-based language server (VS Code, Neovim, Emacs, or Vim) reads to resolve the exact include paths and flags each translation unit was compiled with, so completion and diagnostics match the real build rather than an approximation of it.
+
+The preferred editor for this book is **JetBrains CLion**. It opens a `CMakeLists.txt` directly as a project, reads the `CMakePresets.json` this appendix defines so the clang-debug, clang-asan, clang-tsan, and clang-release profiles appear as selectable build configurations, picks up the Conan toolchain file for dependency resolution, and drives gdb and the sanitizers through its run configurations — the same tools the command-line workflow uses, behind a graphical front end. Nothing in the book requires CLion: the examples build, run, and debug identically from the shell. The only assumption is that you can open and edit a CMake project in whatever editor you prefer.
 
 ## CMake Presets and Conan Lockfiles
 

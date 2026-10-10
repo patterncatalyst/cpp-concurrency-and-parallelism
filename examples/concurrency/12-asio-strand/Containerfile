@@ -1,0 +1,80 @@
+# concurrency/12-asio-strand — strand-vs-mutex: serialization without a lock.
+#
+# Builds one binary:
+#   asio_strand   --mode strand|nostrand|strand-cost|mutex-cost -- posts the
+#                 same unsynchronized-counter handler through a strand and
+#                 directly to a multithreaded io_context (the race demo),
+#                 plus an equivalent-work strand-vs-mutex pair (the
+#                 kernel-cost comparison). All in-process; no sockets, no
+#                 TCP port. See src/asio_strand.cpp for the full story.
+#
+# Boost (Asio, pinned static -- shared=False) is this example's dependency,
+# built from source like every Conan dep without a prebuilt match for this
+# exact UBI10/gcc profile -- the slowest step in this image, same as oneTBB
+# was for 01-execution-models. A static Boost means no runtime-lib staging
+# step is needed here: the binary needs nothing beyond libstdc++ at
+# runtime, so this Containerfile stays as simple as 20-mechanical-sympathy's.
+#
+# Runtime stage installs Lua 5.4 for verify.lua, same as every sibling demo.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (Boost, fmt). Our
+# own target overrides to C++20 in CMakeLists -- the two-layer pattern the
+# sibling 01-execution-models and 20-mechanical-sympathy examples also use:
+# deps at gnu17, our code at the standard the chapter is actually teaching.
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/asio_strand
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. This stage installs only base runtime libs (no dnf plugin
+# needed), so turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/asio_strand /usr/local/bin/asio_strand
+COPY verify.lua ./verify.lua
+
+ENV ASIO_STRAND_BIN=/usr/local/bin/asio_strand
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+# CMD runs verify.lua by default; the demo also allows overriding the
+# command to run asio_strand directly for ad hoc inspection.
+CMD ["lua", "verify.lua"]

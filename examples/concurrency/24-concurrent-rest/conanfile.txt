@@ -1,0 +1,64 @@
+# concurrency/24-concurrent-rest Conan recipe (Conan 2.x).
+#
+# One dependency: Boost, for Boost.Asio + Boost.Beast (async sockets and
+# the HTTP parser/serializer on top of them). Both are header-only; the
+# only compiled piece either pulls in is Boost.System (for error_code),
+# so this recipe disables every other Boost library via without_<lib>
+# before the first build, rather than letting Conan build all of Boost
+# from source. Verified with `conan graph info` before committing this
+# list: with these options the dependency graph resolves to boost + its
+# b2 build tool only -- no bzip2/zlib/libiconv/libbacktrace pulled in
+# transitively (those come from iostreams/locale/stacktrace, all disabled
+# below). shared=False (static libs) means the runtime image needs no
+# Boost .so files staged into it at all -- see Containerfile.
+#
+# without_context=True / without_coroutine=True / without_fiber=True: the
+# server and client both use C++20 compiler coroutines
+# (boost::asio::awaitable + co_spawn), which run on native compiler
+# support, not Boost.Context's stackful-fiber machinery. Boost.Context is
+# only needed for boost::asio::spawn()-style stackful coroutines, which
+# this demo doesn't use.
+#
+# without_thread=True: both binaries use std::thread/std::jthread, not
+# boost::thread.
+
+[requires]
+boost/1.84.0
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+boost/*:shared=False
+boost/*:without_atomic=True
+boost/*:without_chrono=True
+boost/*:without_cobalt=True
+boost/*:without_container=True
+boost/*:without_context=True
+boost/*:without_contract=True
+boost/*:without_coroutine=True
+boost/*:without_date_time=True
+boost/*:without_fiber=True
+boost/*:without_filesystem=True
+boost/*:without_graph=True
+boost/*:without_graph_parallel=True
+boost/*:without_iostreams=True
+boost/*:without_json=True
+boost/*:without_locale=True
+boost/*:without_log=True
+boost/*:without_math=True
+boost/*:without_mpi=True
+boost/*:without_nowide=True
+boost/*:without_program_options=True
+boost/*:without_python=True
+boost/*:without_random=True
+boost/*:without_regex=True
+boost/*:without_serialization=True
+boost/*:without_stacktrace=True
+boost/*:without_test=True
+boost/*:without_thread=True
+boost/*:without_timer=True
+boost/*:without_type_erasure=True
+boost/*:without_url=True
+boost/*:without_wave=True

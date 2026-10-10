@@ -1,0 +1,97 @@
+# concurrency/24-concurrent-rest — a minimal Boost.Beast async HTTP server
+# with an in-flight-request cap, plus a Beast-based load client, both
+# built from one Conan dependency.
+#
+# Builds two binaries:
+#   rest_server   async HTTP server bound to 127.0.0.1:18080; sheds load
+#                 past an atomic in-flight-request cap with HTTP 503 +
+#                 Retry-After, drains cleanly on SIGINT/SIGTERM.
+#   rest_client   concurrent HTTP load generator (also Beast, C++20
+#                 coroutines) used to drive the server past its cap.
+#
+# This example's one Conan dependency is Boost (1.84.0), for Boost.Asio +
+# Boost.Beast. See conanfile.txt for why most of Boost is disabled via
+# without_<lib> -- the trimmed option set was verified with
+# `conan graph info` to resolve to boost + its b2 build tool only, no
+# transitive zlib/bzip2/libiconv/libbacktrace. Boost is still built from
+# source here (conan-center ships no prebuilt binary matching this exact
+# UBI10/gcc profile), which remains the slowest step in this image even
+# trimmed down -- expect several minutes, well under a full default-options
+# Boost build but longer than the sibling examples' single small library.
+#
+# shared=False (static Boost.System) means the runtime image needs no
+# Boost .so files staged into it at all -- unlike the SHARED-LIB pattern
+# 01-execution-models uses for oneTBB's hwloc dependency, there is nothing
+# to copy from /src/build into the runtime stage here beyond the two
+# stripped binaries themselves.
+#
+# Runtime stage installs Lua 5.4 for verify.lua, same as every sibling
+# demo, plus the two binaries. No extra packages: SIGTERM delivery and PID
+# lookup are driven from verify.lua via the shell's own `kill` builtin, and
+# nothing else in the runtime path needs any utility beyond libstdc++.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (Boost). Our own
+# target overrides to C++20 in CMakeLists -- the two-layer pattern the
+# sibling 20-mechanical-sympathy and 01-execution-models examples also use:
+# deps at gnu17, our code at the standard the chapter is actually teaching.
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/rest_server build/rest_client
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. This stage installs only base runtime libs (no dnf plugin
+# needed), so turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/rest_server /usr/local/bin/rest_server
+COPY --from=builder /src/build/rest_client /usr/local/bin/rest_client
+COPY verify.lua ./verify.lua
+
+ENV REST_SERVER_BIN=/usr/local/bin/rest_server
+ENV REST_CLIENT_BIN=/usr/local/bin/rest_client
+
+# No exposed port: the server binds 127.0.0.1:18080 and the client that
+# drives it runs in the same container/network namespace, started and
+# orchestrated entirely by verify.lua. CMD runs verify.lua by default; the
+# demo also allows overriding the command to run rest_server directly for
+# ad hoc inspection (e.g. `docker run --rm -it <img> rest_server`).
+CMD ["lua", "verify.lua"]

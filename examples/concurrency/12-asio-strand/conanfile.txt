@@ -1,0 +1,25 @@
+# concurrency/12-asio-strand Conan recipe (Conan 2.x).
+#
+# Boost.Asio is header-only within Boost, but it's distributed as part of
+# the monolithic `boost` package, which also builds Boost.System (asio's
+# error_code plumbing) and friends. fmt is used only for the demo's
+# key=value output formatting, matching every sibling example's
+# convention.
+#
+# Boost is pinned static (shared=False): a static build needs none of
+# 01-execution-models' runtime-lib staging step (that example's oneTBB
+# dependency forces a shared hwloc), so this Containerfile can stay as
+# simple as 20-mechanical-sympathy's -- the binary needs nothing beyond
+# libstdc++ at runtime.
+
+[requires]
+boost/1.84.0
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+boost/*:shared=False
+fmt/*:shared=False

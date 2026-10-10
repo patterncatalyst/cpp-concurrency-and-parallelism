@@ -1,0 +1,16 @@
+# concurrency/06-lock-ordering Conan recipe (Conan 2.x).
+#
+# Follows the pattern established in examples/concurrency/20-mechanical-
+# sympathy/: one dependency, fmt, used only for the program's output. The
+# substance of this demo (mutexes, latch, scoped_lock) is pure standard
+# library.
+
+[requires]
+fmt/10.2.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+fmt/*:shared=False

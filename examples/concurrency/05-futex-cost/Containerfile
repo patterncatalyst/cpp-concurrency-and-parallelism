@@ -1,0 +1,88 @@
+# concurrency/05-futex-cost — uncontended vs. contended mutex cost, and the
+# futex syscall count behind both.
+#
+# Builds one binary:
+#   futex_cost   --mode baseline|uncontended|contended [-n N] [-t THREADS]
+#                three ways of performing the same N increments; prints a
+#                key=value line with the final count and elapsed time.
+#
+# The runtime stage installs Lua 5.4 (verify.lua, this project's assertion
+# harness convention) plus a best-effort install of `strace`: this demo's
+# headline comparison is a futex(2) call count taken from OUTSIDE the
+# binary via `strace -f -e trace=futex`. strace depends on ptrace, which is
+# routinely unavailable or restricted under a locked-down container runtime
+# (see the chapter's discussion), and some stripped-down mirrors of the UBI
+# repos omit the package entirely. Either failure mode must not break the
+# demo: verify.lua detects strace's absence (or its failure to produce
+# parseable output) at runtime and falls back to a behavioral/timing
+# comparison instead of hard-failing on a missing tool.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern the
+# sibling mechanical-sympathy example also uses: deps at gnu17, our code at
+# the standard the chapter is actually teaching).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/futex_cost
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here) +
+# strace (best-effort; see header comment).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. Turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+# strace is best-effort and MUST NOT fail the build if it's unavailable in
+# this base image's repos: `|| echo` keeps the RUN step's own exit code 0
+# either way. verify.lua does its own `command -v strace` check at runtime
+# and falls back to the behavioral comparison if this didn't land.
+RUN (microdnf install -y --setopt=install_weak_deps=0 strace \
+        && microdnf clean all \
+        && rm -rf /var/cache/yum) \
+    || echo "strace unavailable in this base image -- verify.lua will fall back to the behavioral check"
+
+WORKDIR /demo
+COPY --from=builder /src/build/futex_cost /usr/local/bin/futex_cost
+COPY verify.lua ./verify.lua
+
+ENV FUTEX_COST_BIN=/usr/local/bin/futex_cost
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+CMD ["lua", "verify.lua"]

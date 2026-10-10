@@ -1,0 +1,70 @@
+# concurrency/07-coordination-primitives — a barrier-phased worker pool.
+#
+# Builds one binary:
+#   barrier_workers   [-w WORKERS] [-p PHASES] runs a fixed worker pool
+#                      through phases synchronized by one std::barrier,
+#                      printing one completion-function line per phase and
+#                      a final summary line.
+#
+# The runtime stage installs Lua 5.4: verify.lua is this project's
+# assertion harness convention and runs IN the container, against the
+# binary that same image built.
+
+FROM registry.access.redhat.com/ubi10/ubi:10.2 AS builder
+
+RUN dnf install -y --quiet --setopt=install_weak_deps=False \
+        gcc gcc-c++ \
+        cmake ninja-build python3-pip \
+        which \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN pip install --quiet "conan~=2.0"
+
+# Profile detection + cppstd=gnu17 for dependency builds (fmt). Our own
+# target overrides to C++20 in CMakeLists (the two-layer pattern the
+# sibling mechanical-sympathy example also uses: deps at gnu17, our code at
+# the standard the chapter is actually teaching).
+RUN conan profile detect --force && \
+    sed -i 's|^compiler.cppstd=.*|compiler.cppstd=gnu17|' \
+        /root/.conan2/profiles/default
+
+WORKDIR /src
+
+COPY conanfile.txt ./
+RUN conan install . --output-folder=build/conan \
+        -s build_type=Release \
+        --build=missing
+
+COPY CMakeLists.txt ./
+COPY src/ ./src/
+
+RUN cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
+    && cmake --build build -j"$(nproc)" \
+    && strip --strip-all build/barrier_workers
+
+# ════════════════════════════════════════════════════════════════════════
+# Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
+# ════════════════════════════════════════════════════════════════════════
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2 AS runtime
+
+# UBI-minimal without an entitlement: microdnf's subscription-manager
+# plugin prints a harmless "Found 0 entitlement certificates" on each
+# install. Turn plugins off to keep the build log clean.
+RUN printf 'plugins=0\n' >> /etc/dnf/dnf.conf
+RUN microdnf install -y --setopt=install_weak_deps=0 \
+        libstdc++ \
+        lua \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
+
+WORKDIR /demo
+COPY --from=builder /src/build/barrier_workers /usr/local/bin/barrier_workers
+COPY verify.lua ./verify.lua
+
+ENV BARRIER_WORKERS_BIN=/usr/local/bin/barrier_workers
+
+# No service, no ports: a batch binary plus its Lua assertion harness.
+CMD ["lua", "verify.lua"]

@@ -36,7 +36,7 @@ A `grpc::CompletionQueue` is a thread-safe event queue, and the pattern that dri
 // Proceed() method knows which phase of its own lifecycle just completed
 // and what to request next — this is the state machine every raw async
 // gRPC server hand-rolls, in one form or another.
-void HandleRpcs(grpc::CompletionQueue& cq, EchoService::AsyncService& service) {
+void HandleRpcs(grpc::ServerCompletionQueue& cq, EchoService::AsyncService& service) {
     new CallData(&service, &cq);  // seed the first accept
     void* tag;
     bool ok;
@@ -47,7 +47,7 @@ void HandleRpcs(grpc::CompletionQueue& cq, EchoService::AsyncService& service) {
 
 class CallData {
 public:
-    CallData(EchoService::AsyncService* service, grpc::CompletionQueue* cq)
+    CallData(EchoService::AsyncService* service, grpc::ServerCompletionQueue* cq)
         : service_(service), cq_(cq), responder_(&ctx_), status_(CREATE) {
         Proceed(true);
     }
@@ -69,7 +69,7 @@ public:
 private:
     enum CallStatus { CREATE, PROCESS, FINISH };
     EchoService::AsyncService* service_;
-    grpc::CompletionQueue* cq_;
+    grpc::ServerCompletionQueue* cq_;
     grpc::ServerContext ctx_;
     EchoRequest request_;
     EchoResponse response_;
@@ -127,7 +127,7 @@ C++20 coroutines don't attach to gRPC's own APIs natively — there's no first-p
 // generated coroutine state. The completion queue's own dispatch is
 // unchanged underneath.
 boost::asio::awaitable<void> handle_echo(EchoService::AsyncService& service,
-                                         grpc::CompletionQueue& cq) {
+                                         grpc::ServerCompletionQueue& cq) {
     grpc::ServerContext ctx;
     EchoRequest request;
     grpc::ServerAsyncResponseWriter<EchoResponse> responder(&ctx);

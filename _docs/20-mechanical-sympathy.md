@@ -150,6 +150,9 @@ LinePadded<std::atomic<std::uint64_t>> consumed;
 // std::mdspan with a custom layout policy expresses a struct-of-arrays
 // counter block where each thread's column starts on its own cache line,
 // without hand-writing a std::vector<PaddedCounter>.
+// Schematic: a complete layout policy also needs extents_type, an extents()
+// accessor, and the is_always_unique/exhaustive/strided traits; those are
+// omitted here to keep the striding idea legible.
 struct LineStridedLayout {
     template <typename Extents>
     struct mapping {

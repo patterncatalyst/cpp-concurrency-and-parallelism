@@ -52,7 +52,9 @@ The modern C++ pattern that gets you the actor model's isolation guarantee, with
 
 ```cpp
 #include <condition_variable>
+#include <future>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <stop_token>
 #include <thread>

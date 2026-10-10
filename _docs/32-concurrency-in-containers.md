@@ -188,10 +188,10 @@ std::expected<double, QuotaStatus> cgroup_cpu_quota_v23() {
 // hand -- the sizing policy above feeds the scheduler instead of a
 // constructor argument the caller has to remember to compute correctly
 // every time a pool is created.
-namespace ex = std::execution;
+namespace ex = std::execution;   // schedulers/senders vocabulary
 
 const unsigned n = recommended_cpu_pool_size();   // from "Sizing Pools to the Quota"
-ex::static_thread_pool pool{n};
+exec::static_thread_pool pool{n};   // exec:: in the stdexec reference, not std::execution
 auto sched = pool.get_scheduler();
 ```
 

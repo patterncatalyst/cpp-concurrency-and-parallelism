@@ -50,15 +50,15 @@ The output below is **representative of the shape a ThreadSanitizer report takes
 
 ```
 WARNING: ThreadSanitizer: data race (pid=12345)
-  Write of size 4 at 0x7b0400000back by thread T2:
+  Write of size 4 at 0x7b0400000d80 by thread T2:
     #0 increment(int&) racy_counter.cpp:14
     #1 worker(int&) racy_counter.cpp:19
 
-  Previous write of size 4 at 0x7b0400000back by thread T1:
+  Previous write of size 4 at 0x7b0400000d80 by thread T1:
     #0 increment(int&) racy_counter.cpp:14
     #1 worker(int&) racy_counter.cpp:19
 
-  Location is global 'counter' of size 4 at 0x7b0400000back
+  Location is global 'counter' of size 4 at 0x7b0400000d80
 
   Thread T2 (tid=12346, running) created by main thread at:
     #0 pthread_create

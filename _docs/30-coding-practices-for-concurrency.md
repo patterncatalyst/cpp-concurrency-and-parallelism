@@ -88,6 +88,9 @@ Three standards narrow different gaps between a coding practice and the language
 // shared immutable value — no runtime initialization order to race on,
 // and no risk of the "static local with a runtime-computed value" path
 // that relies on magic-statics locking the first time every caller reaches it.
+// The initializer must be a constant expression, so the helper is constexpr
+// and RoutingTable is a literal type; a runtime-computed value would not compile.
+constexpr RoutingTable make_default_routes();
 constinit const RoutingTable kDefaultRoutes = make_default_routes();
 ```
 

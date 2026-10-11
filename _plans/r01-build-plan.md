@@ -60,7 +60,14 @@ order: 1
 > synced locally, NOT pushed) + memory feedback_remote_first_bootstrap. **This makes Gate A (create the
 > cpp-concurrency remote) the policy-aligned next move — but still asked, since it's outward-facing.**
 >
-> **NEXT: Phase 7 (hub linkage) — and per the new policy, create the GitHub remote for THIS project (Gate A).**
+> **GATE A DONE (2026-10-11):** repo LIVE at github.com/patterncatalyst/cpp-concurrency-and-parallelism
+> (public). main fast-forwarded to the validated tip 8dac8a8 (full phase history preserved, no squash);
+> docs/r01-scaffold also pushed. Pages enabled (Actions build), homepage set, build+deploy GREEN. Live +
+> verified 200: site home, /docs/33-ingest-match-publish/ (renamed slug), /diagrams/21-disruptor-ring.svg.
+> Everything now backed up off-device.
+> **NEXT: Phase 7 — hub linkage** (add to patterncatalyst-workshops-tutorials-list under the C++ group;
+> separate repo, so a PR there per [[feedback_no_upstream_without_permission]] scope). Then Phase 8
+> extract-and-re-point on linux-systems-programming (Gate B). Optional: fix the ch33 occupancy-assert flake.
 > **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
 > (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
 > `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel
@@ -162,7 +169,7 @@ Engineering*; Brandt *Parallel C++*; Kukov *Grokking Concurrency*.
 | 5 | Decks 100/101/201 | lgtm-presentation | DONE (36/54/62 slides, commit c278899) |
 | 6 | Professional-voice sweep site-wide | lgtm-professional-voice | DONE (reader surface clean; ch33 "capstone" renamed to "full example" incl. ids) |
 | 7 | Hub linkage (patterncatalyst-workshops-tutorials-list, C++ group) | lgtm-jekyll | TODO |
-| — | **GATE A** (repo/push/Pages/hub PR) | lgtm-github | gated |
+| — | **GATE A** (repo/push/Pages) | lgtm-github | DONE 2026-10-11 — repo public, main pushed (ff), Pages LIVE |
 | 8 | Source extract-and-re-point on linux-systems-programming | lgtm-github | TODO |
 | — | **GATE B** (lsp removal + PR) | lgtm-github | gated |
 

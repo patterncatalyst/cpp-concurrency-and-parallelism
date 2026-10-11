@@ -22,12 +22,9 @@ permalink: /diagrams/
 <section class="section">
     <div class="container">
         <div class="gallery">
-            {%- comment -%}
-            No diagrams have been drawn yet. Each figure is added here
-            with a diagram-card.html include once it exists under
-            diagrams/<name>.svg + diagrams/<name>.excalidraw — see
-            diagrams/README.md for the palette and naming convention.
-            {%- endcomment -%}
+            {%- for d in site.data.diagrams -%}
+            {% include diagram-card.html file=d.name section=d.section title=d.title caption=d.caption %}
+            {%- endfor -%}
         </div>
     </div>
 </section>

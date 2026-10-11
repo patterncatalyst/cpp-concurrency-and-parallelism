@@ -32,11 +32,14 @@ source "$REPO_ROOT/scripts/lib/_helpers.sh"
 
 export LIBVIRT_DEFAULT_URI="${LIBVIRT_DEFAULT_URI:-qemu:///system}"
 VM_NAME="${VM_NAME:-cpp-conc-numa}"
-# ServerAlive* drops a session that authenticates but then hangs post-auth --
-# which happens while cloud-init + dnf saturate the guest's disk and PAM/login
-# stalls. ConnectTimeout only bounds the TCP connect, not that hang, so every
-# guest command below also runs under an explicit `timeout`.
-SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=10 -o ServerAliveInterval=10 -o ServerAliveCountMax=3"
+# Dedicated lab key (see provision-numa-vm.sh): IdentityAgent=none +
+# IdentitiesOnly force ssh to sign with THIS key file and never consult the
+# user's GUI ssh-agent (GNOME keyring / gcr), whose confirmation dialog cannot
+# be answered from a non-interactive demo and so hangs every connection.
+LAB_KEY="${LAB_KEY:-$HOME/cpp-conc-lab/lab_key}"
+# Each guest command below also runs under an explicit `timeout` so a stall
+# never blocks the demo indefinitely.
+SSH_OPTS="-o IdentityAgent=none -o IdentitiesOnly=yes -i $LAB_KEY -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=10 -o ServerAliveInterval=10 -o ServerAliveCountMax=3"
 REMOTE_DIR="/home/fedora/ch16"
 
 if [[ "${1:-}" == "--clean" ]]; then

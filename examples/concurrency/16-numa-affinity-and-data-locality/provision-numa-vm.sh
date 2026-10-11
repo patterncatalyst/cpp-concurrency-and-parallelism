@@ -26,7 +26,17 @@ RAM_MB="${RAM_MB:-4096}"        # 2048 per node
 CELL_KIB="${CELL_KIB:-2097152}" # 2048 MiB per cell, in KiB; 2 cells == RAM_MB
 DISK_GB="${DISK_GB:-20}"
 NETWORK="${NETWORK:-default}"
-SSH_PUBKEY="${SSH_PUBKEY:-$HOME/.ssh/id_ed25519.pub}"
+# Use a DEDICATED, unencrypted lab keypair (not ~/.ssh/id_ed25519): the user's
+# normal key is typically held by a GUI ssh-agent (GNOME keyring / gcr) that
+# pops a confirmation dialog to sign, which hangs non-interactive ssh from
+# demo.sh. A throwaway passphrase-less key for this disposable guest avoids the
+# agent entirely. Generated on first use.
+LAB_KEY="${LAB_KEY:-$HOME/cpp-conc-lab/lab_key}"
+if [[ ! -f "$LAB_KEY" ]]; then
+  mkdir -p "$(dirname "$LAB_KEY")"
+  ssh-keygen -t ed25519 -N "" -C "cpp-conc-numa-lab" -f "$LAB_KEY" >/dev/null
+fi
+SSH_PUBKEY="${SSH_PUBKEY:-$LAB_KEY.pub}"
 
 FEDORA_VER="${FEDORA_VER:-44}"
 BASE_URL="https://download.fedoraproject.org/pub/fedora/linux/releases/${FEDORA_VER}/Cloud/x86_64/images"

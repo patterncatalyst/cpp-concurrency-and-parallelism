@@ -21,8 +21,20 @@ order: 1
 > dark-arrow #2d2d2d; styles box/blue/green/orange/red/ink/sub/kernel/ghost; edges default dark + `heat=True`
 > red). All 39 SVG+Excalidraw pairs in `diagrams/<name>.{svg,excalidraw}` (one per excalidraw include), jekyll
 > build publishes them to `_site/diagrams/`. Done via relay (Opus grammar+reference 16-first-touch-misplacement;
-> 6 Sonnet batches A–F; Opus validation: all parse, no amber, cream bg, contact-sheet visual check). **NEXT:
-> Phase 5 (decks 100/101/201).**
+> 6 Sonnet batches A–F; Opus validation: all parse, no amber, cream bg, contact-sheet visual check).
+>
+> **PHASE 5 COMPLETE — 3 decks (commit c278899).** python-pptx harness ported from cpp-statelessness
+> as a pure library `tools/build-pptx.py` (parameterized `FOOTER_LABEL`, repointed paths/URLs), plus
+> `tools/convert-diagrams.sh` (diagrams/*.svg → /tmp/diagrams-png/*.jpg via soffice+pdftoppm) and
+> `tools/build-conc-decks.sh [100|101|201|all]`. Three decks, each = `sections_conc_NNN.py` + entry
+> script `build-conc-NNN-pptx.py` → `presentation/cpp-concurrency-NNN-*.pptx`: **100** mental model
+> (36 slides, diagram-forward), **101** C++ toolkit (54, code-heavy C++20/23/26), **201** low-latency
+> deep dive (62, +8 demo cues to verified demos). Relay: 3 Sonnet authors (parallel) → Opus validate
+> (clean rebuild exit 0, notes on every slide, 0 missing-diagram placeholders, demo dirs exist, 3
+> contact-sheet visual QA) → 1 Sonnet voice-repair round (36 edits; ban-tier confessional/filler/meta
+> → 0; 21 sanctioned survivors: bug-case "deliberately", idiom "for free", "Capstone" title). Decks +
+> sources + build-notes committed (statelessness precedent tracks .pptx). **NEXT: Phase 6 (site-wide
+> professional-voice sweep — note the "capstone" rename is a book-wide decision to make there).**
 > **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
 > (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
 > `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel
@@ -121,7 +133,7 @@ Engineering*; Brandt *Parallel C++*; Kukov *Grokking Concurrency*.
 | 2d | Chapters P7–P8 (26–33 + appendix) | lgtm-tutorial + voice | TODO |
 | 3 | Examples (~20–25): Docker demos + Lua verify.lua; NUMA/parallel in KVM lab | lgtm-docker-stack, lgtm-systems-programming | DONE (28/28: 27 Docker + ch16 NUMA) |
 | 4 | Diagrams (≥1/chapter, bespoke palette) | lgtm-diagram-generator | DONE (39/39, tools/generate_diagram.py) |
-| 5 | Decks 100/101/201 | lgtm-presentation | TODO |
+| 5 | Decks 100/101/201 | lgtm-presentation | DONE (36/54/62 slides, commit c278899) |
 | 6 | Professional-voice sweep site-wide | lgtm-professional-voice | TODO |
 | 7 | Hub linkage (patterncatalyst-workshops-tutorials-list, C++ group) | lgtm-jekyll | TODO |
 | — | **GATE A** (repo/push/Pages/hub PR) | lgtm-github | gated |

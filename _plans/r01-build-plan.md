@@ -14,7 +14,15 @@ order: 1
 > **PHASE 3 COMPLETE — 28/28 demos VERIFIED GREEN.** 27 Docker demos on real Docker (Conan+CMake+clang+
 > UBI10+Lua verify.lua, each `./demo.sh` exit 0): ch1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,20,21,
 > 24,25,27,28,29,32,33,34 — PLUS ch16 NUMA verified in the KVM lab (see below). (ch27 debugging + ch28
-> sanitizers: gdb/TSan/valgrind/ASan fire for REAL, req 24 met.) **NEXT: Phase 4 (diagrams).**
+> sanitizers: gdb/TSan/valgrind/ASan fire for REAL, req 24 met.)
+>
+> **PHASE 4 COMPLETE — 39/39 diagrams rendered.** In-repo recolored generator `tools/generate_diagram.py`
+> (bespoke palette: cream #fdfbf7 / blue #4a73b8 / green #5a8870 / orange #a06030 / red #c0392b / ink #1a1a1a /
+> dark-arrow #2d2d2d; styles box/blue/green/orange/red/ink/sub/kernel/ghost; edges default dark + `heat=True`
+> red). All 39 SVG+Excalidraw pairs in `diagrams/<name>.{svg,excalidraw}` (one per excalidraw include), jekyll
+> build publishes them to `_site/diagrams/`. Done via relay (Opus grammar+reference 16-first-touch-misplacement;
+> 6 Sonnet batches A–F; Opus validation: all parse, no amber, cream bg, contact-sheet visual check). **NEXT:
+> Phase 5 (decks 100/101/201).**
 > **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
 > (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
 > `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel
@@ -112,7 +120,7 @@ Engineering*; Brandt *Parallel C++*; Kukov *Grokking Concurrency*.
 | 2c | Chapters P5–P6 (18–25) | lgtm-tutorial + voice | TODO |
 | 2d | Chapters P7–P8 (26–33 + appendix) | lgtm-tutorial + voice | TODO |
 | 3 | Examples (~20–25): Docker demos + Lua verify.lua; NUMA/parallel in KVM lab | lgtm-docker-stack, lgtm-systems-programming | DONE (28/28: 27 Docker + ch16 NUMA) |
-| 4 | Diagrams (≥1/chapter, bespoke palette) | lgtm-diagram-generator | TODO |
+| 4 | Diagrams (≥1/chapter, bespoke palette) | lgtm-diagram-generator | DONE (39/39, tools/generate_diagram.py) |
 | 5 | Decks 100/101/201 | lgtm-presentation | TODO |
 | 6 | Professional-voice sweep site-wide | lgtm-professional-voice | TODO |
 | 7 | Hub linkage (patterncatalyst-workshops-tutorials-list, C++ group) | lgtm-jekyll | TODO |

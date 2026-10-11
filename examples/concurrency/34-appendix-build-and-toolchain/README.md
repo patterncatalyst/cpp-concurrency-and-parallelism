@@ -24,7 +24,7 @@ paths:
   construction; `final_count` equals the expected total exactly, on
   every compiler, every run.
 - **`--inject-race`** — a plain, non-atomic `uint64_t` incremented with
-  an unsynchronized read-modify-write instead. A genuine data race,
+  an unsynchronized read-modify-write instead. A data race,
   reachable only behind this flag (off by default).
 
 [`CMakePresets.json`](CMakePresets.json) ships the full five-preset
@@ -136,7 +136,7 @@ RESULT: PASS
 
 Both runs are a `PASS` — this example is designed so that whichever
 compilers and sanitizer runtimes a given build host happens to provide,
-the result is always a real, honestly-reported outcome, never a silent
+the result is always accurately reported, never a silent
 skip disguised as success.
 
 ## Layout

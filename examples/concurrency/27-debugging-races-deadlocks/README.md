@@ -11,7 +11,7 @@ programs, each made to fail **every run** rather than occasionally:
   one invocation and a corrupted one on the next; ThreadSanitizer is what
   actually proves the defect, independent of what any single run prints.
 - **`ab_ba_deadlock`** — two `Account`s, two threads acquiring their
-  mutexes in opposite order, forced into a genuine AB/BA deadlock on every
+  mutexes in opposite order, forced into an AB/BA deadlock on every
   single run by a `std::latch`. `gdb -p <pid>` attaches to the live,
   permanently-hung process and reads the lock cycle straight off both
   threads' backtraces.

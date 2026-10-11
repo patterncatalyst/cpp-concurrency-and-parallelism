@@ -15,8 +15,8 @@ all exits cleanly, well inside an orchestrator's grace period** — no forced
 workers (default 4), each polling a `stop_token` in a 5ms loop. A real
 `SIGTERM` handler is installed before any worker starts.
 
-**One deliberate deviation from the chapter's literal phrasing, worth
-stating plainly:** the handler does **not** call `request_stop()` itself.
+**One deliberate deviation from the chapter's literal phrasing:** the
+handler does **not** call `request_stop()` itself.
 `std::stop_source::request_stop()` is not guaranteed async-signal-safe — it
 may touch an internal mutex and invoke any registered `stop_callback`s,
 neither of which is safe inside a signal handler. The handler instead does

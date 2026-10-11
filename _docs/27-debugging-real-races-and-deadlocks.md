@@ -12,7 +12,7 @@ duration: "17 min"
 
 ## What we'll cover
 
-- Construct a real, reproducible data race rather than a hypothetical one, as the worked example for the rest of the chapter.
+- Construct a real, reproducible data race rather than a hypothetical one, as this chapter's worked example.
 - Construct a real, reproducible deadlock from a lock-ordering violation.
 - Drive gdb against the multithreaded program: inspecting per-thread backtraces, switching threads, and setting thread-scoped breakpoints.
 - Read a ThreadSanitizer report for the data race and map each line back to the source locations involved.

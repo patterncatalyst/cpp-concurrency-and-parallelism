@@ -111,7 +111,7 @@ Split the same 200,000 increments across eight threads sharing one mutex, and
 the picture changes by more than two orders of magnitude. The futex count
 rises into the low thousands, varying run to run with scheduling (one
 reference measurement put it at 2,360), because now the compare-and-swap
-genuinely fails often enough to send threads into the kernel to sleep and
+fails often enough to send threads into the kernel to sleep and
 wake each other. Breaking that count down by operation shows the mechanism
 described above actually at work: in that same reference measurement, only
 on the order of a few hundred of the 200,000 lock operations under
@@ -189,7 +189,7 @@ thread that held a lock for what should have been a few hundred nanoseconds
 can instead be preempted mid-critical-section when its quota runs out for
 the period, stretching the window during which every other thread's
 compare-and-swap fails. The futex call count goes up, the voluntary-context-
-switch count goes up, and neither number is lying: contention genuinely
+switch count goes up, and neither number is lying: contention
 increased. But the cause is scheduling pressure from the quota, not a
 change in the workload or the lock itself. Reading `cpu.stat`'s
 `nr_throttled` and `throttled_usec` alongside a futex-count comparison is

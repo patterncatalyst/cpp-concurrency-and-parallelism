@@ -65,7 +65,7 @@ def build_title(prs, total):
                 size=F.TITLE_HUGE, color=C.TEXT_WHITE, bold=True, font=FontFam.HEADER)
     bp.add_text(slide, Inches(1.0), Inches(4.5), Inches(11.3), Inches(0.5),
                 "NUMA and SIMD  •  benchmarking without deception  •  false sharing  "
-                "•  the Disruptor  •  observability  •  the capstone pipeline",
+                "•  the Disruptor  •  observability  •  the full pipeline",
                 size=F.BODY, color=C.TEXT_LIGHT, font=FontFam.BODY)
     bp.add_text(slide, Inches(1.0), Inches(5.2), Inches(11.3), Inches(0.4),
                 "Companion deck to cpp-concurrency-and-parallelism  —  Docs 16–33",
@@ -82,7 +82,7 @@ def build_title(prs, total):
         "other systems where single-digit microseconds are the budget, not an "
         "aspiration. Where an introductory deck explains what a thread is, this one "
         "assumes that and goes straight at NUMA placement, false sharing, the "
-        "Disruptor pattern, and a capstone pipeline that composes all of it under "
+        "Disruptor pattern, and a full pipeline that composes all of it under "
         "load.\n\n"
         "The spine is fourteen sections built from chapters 16 through 33 of the "
         "book: locality and vectorization, the benchmarking discipline that makes "
@@ -90,7 +90,7 @@ def build_title(prs, total):
         "sympathy, lock-free messaging, communication models and the actor model, "
         "concurrent REST and gRPC under load, error handling across thread "
         "boundaries, debugging and sanitizers, observability, coding practices and "
-        "architecture patterns, running correctly in a container, and a capstone "
+        "architecture patterns, running correctly in a container, and a full end-to-end example "
         "order-book pipeline that ties the whole arc together.\n\n"
         "Every pattern in this deck has a runnable companion under examples/"
         "concurrency/, and we will cue each demo at the point its pattern is "
@@ -141,7 +141,7 @@ def build_agenda(prs, total, sections):
         "and gRPC, error handling across boundaries, debugging and sanitizers, "
         "observability, coding and architecture patterns, and running correctly "
         "under a container's real resource limits.\n\n"
-        "Section fourteen closes with the capstone: a single ingest-match-publish "
+        "Section fourteen closes with the full example: a single ingest-match-publish "
         "pipeline that composes a thread pool, a pinned single-writer thread, "
         "lock-free rings, and full tracing into one measured system, proving the "
         "earlier sections' individually-true claims hold up stacked together. "
@@ -163,7 +163,7 @@ def build_closing(prs, total):
                   "a fast path; communication models and architecture patterns turn "
                   "the fast path into a whole system.", size=Pt(18),
              color=C.TEXT_LIGHT, font=FontFam.BODY, space_before=Pt(10)),
-        dict(text="The capstone pipeline composes all of it, measured under load — "
+        dict(text="The full pipeline composes all of it, measured under load — "
                   "and eight demos across this deck are where a reader's own hardware "
                   "produces the real numbers.", size=Pt(18), color=C.ACCENT_CYAN,
              font=FontFam.BODY, space_before=Pt(10)),
@@ -175,13 +175,13 @@ def build_closing(prs, total):
                 REPO_URL, size=F.CAPTION, color=C.TEXT_MUTED, font=FontFam.CODE)
     bp.set_notes(slide,
         "To close: every pattern in this deck, from first-touch NUMA placement to "
-        "the capstone's pinned single-writer match thread, is backed by a runnable "
+        "the full example's pinned single-writer match thread, is backed by a runnable "
         "example under examples/concurrency/, and none of the performance claims in "
         "this deck are presented as the book's own measurement — the hardware a "
         "reader runs these on produces the real figures.\n\n"
         "The arc holds together end to end: a trustworthy benchmark makes every "
         "other number in the book meaningful, mechanical sympathy and lock-free "
-        "messaging turn that discipline into a fast path, and the capstone pipeline "
+        "messaging turn that discipline into a fast path, and the full pipeline "
         "proves the individually-true claims from every earlier section still hold "
         "once they are stacked into one system under real load. Clone the repo, run "
         "the demos, and measure your own hardware. Thank you.")

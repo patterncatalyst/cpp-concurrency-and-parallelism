@@ -225,7 +225,7 @@ catch the mistake; a detached thread that throws an unhandled exception calls
 object left anywhere to have prevented the thread from being abandoned in a
 half-finished state in the first place.
 
-There are legitimate uses, such as a genuinely fire-and-forget background
+There are legitimate uses, such as a fire-and-forget background
 task whose owning process is about to exit regardless, or an old-style API
 boundary that only accepts a bare thread id. But in service code, where a
 request's

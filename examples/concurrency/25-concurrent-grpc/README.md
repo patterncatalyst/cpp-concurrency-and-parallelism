@@ -41,8 +41,8 @@ same cgroup-aware sizing concern `15-thread-pool`'s `cgroup_probe` and
 since every example in this project is self-contained.
 
 [`src/concurrent_client.cpp`](src/concurrent_client.cpp) opens `--calls`
-concurrent `ServerStreamEcho` RPCs: one `std::thread` per call (genuine
-OS-level concurrency), all released from the same starting line via a
+concurrent `ServerStreamEcho` RPCs: one `std::thread` per call (OS-level
+concurrency), all released from the same starting line via a
 `std::latch` so they actually overlap instead of trickling in one at a
 time. Each call reads its stream to completion (or its immediate terminal
 status, if rejected) and prints one `key=value` line:
@@ -120,7 +120,7 @@ for the identical trio+version pins), plus everything gRPC's own Conan
 recipe pulls in transitively — abseil, c-ares, re2, zlib,
 OpenSSL/boringssl. Static linking means the runtime stage needs nothing
 beyond `libstdc++` (no `/deps` shared-lib staging, unlike
-`01-execution-models`'s oneTBB). The first build can take a genuinely long
+`01-execution-models`'s oneTBB). The first build can take a long
 time, especially if no prebuilt Conan binary matches this exact
 UBI10/gcc/Conan profile and `--build=missing` falls back to compiling the
 whole trio from source; a warm Conan layer in the image cache makes every

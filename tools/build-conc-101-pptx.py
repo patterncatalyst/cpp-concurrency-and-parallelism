@@ -82,7 +82,7 @@ def build_title(prs, total):
 
     bp.set_notes(slide,
         "Welcome to the modern C++ concurrency toolkit. This deck is "
-        "code-heavy and deliberately broad: twelve chapters' worth of the "
+        "code-heavy and broad: twelve chapters' worth of the "
         "standard library's concurrency surface, from std::jthread through "
         "thread pools, with real, compiling C++ on every slide.\n\n"
         "The organizing idea is the same one the book uses: show what the "

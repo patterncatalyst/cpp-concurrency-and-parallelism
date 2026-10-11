@@ -54,7 +54,7 @@ and shared, via `lock_shared()`/`shared_lock`, for readers that may run
 concurrently with each other as long as no writer holds the exclusive mode.
 For a cache or configuration structure that is read far more often than it
 is written, this converts what would be serialized reader traffic under
-`std::mutex` into genuinely parallel reads, at the cost of a somewhat more
+`std::mutex` into parallel reads, at the cost of a somewhat more
 expensive lock operation per acquisition and the possibility of writer
 starvation under some implementations' fairness policies. Measure before
 assuming it is a net win on a given workload: a shared_mutex under light
@@ -183,7 +183,7 @@ for the rest of the process's life, silently, with no exception at the call
 site that made the mistake.
 
 This is why a bare `lock()`/`unlock()` pair, outside of the narrow cases
-where `unique_lock`'s `adopt_lock` or an early-release pattern genuinely
+where `unique_lock`'s `adopt_lock` or an early-release pattern
 needs it, is a legitimate finding in code review rather than a style
 preference. It is not that manual locking is always wrong; it is that the
 RAII types cost nothing beyond the lock and unlock calls they wrap, since the

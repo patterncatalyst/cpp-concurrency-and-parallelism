@@ -108,4 +108,4 @@ The prerequisites are a property of the platform, not of a language standard —
 - One `dnf` install provides the whole C++ toolchain (clang, gcc, CMake, Ninja, gdb, valgrind, lua); Conan 2 pins every third-party library per example so nothing is installed system-wide.
 - Docker Engine with Compose v2 runs every example, and a container CPU limit is also how the container chapters demonstrate cgroup quota and cpuset behavior.
 - The KVM lab is optional and needed only for the NUMA chapter; it keeps real NUMA experiments inside a disposable guest so host kernel settings are never changed.
-- Any CMake-aware editor works; CLion is the preferred one. Each example runs through a single `./demo.sh` whose `verify.lua` asserts the chapter's claim for real.
+- Any CMake-aware editor works; CLion is the preferred one. Each example runs through a single `./demo.sh` whose `verify.lua` asserts the chapter's claim.

@@ -17,7 +17,7 @@ duration: "13 min"
 - Show how to express and enforce a timeout on a blocking or async operation.
 - Propagate a single deadline across a chain of nested calls so no individual hop can silently exceed the caller's budget.
 
-A thread that waits on a lock, a condition variable, or a socket needs to know how long it's been waiting, and it needs that answer to be right even while the system clock is being corrected underneath it. Get the clock choice wrong and the bug doesn't show up in testing — it shows up the first time `chronyd` or `ntpd` steps the wall clock during a slow request, and a timeout that should have fired early fires late, or fires immediately on a perfectly healthy connection. This chapter fixes the clock choice once, so every timeout and deadline in the rest of the book inherits it correctly.
+A thread that waits on a lock, a condition variable, or a socket needs to know how long it's been waiting, and it needs that answer to be right even while the system clock is being corrected underneath it. Get the clock choice wrong and the bug doesn't show up in testing — it shows up the first time `chronyd` or `ntpd` steps the wall clock during a slow request, and a timeout that should have fired early fires late, or fires immediately on a perfectly healthy connection. This chapter fixes the clock choice once, so every timeout and deadline in later chapters inherits it correctly.
 
 ## The Clock Taxonomy: steady_clock vs system_clock
 
@@ -165,4 +165,4 @@ std::execution::sync_wait(std::move(work));
 - `clock_gettime` on `CLOCK_MONOTONIC` is a vDSO read, not a syscall — a program can check a deadline on every loop iteration for tens of nanoseconds, while a trace of the same program shows zero `clock_gettime` lines and the sleeping calls it actually does make.
 - `wait_for`/`wait_until` are clock-typed; pass a `steady_clock::time_point` to `wait_until` so a wall-clock step can never corrupt the wait, and recompute a `poll`/`epoll` timeout from a fixed `steady_clock` deadline each iteration rather than counting down a separately-tracked duration.
 - Propagate one absolute deadline through a call chain instead of re-applying a fresh timeout at each hop — the pattern underneath both HTTP request timeouts and gRPC deadline propagation in later chapters.
-- Under a cgroup CPU quota, a monotonic deadline can still expire from CFS throttling rather than genuine slowness; `cpu.stat`'s `nr_throttled`/`throttled_usec` distinguishes "the container didn't run" from "the work was actually slow."
+- Under a cgroup CPU quota, a monotonic deadline can still expire from CFS throttling rather than slowness; `cpu.stat`'s `nr_throttled`/`throttled_usec` distinguishes "the container didn't run" from "the work was actually slow."

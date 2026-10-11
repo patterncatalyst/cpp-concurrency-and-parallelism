@@ -1,11 +1,11 @@
 #!/usr/bin/env lua5.4
--- concurrency/33-capstone-ingest-match-publish — verify.lua
+-- concurrency/33-ingest-match-publish — verify.lua
 --
 -- Same assertion-harness contract every sibling example in this project
 -- follows: plain Lua 5.4 (no external modules), run once inside the
 -- demo's container against the binary that same image just built.
 --
---   * No required arguments. Reads CAPSTONE_PIPELINE_BIN and the
+--   * No required arguments. Reads PIPELINE_BIN and the
 --     --sustained/--burst/etc. knobs via env var overrides, with sane
 --     defaults otherwise.
 --   * Prints a readable, line-oriented summary to stdout as it goes.
@@ -14,7 +14,7 @@
 --   * Exits non-zero (and prints a line starting "FAIL"/"RESULT: FAIL")
 --     on any hard failure.
 --
--- capstone_pipeline itself never judges pass/fail -- it only reports (one
+-- pipeline itself never judges pass/fail -- it only reports (one
 -- EVENT line per accepted order, one final SUMMARY line of counters and
 -- latency percentiles), exactly like every sibling binary in this
 -- project. All of the judgment below is this file's job.
@@ -57,23 +57,23 @@
 --      failed, since a very small sample can defy strict monotonicity at
 --      the boundaries.
 
-local BIN = os.getenv("CAPSTONE_PIPELINE_BIN") or "/usr/local/bin/capstone_pipeline"
+local BIN = os.getenv("PIPELINE_BIN") or "/usr/local/bin/pipeline"
 
 local args = {}
 local function add_opt(flag, env)
     local v = os.getenv(env)
     if v then table.insert(args, flag .. " " .. v) end
 end
-add_opt("--sustained", "CAPSTONE_SUSTAINED")
-add_opt("--burst", "CAPSTONE_BURST")
-add_opt("--ingest-threads", "CAPSTONE_INGEST_THREADS")
-add_opt("--publish-threads", "CAPSTONE_PUBLISH_THREADS")
-add_opt("--ingest-capacity", "CAPSTONE_INGEST_CAPACITY")
-add_opt("--publish-capacity", "CAPSTONE_PUBLISH_CAPACITY")
+add_opt("--sustained", "PIPELINE_SUSTAINED")
+add_opt("--burst", "PIPELINE_BURST")
+add_opt("--ingest-threads", "PIPELINE_INGEST_THREADS")
+add_opt("--publish-threads", "PIPELINE_PUBLISH_THREADS")
+add_opt("--ingest-capacity", "PIPELINE_INGEST_CAPACITY")
+add_opt("--publish-capacity", "PIPELINE_PUBLISH_CAPACITY")
 
 local cmd = BIN .. " " .. table.concat(args, " ")
 
-print(string.format("== verify.lua: 33-capstone-ingest-match-publish -- running: %s ==", cmd))
+print(string.format("== verify.lua: 33-ingest-match-publish -- running: %s ==", cmd))
 
 local handle, perr = io.popen(cmd .. " 2>&1")
 if not handle then
@@ -83,7 +83,7 @@ end
 local output = handle:read("*a")
 local ok, why, code = handle:close()
 if not ok then
-    print(string.format("FAIL: capstone_pipeline exited abnormally (%s %s)", tostring(why), tostring(code)))
+    print(string.format("FAIL: pipeline exited abnormally (%s %s)", tostring(why), tostring(code)))
     print("--- output ---")
     print(output)
     os.exit(1)
@@ -300,7 +300,7 @@ if not (S.p50 <= S.p99 and S.p99 <= S.p999) then
     warn(string.format(
         "latency percentiles not monotonically increasing (p50=%d p99=%d p999=%d) -- " ..
         "can happen on a very small accepted-order sample; not failed, since this " ..
-        "chapter deliberately does not assert a fixed latency number",
+        "chapter does not assert a fixed latency number",
         S.p50, S.p99, S.p999))
 else
     print(string.format(

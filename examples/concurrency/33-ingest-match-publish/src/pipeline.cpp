@@ -1,7 +1,7 @@
-// concurrency/33-capstone-ingest-match-publish — the book's capstone:
+// concurrency/33-ingest-match-publish — the book's full example:
 // ingest -> match -> publish, in one process.
 //
-// This is not a new idea; it is the rest of the book wired together the
+// This is not a new idea; it is earlier chapters wired together the
 // way Doc 33 describes. Every piece below is a direct, smaller application
 // of an earlier chapter's technique rather than something invented fresh
 // for this file:
@@ -29,14 +29,14 @@
 //            fast-path playbook (pinned core, busy-poll read, zero
 //            per-order heap allocation: the book's pool and price levels
 //            are pre-sized once at startup, never resized on the hot
-//            path). Price-time priority is a real, working limit order
+//            path). Price-time priority is a working limit order
 //            book: intrusive doubly-linked FIFOs per price level, O(1)
 //            insert/remove, cached best-bid/best-ask pointers.
 //
 //   PUBLISH  a small pool of threads drains the match stage's output ring
 //            and "writes" each outcome out (to an in-memory buffer stood
 //            in for a subscriber socket, per ch9's multi-consumer
-//            technique) -- the one stage that genuinely parallelizes,
+//            technique) -- the one stage that parallelizes,
 //            unlike match.
 //
 // What every example in this project prints is a reporting contract, not
@@ -47,7 +47,7 @@
 // "binary reports, Lua judges" convention.
 //
 // Usage:
-//   capstone_pipeline [--sustained N] [--burst N] [--ingest-threads N]
+//   pipeline [--sustained N] [--burst N] [--ingest-threads N]
 //                      [--publish-threads N] [--ingest-capacity N]
 //                      [--publish-capacity N]
 //
@@ -70,7 +70,7 @@
 #include <sys/syscall.h>
 #include <vector>
 
-// fmt/format.h (not just fmt/core.h, which the rest of this book's
+// fmt/format.h (not just fmt/core.h, which this book's other
 // examples use for fmt::print alone) -- this example also builds each
 // EVENT line into a std::string with fmt::format before deferring the
 // actual print to after every thread has joined (see publish_worker).
@@ -79,7 +79,7 @@
 namespace {
 
 // ════════════════════════════════════════════════════════════════════════
-// Small helpers shared with the rest of this book's examples.
+// Small helpers shared with this book's other examples.
 // ════════════════════════════════════════════════════════════════════════
 
 #if defined(__cpp_lib_hardware_interference_size)
@@ -663,7 +663,7 @@ int main(int argc, char** argv) {
         else if (arg == "--publish-capacity") next_u64(cfg.publish_capacity);
         else if (arg == "-h" || arg == "--help") {
             fmt::print(
-                "usage: capstone_pipeline [--sustained N] [--burst N] "
+                "usage: pipeline [--sustained N] [--burst N] "
                 "[--ingest-threads N] [--publish-threads N] "
                 "[--ingest-capacity N] [--publish-capacity N]\n");
             return 0;

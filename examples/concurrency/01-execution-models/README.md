@@ -6,7 +6,7 @@ Compendium reference:
 The runnable companion to compendium Doc 1. The one-line takeaway:
 **concurrency (structure) and parallelism (execution) are independent
 axes**, so crossing them produces four real execution models, not two, and
-the only honest way to tell them apart is to count what actually happened
+the only reliable way to tell them apart is to count what actually happened
 rather than time how long it took.
 
 ## What it demonstrates
@@ -77,7 +77,7 @@ which would make `parallel` and `both` structurally unable to show
    model runs, and the program pins it itself.
 2. **`concurrent_pinned` (hard, every trial).** `distinct_cpus==1` (every
    worker self-pins to the same cpu id) and `max_inflight>1` (many
-   `jthread`s genuinely overlap while pinned to that one CPU — a periodic
+   `jthread`s overlap while pinned to that one CPU — a periodic
    `std::this_thread::yield()` inside the work window gives the scheduler
    real chances to interleave them).
 3. **`parallel`/`both` (conditionally hard).** `distinct_cpus>1` is only

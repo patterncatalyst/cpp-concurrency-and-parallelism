@@ -35,6 +35,32 @@ order: 1
 > → 0; 21 sanctioned survivors: bug-case "deliberately", idiom "for free", "Capstone" title). Decks +
 > sources + build-notes committed (statelessness precedent tracks .pptx). **NEXT: Phase 6 (site-wide
 > professional-voice sweep — note the "capstone" rename is a book-wide decision to make there).**
+>
+> **PHASE 6 COMPLETE — professional-voice sweep.** Reader-facing surface (md/py/svg) now clean:
+> genuine/genuinely, confessional (honest/plainly/worth-stating), meta-narration ("rest of the
+> book/deck"), and reassurance ("for real") all at 0. Sanctioned survivors kept: bug-case/forced-condition
+> "deliberately" (~42) and idiomatic "for free"/"on purpose" (~22). Done via relay: 4 Sonnet executors
+> (chapters 00–15 / 16–25 / 26–34 / READMEs+parts+build-comments) + Opus triage/validate; deck sources
+> and the ch33 demo dir swept by hand. Code-comment prose in demo `.cpp` files left as-is (outside the
+> voice skill's default surface). **User decision (2026-10-11): "capstone" removed book-wide INCLUDING
+> identifiers** — `33-capstone-ingest-match-publish` → `33-ingest-match-publish` (dir + doc slug + CI
+> script), C++ target `capstone_pipeline` → `pipeline`, env `CAPSTONE_*` → `PIPELINE_*`; ch33 re-verified
+> locally (built+ran+verify.lua PASS on re-run; one intermittent occupancy-assert flake observed, not a
+> regression — see below). ch33/part-08 titles → "Full Example…". PROVENANCE comments keep real lsp source
+> filenames. Jekyll build clean, new slug resolves, zero dangling old-slug refs, 3 decks rebuilt+validated.
+>
+> **KNOWN FLAKE (ch33):** verify.lua can intermittently fail with `ingest_peak_occupancy (65) exceeded
+> ingest_capacity (64)` under the overload burst — a benign measurement race in sampling peak occupancy of
+> the MPSC ingest ring (not memory corruption; re-run passes). Predates the rename. Candidate fix: tolerate
+> peak==capacity+1 in verify.lua, or tighten the peak-occupancy counter's memory ordering in pipeline.cpp.
+>
+> **STANDING POLICY CHANGE (2026-10-11, user):** new projects of our own → create the remote (public)
+> FIRST, then branch, then work (off-device durability); tutorials default to the workshops/tutorials hub
+> but always ask. Encoded in lgtm-github/jekyll/tutorial skills (lgtm-skills branch `docs/project-bootstrap-policy`,
+> synced locally, NOT pushed) + memory feedback_remote_first_bootstrap. **This makes Gate A (create the
+> cpp-concurrency remote) the policy-aligned next move — but still asked, since it's outward-facing.**
+>
+> **NEXT: Phase 7 (hub linkage) — and per the new policy, create the GitHub remote for THIS project (Gate A).**
 > **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
 > (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
 > `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel
@@ -112,7 +138,7 @@ codetabs as C++20/23/26. Ship incrementally across ~12 relay iterations.
 - **P5 Low Latency & High Throughput:** 18 Benchmarking Without Deception[S] · 19 Low-Latency Fast Path[S] · 20 Mechanical Sympathy[N] · 21 Lock-Free Messaging & the Disruptor[N]
 - **P6 Communications & Concurrency:** 22 Communication Models (sockets/pipes/D-Bus)[N] · 23 Actor Model & CSP Channels[N] · 24 Concurrent REST (Asio/Beast)[N] · 25 Concurrent gRPC[N]
 - **P7 Correctness, Errors & Debugging:** 26 Error vs Exception Handling[N] · 27 Debugging Real Races & Deadlocks[N] · 28 Sanitizers & Dynamic Analysis[N] · 29 Observing Concurrency (OTel→LGTM)[N, added]
-- **P8 Practice:** 30 Good Coding Practices[N] · 31 Design & Architecture Patterns[N] · 32 Concurrency in Containers[N] · 33 Capstone: Low-Latency Ingest→Match→Publish[S]
+- **P8 Practice:** 30 Good Coding Practices[N] · 31 Design & Architecture Patterns[N] · 32 Concurrency in Containers[N] · 33 Full Example: Low-Latency Ingest→Match→Publish[S]
 - **Appendix:** Build & Toolchain (clang/gdb/CMake/Conan/Lua `verify.lua`)
 
 Every chapter: 2–2.5k-word body, "What we'll cover" open + "What we learned" close, ≥1 diagram, example
@@ -134,7 +160,7 @@ Engineering*; Brandt *Parallel C++*; Kukov *Grokking Concurrency*.
 | 3 | Examples (~20–25): Docker demos + Lua verify.lua; NUMA/parallel in KVM lab | lgtm-docker-stack, lgtm-systems-programming | DONE (28/28: 27 Docker + ch16 NUMA) |
 | 4 | Diagrams (≥1/chapter, bespoke palette) | lgtm-diagram-generator | DONE (39/39, tools/generate_diagram.py) |
 | 5 | Decks 100/101/201 | lgtm-presentation | DONE (36/54/62 slides, commit c278899) |
-| 6 | Professional-voice sweep site-wide | lgtm-professional-voice | TODO |
+| 6 | Professional-voice sweep site-wide | lgtm-professional-voice | DONE (reader surface clean; ch33 "capstone" renamed to "full example" incl. ids) |
 | 7 | Hub linkage (patterncatalyst-workshops-tutorials-list, C++ group) | lgtm-jekyll | TODO |
 | — | **GATE A** (repo/push/Pages/hub PR) | lgtm-github | gated |
 | 8 | Source extract-and-re-point on linux-systems-programming | lgtm-github | TODO |

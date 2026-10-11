@@ -44,7 +44,7 @@ mode=naive n=50000 elapsed_ns=1842933 checksum=1249975000 expected_checksum=1249
 ```
 
 That absence — no `min_ns`, no `median_ns`, no `p99_ns`, no `co_p99_ns` —
-is the methodology gap the rest of the chapter argues against, made
+is the methodology gap this chapter argues against, made
 visible in the program's own output instead of only in prose.
 
 `fmt` is pulled in for output formatting only, the same role it plays in

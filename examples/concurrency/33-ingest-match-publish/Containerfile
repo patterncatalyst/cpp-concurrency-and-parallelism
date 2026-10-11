@@ -1,8 +1,8 @@
-# concurrency/33-capstone-ingest-match-publish — the book's capstone
+# concurrency/33-ingest-match-publish — the book's full example
 # pipeline: ingest -> match -> publish, in one process, one container.
 #
 # Builds one binary:
-#   capstone_pipeline   several ingest threads generate NEW/CANCEL order
+#   pipeline   several ingest threads generate NEW/CANCEL order
 #                       messages (a simulated feed -- no real gRPC/REST
 #                       server, keeping this a one-container build), hand
 #                       them off over a bounded lock-free ring to a single
@@ -51,7 +51,7 @@ RUN cmake -S . -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_TOOLCHAIN_FILE=build/conan/conan_toolchain.cmake \
     && cmake --build build -j"$(nproc)" \
-    && strip --strip-all build/capstone_pipeline
+    && strip --strip-all build/pipeline
 
 # ════════════════════════════════════════════════════════════════════════
 # Runtime — ubi-minimal + libstdc++ + Lua 5.4 (verify.lua runs here).
@@ -66,12 +66,12 @@ RUN microdnf install -y --setopt=install_weak_deps=0 \
     && rm -rf /var/cache/yum
 
 WORKDIR /demo
-COPY --from=builder /src/build/capstone_pipeline /usr/local/bin/capstone_pipeline
+COPY --from=builder /src/build/pipeline /usr/local/bin/pipeline
 COPY verify.lua ./verify.lua
 
-ENV CAPSTONE_PIPELINE_BIN=/usr/local/bin/capstone_pipeline
+ENV PIPELINE_BIN=/usr/local/bin/pipeline
 
 # No service, no ports: a batch binary plus its Lua assertion harness.
 # CMD runs verify.lua by default; the demo also allows overriding the
-# command to run capstone_pipeline directly for ad hoc inspection.
+# command to run pipeline directly for ad hoc inspection.
 CMD ["lua", "verify.lua"]

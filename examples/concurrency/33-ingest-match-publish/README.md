@@ -1,17 +1,17 @@
-# concurrency/33-capstone-ingest-match-publish — ingest, match, publish
+# concurrency/33-ingest-match-publish — ingest, match, publish
 
 Compendium reference:
-[Doc 33 — Capstone: Ingest, Match, Publish](../../../_docs/33-capstone-ingest-match-publish.md)
+[Doc 33 — Full Example: Ingest, Match, Publish](../../../_docs/33-ingest-match-publish.md)
 
-The runnable companion to compendium Doc 33, and this book's capstone: a
+The runnable companion to compendium Doc 33, and this book's full example: a
 real three-stage, low-latency pipeline — ingest, match, publish — wired
-together from the patterns the rest of the book spent 32 chapters
+together from the patterns earlier chapters spent 32 chapters
 establishing one at a time. Nothing here is a new idea; it is the smaller
 ideas, stacked.
 
 ## What it demonstrates
 
-[`src/capstone_pipeline.cpp`](src/capstone_pipeline.cpp) is one process,
+[`src/pipeline.cpp`](src/pipeline.cpp) is one process,
 one binary, three concurrency shapes:
 
 - **Ingest** — several producer threads (`--ingest-threads`, default 4)
@@ -88,7 +88,7 @@ to back, in a single pass:
 
 ## Verification: verify.lua
 
-[`verify.lua`](verify.lua) runs `capstone_pipeline` once and checks:
+[`verify.lua`](verify.lua) runs `pipeline` once and checks:
 
 **Hard** (any failure here is a real bug, not noise):
 
@@ -160,29 +160,29 @@ its dependency:
 ## Running it
 
 ```bash
-./demo.sh            # build + run capstone_pipeline + verify.lua
+./demo.sh            # build + run pipeline + verify.lua
 ./demo.sh --clean    # remove the image
 DEMO_NO_PAUSE=1 ./demo.sh   # skip the presenter pause (CI / scripted)
 ```
 
-`capstone_pipeline` itself takes:
+`pipeline` itself takes:
 
 ```
-capstone_pipeline [--sustained N] [--burst N] [--ingest-threads N] \
+pipeline [--sustained N] [--burst N] [--ingest-threads N] \
                    [--publish-threads N] [--ingest-capacity N] \
                    [--publish-capacity N]
 ```
 
 CI verification:
-[`../../../scripts/test-concurrency-demo-33-capstone-ingest-match-publish.sh`](../../../scripts/test-concurrency-demo-33-capstone-ingest-match-publish.sh).
+[`../../../scripts/test-concurrency-demo-33-ingest-match-publish.sh`](../../../scripts/test-concurrency-demo-33-ingest-match-publish.sh).
 
 ## Layout
 
 ```
-33-capstone-ingest-match-publish/
-├── src/capstone_pipeline.cpp   ingest + BoundedRing<T> + MatchEngine + publish, one TU
+33-ingest-match-publish/
+├── src/pipeline.cpp   ingest + BoundedRing<T> + MatchEngine + publish, one TU
 ├── conanfile.txt               [requires] fmt/10.2.1 -- the project's one dependency
-├── CMakeLists.txt              C++20, find_package(fmt), -O2, target capstone_pipeline
+├── CMakeLists.txt              C++20, find_package(fmt), -O2, target pipeline
 ├── Containerfile                UBI 10 (gcc + cmake + conan) builder → ubi-minimal + lua runtime
 ├── verify.lua                  Lua 5.4 assertion harness (correctness hard, timing soft)
 ├── demo.sh                     the driver (docker build + docker run)

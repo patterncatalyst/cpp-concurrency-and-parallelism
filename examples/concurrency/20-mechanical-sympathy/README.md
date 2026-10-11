@@ -66,7 +66,7 @@ doesn't guarantee the scheduler keeps two pinned threads pinned under host
 contention, and a busy shared host or SMT-sibling placement can mute (but
 never reverse the existence of) the effect. The fix — `alignas` on the hot
 fields — is correct regardless; the demo's job is to show the signal when
-the environment allows it and say so plainly when it can't, rather than
+the environment allows it and say so clearly when it can't, rather than
 assert a margin it can't actually guarantee on someone else's CI runner.
 
 In practice, on this environment, the effect was large and consistent
@@ -118,7 +118,7 @@ between the two cores' caches.
 
 ## Convention this example establishes
 
-This is the reference example the rest of the tutorial's demos copy:
+This is the reference example every other demo in this tutorial copies:
 
 - **Directory shape**: `src/`, `conanfile.txt` (or `conanfile.py` for
   heavier dependency graphs), `CMakeLists.txt`, `Containerfile`,

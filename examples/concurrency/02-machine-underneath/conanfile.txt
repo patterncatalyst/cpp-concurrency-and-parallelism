@@ -1,6 +1,6 @@
 # concurrency/02-machine-underneath Conan recipe (Conan 2.x).
 #
-# One dependency (fmt), same as the rest of the tutorial's examples --
+# One dependency (fmt), same as the other examples in this tutorial --
 # used only for output formatting. The benchmark's substance (the
 # pointer-chase chase loop, the cache-line-sized node layout, the timing)
 # is pure standard library.

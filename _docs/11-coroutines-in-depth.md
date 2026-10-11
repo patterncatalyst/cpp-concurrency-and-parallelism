@@ -110,7 +110,7 @@ for (auto value : fibonacci() | std::views::take(10)) {
 }
 ```
 
-Two things about that function are worth noticing beyond the brevity. It is an infinite loop with no termination condition, consumed finitely by `std::views::take` (or an explicit `break`) — and that is not a leak. Breaking out destroys the generator object, which destroys the coroutine frame, which destroys a coroutine suspended mid-`co_yield`; destroying a suspended coroutine is well-defined, runs the destructors of any locals in scope at the suspension point, and frees the frame. The per-call state — `a` and `b` above — is in the function body as ordinary locals, not hoisted into a hand-written class's members the way a manual generator requires; that is the ergonomic argument for `std::generator`, independent of any performance claim.
+Two things about that function matter beyond the brevity. It is an infinite loop with no termination condition, consumed finitely by `std::views::take` (or an explicit `break`) — and that is not a leak. Breaking out destroys the generator object, which destroys the coroutine frame, which destroys a coroutine suspended mid-`co_yield`; destroying a suspended coroutine is well-defined, runs the destructors of any locals in scope at the suspension point, and frees the frame. The per-call state — `a` and `b` above — is in the function body as ordinary locals, not hoisted into a hand-written class's members the way a manual generator requires; that is the ergonomic argument for `std::generator`, independent of any performance claim.
 
 ## The Lifetime Trap
 

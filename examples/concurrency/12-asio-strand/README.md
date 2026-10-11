@@ -101,7 +101,7 @@ reasonable, portable stand-in — a thread parked by a contended mutex's
 switch — but it is still a proxy, not the metric itself, and a
 synthetic single-strand benchmark can plausibly show idle worker threads
 parking in the `io_context`'s own scheduler while all the work sits on
-one strand. The race-demo assertions above are the load-bearing checks;
+one strand. The race-demo assertions above are the checks that matter;
 this comparison is explanatory color, exactly as the chapter frames it.
 
 ## Running it

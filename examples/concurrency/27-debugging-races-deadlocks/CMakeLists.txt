@@ -21,7 +21,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # CMAKE_BUILD_TYPE stays Release -- matching every other example in this
 # project, and (more importantly) matching the `-s build_type=Release` the
 # Containerfile's `conan install` resolves fmt against. RelWithDebInfo
-# would be the more "honest" label for what this binary actually is, but
+# would be the more accurate label for what this binary actually is, but
 # nothing else in this project builds fmt for anything but Release, and
 # CMakeDeps' generated config has no tested fallback for a mismatched
 # config here. add_compile_options below overrides Release's default

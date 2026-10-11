@@ -222,7 +222,7 @@ most likely to need iteration on a first real build:
   `parentSpanId`) before being committed here. What that testing could not
   cover is the real stack's actual response shapes end-to-end.
 
-Honest assessment: the compose topology, the verifier's query logic, and
+Net assessment: the compose topology, the verifier's query logic, and
 the service's propagation pattern are all sound and were checked as
 thoroughly as this environment allows without an actual build. The
 opentelemetry-cpp compile step is the one piece with real first-run risk —

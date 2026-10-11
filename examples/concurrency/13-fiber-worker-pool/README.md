@@ -125,7 +125,7 @@ limit, and a side-by-side contrast against `fixedsize_stack` (no guard
 page) "silently continuing" past an overflow. This example keeps the
 guard-page demonstration to the deterministic, always-terminating
 `protected_fixedsize_stack` case only: deliberately running
-`fixedsize_stack` past its end is genuine undefined behavior (an overrun
+`fixedsize_stack` past its end is undefined behavior (an overrun
 into whatever memory happens to be mapped next), not something this demo
 can safely or deterministically reproduce for an assertion — the chapter
 text's contrast between the two allocators is conceptual, not something

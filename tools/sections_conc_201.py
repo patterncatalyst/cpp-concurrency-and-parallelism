@@ -7,7 +7,7 @@ cpp-statelessness compendium deck: SECTIONS is a list of section dicts, each
 with num/label/title/tagline/divider_notes/slides[]. Slide kinds: content |
 content-code | diagram | stat-row | demo-cue — rendered by tools/build-pptx.py.
 
-Content source: _docs/16 through _docs/33 (NUMA through the capstone).
+Content source: _docs/16 through _docs/33 (NUMA through the full example).
 Diagrams come from diagrams/*.svg, converted to /tmp/diagrams-png/<name>.jpg
 by tools/convert-diagrams.sh. Demo cues reference examples/concurrency/*.
 
@@ -1533,12 +1533,12 @@ SECTIONS = [
 },
 
 # ============================================================================
-# §14 — Capstone: Ingest, Match, Publish (ch33)
+# §14 — Full example: Ingest, Match, Publish (ch33)
 # ============================================================================
 {
     "num": 14,
     "label": "§14",
-    "title": "Capstone: ingest, match, publish",
+    "title": "Full example: ingest, match, publish",
     "tagline": "A real low-latency service is never one technique running alone — it's several wired into stages.",
     "divider_notes": (
         "Every earlier chapter picked one concurrency model, one "
@@ -1633,14 +1633,14 @@ SECTIONS = [
             "kind": "demo-cue",
             "demo_num": 33,
             "demo_name": "The full pipeline, under sustained load and a burst",
-            "demo_command": "cd examples/concurrency/33-capstone-ingest-match-publish && ./demo.sh",
+            "demo_command": "cd examples/concurrency/33-ingest-match-publish && ./demo.sh",
             "demo_description": (
-                "Runs capstone_pipeline once and checks that no accepted order was lost or "
+                "Runs pipeline once and checks that no accepted order was lost or "
                 "duplicated through either ring, that the order book's own conservation "
                 "counters balance, that match really is single-threaded, that the overload "
                 "burst engaged back-pressure, and that p50/p99/p99.9 figures are present."
             ),
-            "demo_url": demo_url("33-capstone-ingest-match-publish"),
+            "demo_url": demo_url("33-ingest-match-publish"),
             "notes": (
                 "This is the deck's closing argument made runnable: no latency number in "
                 "the chapter is presented as the book's own measurement, because a matching "

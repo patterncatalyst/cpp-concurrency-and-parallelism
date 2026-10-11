@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# concurrency/33-capstone-ingest-match-publish end-to-end verification
+# concurrency/33-ingest-match-publish end-to-end verification
 # (CI wrapper).
 #
 # Runs demo.sh non-interactively and asserts it exits 0. demo.sh builds
@@ -17,7 +17,7 @@ source "$REPO_ROOT/scripts/lib/_helpers.sh"
 
 require docker
 
-DEMO="$REPO_ROOT/examples/concurrency/33-capstone-ingest-match-publish"
+DEMO="$REPO_ROOT/examples/concurrency/33-ingest-match-publish"
 cd "$DEMO"
 
 export DEMO_NO_PAUSE=1
@@ -32,4 +32,4 @@ else
 fi
 
 log_step "RESULT"
-log_ok "concurrency/33-capstone-ingest-match-publish verified — ingest/match/publish capstone pipeline"
+log_ok "concurrency/33-ingest-match-publish verified — ingest/match/publish pipeline"

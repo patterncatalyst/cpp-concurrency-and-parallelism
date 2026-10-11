@@ -21,7 +21,7 @@ orders of magnitude more.**
   the compare-and-swap that acquires the lock never loses.
 - `contended` — the same `N` increments split evenly (default 8 threads)
   across worker threads sharing one mutex, so the compare-and-swap
-  genuinely fails often enough to park threads in the kernel.
+  fails often enough to park threads in the kernel.
 
 The program prints one `key=value` line:
 

@@ -37,7 +37,7 @@ walk. That matters: a hardware prefetcher is built to predict a
 sequential or strided access pattern, and would quietly turn this into a
 bandwidth benchmark instead of a latency one. A random, single-cycle
 permutation makes every load's address depend on the *value* of the
-previous load — the next address genuinely cannot be known until the
+previous load — the next address cannot be known until the
 current one completes — so there's nothing for the prefetcher to act on.
 
 The program prints one line per step in a `key=value` form:
@@ -94,7 +94,7 @@ binary and a `lua` interpreter) and checks:
    one — once a step no longer fits in a given cache level, the hit rate
    against that level can only get worse as the working set keeps
    growing, never better. A measured decrease here would mean either a
-   bug in this harness or a genuinely surprising hardware/virtualization
+   bug in this harness or a surprising hardware/virtualization
    condition, so it's treated as a hard failure rather than averaged away.
 3. **The exact ns/access values and the DRAM/L1 ratio are
    SOFT/informational.** They depend on the host's real cache sizes and

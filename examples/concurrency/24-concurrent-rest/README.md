@@ -27,7 +27,7 @@ C++20-coroutine stack as Doc 24's session code:
   immediately if that pushed the count over the cap (the shed path), or
   held until the response is written if it didn't (the accepted path). A
   short simulated-work delay (`--work-ms`, default 15 — an async
-  `steady_timer`, never a blocking sleep) stands in for real handler work,
+  `steady_timer`, never a blocking sleep) stands in for handler work,
   just long enough that concurrent requests actually overlap instead of
   draining one at a time faster than the cap could ever be observed.
   `SIGINT`/`SIGTERM` closes the acceptor and lets `io_context::run()`

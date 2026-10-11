@@ -34,7 +34,7 @@ algorithm does not care what order its own argument list names.
 unlike chapter 5's timing comparison, a `std::latch`-forced deadlock has no
 inherent scheduling noise to make soft:
 
-1. **The deadlock build genuinely hangs.** `verify.lua` runs it under an
+1. **The deadlock build reliably hangs.** `verify.lua` runs it under an
    in-container `timeout` (default 3s, `--signal=KILL`) and asserts
    `timeout` had to kill it — if the process ever exits 0 on its own, the
    forced deadlock didn't reproduce, and that's a FAIL.

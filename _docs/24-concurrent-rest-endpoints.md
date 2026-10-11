@@ -13,11 +13,11 @@ duration: "16 min"
 ## What we'll cover
 
 - Compare thread-per-request and async-handler models for serving REST traffic.
-- Build a minimal Boost.Asio/Beast HTTP server as the concrete example for the rest of the chapter.
+- Build a minimal Boost.Asio/Beast HTTP server as this chapter's concrete example.
 - Cover back-pressure: how the server signals it can't accept more work without collapsing.
 - Cover overload shedding as the last line of defense when back-pressure isn't enough.
 
-A REST endpoint under real load is a concurrency problem wearing an HTTP costume. The protocol framing is incidental; the decisions that determine whether the service stays responsive at a thousand connections or falls over at a hundred are the same ones the rest of this book has already covered — how many threads actually run application code, how work gets handed to them, and what happens when more requests arrive than the service can finish in time. This chapter applies those decisions to a concrete server, built on Boost.Asio and its HTTP layer, Beast.
+A REST endpoint under real load is a concurrency problem wearing an HTTP costume. The protocol framing is incidental; the decisions that determine whether the service stays responsive at a thousand connections or falls over at a hundred are the same ones earlier chapters have already covered — how many threads actually run application code, how work gets handed to them, and what happens when more requests arrive than the service can finish in time. This chapter applies those decisions to a concrete server, built on Boost.Asio and its HTTP layer, Beast.
 
 ## Thread-per-Request vs Async Handlers
 
@@ -96,7 +96,7 @@ The shape is the same bounded-queue discipline [Thread Pools and Work Scheduling
 
 Back-pressure assumes the server can tell, cheaply, how much work is already accepted — a counter, a queue depth, a semaphore's remaining count. Overload shedding is what happens when that number says the server is already at capacity: reject the new request outright, cheaply enough that rejecting it doesn't itself consume the resource that's scarce.
 
-For a REST endpoint the natural rejection is HTTP 503 Service Unavailable, ideally paired with a `Retry-After` header so a well-behaved client backs off instead of retrying immediately into the same overload. The rejection path has to be genuinely cheap — checking an atomic counter and writing a fixed, pre-serialized 503 response, with no database call, no logging call that itself blocks on I/O, nothing that could itself queue behind the condition that triggered the shed in the first place. A shedding path that does meaningful work defeats its own purpose: a service shedding load because it's out of handler capacity, using handler capacity to shed it, degrades exactly like the overload it was meant to prevent.
+For a REST endpoint the natural rejection is HTTP 503 Service Unavailable, ideally paired with a `Retry-After` header so a well-behaved client backs off instead of retrying immediately into the same overload. The rejection path has to be cheap — checking an atomic counter and writing a fixed, pre-serialized 503 response, with no database call, no logging call that itself blocks on I/O, nothing that could itself queue behind the condition that triggered the shed in the first place. A shedding path that does meaningful work defeats its own purpose: a service shedding load because it's out of handler capacity, using handler capacity to shed it, degrades exactly like the overload it was meant to prevent.
 
 <!-- DIAGRAM SPEC: Left side, a stack of inbound request arrows (orange #a06030) converging on a single "accept" box (blue #4a73b8). From accept, a gate shape leads to an "in-flight counter" box showing a fraction, e.g. "847 / 1000". Two paths exit the gate: a green #5a8870 path labeled "below capacity" leading to a row of handler boxes (also blue) that process and emit "200 OK" responses; a red #c0392b path labeled "at capacity" leading directly to a small box labeled "503 + Retry-After" that bypasses the handler row entirely, drawn with a dashed border to indicate it does no further work. A cream #fdfbf7 background throughout. Caption note beneath: "the shed path never touches a handler — it answers from the gate itself." -->
 {% include excalidraw.html name="24-rest-overload-shedding" caption="Figure 24.1 — accepted requests split at the capacity gate: handled below the in-flight cap, shed with 503 above it, with the shed path doing no handler-side work" %}

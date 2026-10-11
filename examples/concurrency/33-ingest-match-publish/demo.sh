@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# concurrency/33-capstone-ingest-match-publish — the book's capstone
+# concurrency/33-ingest-match-publish — the book's full example
 # pipeline: ingest -> match -> publish, in one process.
 #
 # Builds the image (one Conan dependency, fmt, same as every sibling
 # example) and runs it. The container's default command runs verify.lua,
-# this project's Lua 5.4 assertion harness: it runs capstone_pipeline
+# this project's Lua 5.4 assertion harness: it runs pipeline
 # once, parses every EVENT line and the final SUMMARY line, and checks
 # that no accepted order was lost or duplicated through either ring, that
 # the order book's own conservation counters balance, that the match
@@ -14,7 +14,7 @@
 # own exit code (0 = pass) is this script's exit code too.
 #
 # Usage:
-#   ./demo.sh            build + run capstone_pipeline + verify.lua
+#   ./demo.sh            build + run pipeline + verify.lua
 #   ./demo.sh --clean    remove the built image
 #   DEMO_NO_PAUSE=1 ./demo.sh    skip the presenter pause (CI / scripted)
 
@@ -24,7 +24,7 @@ cd "$DIR"
 REPO_ROOT="$(cd "$DIR/../../.." && pwd)"
 source "$REPO_ROOT/scripts/lib/_helpers.sh"
 
-IMG=cpp-tut/concurrency-33-capstone-ingest-match-publish:latest
+IMG=cpp-tut/concurrency-33-ingest-match-publish:latest
 
 if [[ "${1:-}" == "--clean" ]]; then
     log_step "Removing image $IMG"
@@ -38,7 +38,7 @@ fi
 
 require docker
 
-banner "33-capstone-ingest-match-publish" "ingest -> match -> publish, end to end"
+banner "33-ingest-match-publish" "ingest -> match -> publish, end to end"
 
 if should_build "$IMG"; then
     log_step "Building $IMG"
@@ -56,9 +56,9 @@ callout \
     "burst should fill the ingest ring and produce BUSY responses --" \
     "back-pressure, not unbounded memory growth. Watch the SUMMARY line's" \
     "p50/p99/p99.9 latency figures at the end."
-pause "About to run capstone_pipeline through verify.lua inside the container"
+pause "About to run pipeline through verify.lua inside the container"
 
-log_step "Running capstone_pipeline + verify.lua inside the container"
+log_step "Running pipeline + verify.lua inside the container"
 set +e
 docker run --rm "$IMG"
 rc=$?

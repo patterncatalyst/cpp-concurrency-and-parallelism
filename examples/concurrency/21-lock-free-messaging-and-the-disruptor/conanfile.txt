@@ -1,7 +1,7 @@
 # concurrency/21-lock-free-messaging-and-the-disruptor Conan recipe
 # (Conan 2.x).
 #
-# One dependency (fmt), same as the rest of the tutorial's examples --
+# One dependency (fmt), same as the other examples in this tutorial --
 # used only for output formatting. The ring, the sequence barriers, and
 # the back-pressure logic are pure standard library (<atomic>, <thread>).
 

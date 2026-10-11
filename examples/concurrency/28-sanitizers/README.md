@@ -40,7 +40,7 @@ racy_counter --mode racy|fixed [-n ITERATIONS]
 scenario the chapter calls out as concurrency's distinct contribution to
 memory-safety bugs: `--mode uaf` hands a **raw** pointer to a detached
 worker thread, then frees the buffer on the main thread; the worker sleeps
-briefly (so the free genuinely happens first) and then reads through the
+briefly (so the free happens first) and then reads through the
 now-dangling pointer. `--mode fixed` hands the worker a
 `std::shared_ptr<int[]>` **by value** instead — its own copy keeps the
 allocation's reference count above zero for as long as it's running, so

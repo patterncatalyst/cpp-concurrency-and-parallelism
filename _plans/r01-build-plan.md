@@ -89,7 +89,7 @@ order: 1
 > it. KEPT lsp-specific systems chapters (24=Networking, 39/40 perf, **41 systems-capstone-fleet** — the plan's
 > literal list would have wrongly removed 41). Branch docs/extract-cpp-concurrency @ 999222e, validate.py OK;
 > **PR linux-systems-programming#29 open (squash-merge by user).**
-> **OUTSTANDING:** merge lsp PR #29; optional ch33 flake. **ALL 8 PHASES COMPLETE once #29 merges.**
+> **PR #29 MERGED (2026-10-11): lsp Pages live, 11 stubs point to the new book, 41-capstone-fleet kept intact, ~5884 lines of duplicated concurrency content removed.** ALL 8 PHASES + both gates COMPLETE. Only optional remaining: ch33 occupancy-assert flake.
 > **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
 > (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
 > `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel
@@ -193,7 +193,7 @@ Engineering*; Brandt *Parallel C++*; Kukov *Grokking Concurrency*.
 | 7 | Hub linkage (patterncatalyst-workshops-tutorials-list, C++ group) | lgtm-jekyll | DONE (PR #5 open — needs user merge) + 5 books added |
 | — | **GATE A** (repo/push/Pages) | lgtm-github | DONE 2026-10-11 — repo public, main pushed (ff), Pages LIVE |
 | 8 | Source extract-and-re-point on linux-systems-programming | lgtm-github | DONE — PR #29 open (stub-in-place, 11 ch) |
-| — | **GATE B** (lsp removal + PR) | lgtm-github | PR #29 open — needs user merge |
+| — | **GATE B** (lsp removal + PR) | lgtm-github | MERGED — PR #29, lsp Pages live |
 
 ## Acceptance (high level)
 - Scaffold: `jekyll build` exits 0; 4 collections; `baseurl: /cpp-concurrency-and-parallelism`; codetabs

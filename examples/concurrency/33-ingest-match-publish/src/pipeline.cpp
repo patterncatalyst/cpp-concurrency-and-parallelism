@@ -532,7 +532,13 @@ void ingest_worker(
                 busy_count.fetch_add(1, std::memory_order_relaxed);
                 continue;
             }
-            update_peak(ingest_peak_occupancy, occ_before + 1);
+            // occ_before is a clamped snapshot read before this push; this
+            // push adds one. occupancy() already clamps to capacity, but the
+            // +1 here can push a snapshot that read exactly capacity one past
+            // it, so clamp again -- the ring is truly bounded, a full ring
+            // rejects the push, so the high-water mark can never exceed capacity.
+            update_peak(ingest_peak_occupancy,
+                        std::min<std::uint64_t>(occ_before + 1, ring.capacity()));
 
             if (paced) {
                 std::this_thread::sleep_for(std::chrono::microseconds(kSustainedInterSubmitSleepUs));

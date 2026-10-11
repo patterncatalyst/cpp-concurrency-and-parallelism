@@ -92,7 +92,23 @@ bool pin_current_thread_to_node(int node) {
     if (!any) {
         return false;
     }
-    return sched_setaffinity(0, sizeof(set), &set) == 0;
+    if (sched_setaffinity(0, sizeof(set), &set) != 0) {
+        return false;
+    }
+    // sched_setaffinity does not migrate synchronously -- the thread moves on
+    // its next reschedule. First-touch binds a page to the node of the CPU that
+    // faults it, so if we started writing before the migration completed the
+    // pages would land on the OLD node. Yield until we are actually running on
+    // a CPU that belongs to the target node (bounded, so a misconfiguration
+    // can't spin forever).
+    for (int i = 0; i < 100000; ++i) {
+        int cpu = sched_getcpu();
+        if (cpu >= 0 && numa_node_of_cpu(cpu) == node) {
+            return true;
+        }
+        sched_yield();
+    }
+    return false;
 }
 
 // Write one byte into every page so first-touch binds the pages, then report

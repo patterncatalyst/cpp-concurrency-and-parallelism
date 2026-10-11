@@ -108,7 +108,7 @@ pause "About to copy the source and build it in the guest"
 # ── 3. copy + build in the guest ──────────────────────────────────────────
 log_step "Copying source to the guest and building"
 ssh $SSH_OPTS "fedora@$IP" "rm -rf $REMOTE_DIR && mkdir -p $REMOTE_DIR"
-scp $SSH_OPTS -q -r src CMakeLists.txt verify.lua "fedora@$IP:$REMOTE_DIR/"
+scp $SSH_OPTS -q -r src CMakeLists.txt verify.lua cpuset-run.sh "fedora@$IP:$REMOTE_DIR/"
 ssh $SSH_OPTS "fedora@$IP" \
     "cd $REMOTE_DIR && cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release >/dev/null && cmake --build build >/dev/null"
 log_ok "built numa_locality in the guest"
@@ -124,10 +124,8 @@ echo
 # ── 5. cpuset-confined run: mems=0, ask for node 1 -> silent fallback ─────
 log_step "Running confined to cpuset.mems=0 while asking for node 1 (fallback case)"
 echo
-ssh $SSH_OPTS "fedora@$IP" \
-    "cd $REMOTE_DIR && sudo systemd-run --quiet --collect --pipe --wait \
-        -p AllowedMemoryNodes=0 -p AllowedCPUs=0-1 \
-        $REMOTE_DIR/build/numa_locality --onnode 1 | tee cpuset.out"
+timeout 60 ssh $SSH_OPTS "fedora@$IP" \
+    "sudo bash $REMOTE_DIR/cpuset-run.sh $REMOTE_DIR/build/numa_locality 1 | tee $REMOTE_DIR/cpuset.out"
 echo
 
 pause "About to verify placement (HARD) and report timing (SOFT)"

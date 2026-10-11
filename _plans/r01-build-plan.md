@@ -65,9 +65,22 @@ order: 1
 > docs/r01-scaffold also pushed. Pages enabled (Actions build), homepage set, build+deploy GREEN. Live +
 > verified 200: site home, /docs/33-ingest-match-publish/ (renamed slug), /diagrams/21-disruptor-ring.svg.
 > Everything now backed up off-device.
-> **NEXT: Phase 7 — hub linkage** (add to patterncatalyst-workshops-tutorials-list under the C++ group;
-> separate repo, so a PR there per [[feedback_no_upstream_without_permission]] scope). Then Phase 8
-> extract-and-re-point on linux-systems-programming (Gate B). Optional: fix the ch33 occupancy-assert flake.
+> **PHASE 7 + SITE-COMPLETION DONE (2026-10-11).** Live site fully wired (all index pages 200 w/ content,
+> commit 63e2dc8 on main, Pages GREEN):
+>   - Chapters nav 404 fixed → `/docs/00-index/` chapters map (chapters.html, TOC by part).
+>   - Examples page was empty → added `_examples/` collection (28 per-demo pages); cards + per-demo pages resolve.
+>   - Diagrams page was empty → `_data/diagrams.yml` (extracted from chapters' excalidraw includes) + gallery loop (39).
+>   - part_index.html was unstyled (divergent doc-page classes) → ported statelessness's tutorial-vocabulary version.
+>   - bibliography.html → house table, 5 VERIFIED books w/ publisher links; dropped 2 unverifiable (Brent Son =
+>     fabricated; Jordan Lim C++26 = Amazon-only self-pub); dropped the editorial-constraint lead-in.
+>   - Top-level README.md added (sibling-repo style).
+>   **Hub** (patterncatalyst-workshops-tutorials-list): site entry under C++ Programming + 5 books in
+>   books.yml/book_categories.yml → **PR #5 OPEN, needs user merge** (auto-merge blocked by review classifier).
+>   **Skills** (lgtm-skills branch `docs/project-bootstrap-policy`, synced, NOT pushed): remote-first bootstrap;
+>   lgtm-jekyll "Wire the listing/index pages"; lgtm-tutorial publishing/cross-site checklist (hub entry, book
+>   refs verify-first + publisher/Leanpub>Amazon). Commits 7734e65 + 62dace8.
+> **OUTSTANDING:** (a) merge hub PR #5; (b) push lgtm-skills branch / open its PR (user's call); (c) ch33
+> occupancy-assert flake (benign, optional fix). **NEXT: Phase 8 extract-and-re-point on lsp (Gate B).**
 > **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
 > (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
 > `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel
@@ -168,7 +181,7 @@ Engineering*; Brandt *Parallel C++*; Kukov *Grokking Concurrency*.
 | 4 | Diagrams (≥1/chapter, bespoke palette) | lgtm-diagram-generator | DONE (39/39, tools/generate_diagram.py) |
 | 5 | Decks 100/101/201 | lgtm-presentation | DONE (36/54/62 slides, commit c278899) |
 | 6 | Professional-voice sweep site-wide | lgtm-professional-voice | DONE (reader surface clean; ch33 "capstone" renamed to "full example" incl. ids) |
-| 7 | Hub linkage (patterncatalyst-workshops-tutorials-list, C++ group) | lgtm-jekyll | TODO |
+| 7 | Hub linkage (patterncatalyst-workshops-tutorials-list, C++ group) | lgtm-jekyll | DONE (PR #5 open — needs user merge) + 5 books added |
 | — | **GATE A** (repo/push/Pages) | lgtm-github | DONE 2026-10-11 — repo public, main pushed (ff), Pages LIVE |
 | 8 | Source extract-and-re-point on linux-systems-programming | lgtm-github | TODO |
 | — | **GATE B** (lsp removal + PR) | lgtm-github | gated |

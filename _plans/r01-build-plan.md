@@ -24,11 +24,24 @@ order: 1
 > own examples do). verify.lua PASSES live: 24 traces in Tempo w/ correct cross-thread span nesting (root→3
 > children each), pool_queue_depth saturation metric in Mimir (max 54). Diagnosed the segfault with a throwaway
 > Release+`-g` gdb image (the real build strips); backtrace pinned it to __run_exit_handlers.
-> **1 Phase-3 item REMAINS:**
->   1. **ch16 NUMA** — needs the KVM lab. HOST SETUP DONE: virt-install installed; user ran cloud-utils+
->      libvirtd+default-net line (verify `virsh net-list` shows default active). Provision a 2-NUMA-node
->      guest (qemu `-numa`/virt-install `--cpu`), build+run the NUMA demo there via lgtm-systems-programming
->      (`~/Dev/linux-systems-programming/scripts/lab/provision-vm.sh`); NEVER mutate host NUMA/governor.
+> **1 Phase-3 item REMAINS — ch16 NUMA (AUTHORED, commit 86d6b6d; live-verify BLOCKED):**
+>   - **Example authored & committed** (self-contained KVM-lab demo, NOT Docker): `src/numa_locality.cpp`
+>     (libnuma + sched_setaffinity; HARD = numa_alloc_onnode placement via get_mempolicy + first-touch
+>     binding + cpuset silent fallback; SOFT = local/remote timing), `verify.lua`, `provision-numa-vm.sh`
+>     (2 NUMA cells via `--cpu host-passthrough,cell0..,cell1..` — XML validated with `--print-xml`; +virtio-rng;
+>     `NUMA_CELLS=0` plain toggle; cache at `$HOME/cpp-conc-lab` 0755 since qemu:///system needs path traversal),
+>     minimal `cloud-init/` (package_update=false), `demo.sh` (ssh hardened: ServerAlive + `timeout`). Decision
+>     (user-approved): host is SINGLE NUMA node, so QEMU emulates topology not latency → placement HARD, timing SOFT.
+>   - **BLOCKER:** KVM guests on this host **deadlock in the PAM session phase** — ssh AUTH succeeds, then every
+>     session/sftp/exec hangs indefinitely (even 150s), CPU idle (~12s over 12min). **Reproduces on a PLAIN
+>     single-node guest**, so NOT the NUMA config. RULED OUT: NUMA cells, virtio-rng/entropy, cloud-init dnf
+>     upgrade (now disabled), cache DAC perms (fixed), SELinux (overlay svirt_image_t / base virt_content_t ok;
+>     crc runs from user_home_t on this host), NAT + net.ipv4.ip_forward=1, dnsmasq DNS (resolves). Can't see
+>     inside (console pty is root-owned; sudo needs a password).
+>   - **NEXT to unblock:** read guest logs OFFLINE — ask user to `sudo dnf install -y libguestfs-tools-c`, then
+>     provision + `virt-cat -d cpp-conc-numa /var/log/cloud-init-output.log` and `virt-log -d cpp-conc-numa` to
+>     see why sessions wedge (suspect: systemd/logind or cloud-init never reaching multi-user). Alt: user runs
+>     `sudo virsh console cpp-conc-numa`. Guest is disposable; nothing persists. NEVER mutate host NUMA/governor.
 > Snippet-only chapters (no demo, intentional): ch19,22,23,26,30,31.
 >
 > **Build mechanics:** builds run SEQUENTIALLY (shared Conan cache/Docker/port 50051). Aggregator

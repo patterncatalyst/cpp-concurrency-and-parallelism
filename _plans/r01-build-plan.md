@@ -79,8 +79,17 @@ order: 1
 >   **Skills** (lgtm-skills branch `docs/project-bootstrap-policy`, synced, NOT pushed): remote-first bootstrap;
 >   lgtm-jekyll "Wire the listing/index pages"; lgtm-tutorial publishing/cross-site checklist (hub entry, book
 >   refs verify-first + publisher/Leanpub>Amazon). Commits 7734e65 + 62dace8.
-> **OUTSTANDING:** (a) merge hub PR #5; (b) push lgtm-skills branch / open its PR (user's call); (c) ch33
-> occupancy-assert flake (benign, optional fix). **NEXT: Phase 8 extract-and-re-point on lsp (Gate B).**
+> Hub PR #5 MERGED (live); lgtm-skills PR #46 MERGED to main (policy + checklists live).
+>
+> **PHASE 8 DONE — lsp extract-and-re-point (Gate B), PR #29 OPEN, needs user merge.** Discovery: lsp
+> cross-references chapters by PROSE NUMBER (407 "Chapter NN" refs), no slug links, no prior extraction
+> precedent — delete-and-renumber would break hundreds of refs. User chose **stub-in-place** (Part 07 {25,26,27}
+> + Part 14 {49–56} = 11 chapters): each body replaced with a "moved to <new book>" stub mapping to the matching
+> cpp-concurrency chapter, KEEPING number/slug/title so all 407 prose refs still resolve; Part 07/14 blurbs note
+> it. KEPT lsp-specific systems chapters (24=Networking, 39/40 perf, **41 systems-capstone-fleet** — the plan's
+> literal list would have wrongly removed 41). Branch docs/extract-cpp-concurrency @ 999222e, validate.py OK;
+> **PR linux-systems-programming#29 open (squash-merge by user).**
+> **OUTSTANDING:** merge lsp PR #29; optional ch33 flake. **ALL 8 PHASES COMPLETE once #29 merges.**
 > **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
 > (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
 > `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel
@@ -183,8 +192,8 @@ Engineering*; Brandt *Parallel C++*; Kukov *Grokking Concurrency*.
 | 6 | Professional-voice sweep site-wide | lgtm-professional-voice | DONE (reader surface clean; ch33 "capstone" renamed to "full example" incl. ids) |
 | 7 | Hub linkage (patterncatalyst-workshops-tutorials-list, C++ group) | lgtm-jekyll | DONE (PR #5 open — needs user merge) + 5 books added |
 | — | **GATE A** (repo/push/Pages) | lgtm-github | DONE 2026-10-11 — repo public, main pushed (ff), Pages LIVE |
-| 8 | Source extract-and-re-point on linux-systems-programming | lgtm-github | TODO |
-| — | **GATE B** (lsp removal + PR) | lgtm-github | gated |
+| 8 | Source extract-and-re-point on linux-systems-programming | lgtm-github | DONE — PR #29 open (stub-in-place, 11 ch) |
+| — | **GATE B** (lsp removal + PR) | lgtm-github | PR #29 open — needs user merge |
 
 ## Acceptance (high level)
 - Scaffold: `jekyll build` exits 0; 4 collections; `baseurl: /cpp-concurrency-and-parallelism`; codetabs

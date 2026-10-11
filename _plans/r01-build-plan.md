@@ -11,9 +11,10 @@ order: 1
 > **Fedora is the reference platform** (user directive) — prereqs use `dnf`; demos build in UBI10.
 > All committed on branch `docs/r01-scaffold`. Nothing pushed (Gate A pending).
 >
-> **Phase 3 (examples) — 27 of 27 Docker demos VERIFIED GREEN** on real Docker (Conan+CMake+clang+
+> **PHASE 3 COMPLETE — 28/28 demos VERIFIED GREEN.** 27 Docker demos on real Docker (Conan+CMake+clang+
 > UBI10+Lua verify.lua, each `./demo.sh` exit 0): ch1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,20,21,
-> 24,25,27,28,29,32,33,34. (ch27 debugging + ch28 sanitizers: gdb/TSan/valgrind/ASan fire for REAL, req 24 met.)
+> 24,25,27,28,29,32,33,34 — PLUS ch16 NUMA verified in the KVM lab (see below). (ch27 debugging + ch28
+> sanitizers: gdb/TSan/valgrind/ASan fire for REAL, req 24 met.) **NEXT: Phase 4 (diagrams).**
 > **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
 > (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
 > `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel
@@ -24,24 +25,21 @@ order: 1
 > own examples do). verify.lua PASSES live: 24 traces in Tempo w/ correct cross-thread span nesting (root→3
 > children each), pool_queue_depth saturation metric in Mimir (max 54). Diagnosed the segfault with a throwaway
 > Release+`-g` gdb image (the real build strips); backtrace pinned it to __run_exit_handlers.
-> **1 Phase-3 item REMAINS — ch16 NUMA (AUTHORED, commit 86d6b6d; live-verify BLOCKED):**
->   - **Example authored & committed** (self-contained KVM-lab demo, NOT Docker): `src/numa_locality.cpp`
->     (libnuma + sched_setaffinity; HARD = numa_alloc_onnode placement via get_mempolicy + first-touch
->     binding + cpuset silent fallback; SOFT = local/remote timing), `verify.lua`, `provision-numa-vm.sh`
->     (2 NUMA cells via `--cpu host-passthrough,cell0..,cell1..` — XML validated with `--print-xml`; +virtio-rng;
->     `NUMA_CELLS=0` plain toggle; cache at `$HOME/cpp-conc-lab` 0755 since qemu:///system needs path traversal),
->     minimal `cloud-init/` (package_update=false), `demo.sh` (ssh hardened: ServerAlive + `timeout`). Decision
->     (user-approved): host is SINGLE NUMA node, so QEMU emulates topology not latency → placement HARD, timing SOFT.
->   - **BLOCKER:** KVM guests on this host **deadlock in the PAM session phase** — ssh AUTH succeeds, then every
->     session/sftp/exec hangs indefinitely (even 150s), CPU idle (~12s over 12min). **Reproduces on a PLAIN
->     single-node guest**, so NOT the NUMA config. RULED OUT: NUMA cells, virtio-rng/entropy, cloud-init dnf
->     upgrade (now disabled), cache DAC perms (fixed), SELinux (overlay svirt_image_t / base virt_content_t ok;
->     crc runs from user_home_t on this host), NAT + net.ipv4.ip_forward=1, dnsmasq DNS (resolves). Can't see
->     inside (console pty is root-owned; sudo needs a password).
->   - **NEXT to unblock:** read guest logs OFFLINE — ask user to `sudo dnf install -y libguestfs-tools-c`, then
->     provision + `virt-cat -d cpp-conc-numa /var/log/cloud-init-output.log` and `virt-log -d cpp-conc-numa` to
->     see why sessions wedge (suspect: systemd/logind or cloud-init never reaching multi-user). Alt: user runs
->     `sudo virsh console cpp-conc-numa`. Guest is disposable; nothing persists. NEVER mutate host NUMA/governor.
+> **PHASE 3 COMPLETE — ch16 NUMA VERIFIED (commit 2fc776e).** Self-contained KVM-lab demo (NOT Docker):
+> `src/numa_locality.cpp` (libnuma + sched_setaffinity), `verify.lua`, `provision-numa-vm.sh` (2 NUMA cells via
+> `--cpu host-passthrough,cell0..,cell1..`, `--print-xml`-validated; dedicated lab key; cache at `$HOME/cpp-conc-lab`
+> 0755), minimal `cloud-init/`, `cpuset-run.sh` (raw cgroup v2 cpuset), `demo.sh`, `LAB-NETWORKING.md`. verify.lua
+> PASSES on a 2-node guest: numa_alloc_onnode placement (both nodes), first-touch binding (both nodes), cpuset.mems=0
+> → numa_alloc_onnode(1) silently falls back to node 0. Timing SOFT (ratio ~1.0 — host is single-NUMA-node so QEMU
+> emulates topology not latency; user-approved placement-HARD/timing-SOFT).
+>   - **THREE host-environment gotchas hit + solved (all in LAB-NETWORKING.md):** (1) ssh auth OK then hangs =
+>     GNOME-keyring/gcr ssh-agent GUI sign dialog → use a dedicated passphrase-less lab key + `IdentityAgent=none`
+>     (now in scripts); (2) guest can't reach internet (dnf hangs) = Docker sets FORWARD policy DROP → user ran
+>     `sudo iptables -I FORWARD -i/-o virbr0 -j ACCEPT`; (3) first-touch landed on wrong node = sched_setaffinity
+>     migration race → spin until sched_getcpu() on target node before touching. VPN was a red herring (broke too,
+>     but issue persisted with it off). Diagnosed guest internals OFFLINE with libguestfs (virt-cat/virt-log).
+>   - **Guest left running** (`cpp-conc-numa`, reused across runs); `./demo.sh --clean` destroys it. The FORWARD
+>     iptables rule is not persistent — a Docker restart may re-break guest networking (re-run the iptables line).
 > Snippet-only chapters (no demo, intentional): ch19,22,23,26,30,31.
 >
 > **Build mechanics:** builds run SEQUENTIALLY (shared Conan cache/Docker/port 50051). Aggregator
@@ -113,7 +111,7 @@ Engineering*; Brandt *Parallel C++*; Kukov *Grokking Concurrency*.
 | 2b | Chapters P3–P4 (10–17) | lgtm-tutorial + voice | TODO |
 | 2c | Chapters P5–P6 (18–25) | lgtm-tutorial + voice | TODO |
 | 2d | Chapters P7–P8 (26–33 + appendix) | lgtm-tutorial + voice | TODO |
-| 3 | Examples (~20–25): Docker demos + Lua verify.lua; NUMA/parallel in KVM lab | lgtm-docker-stack, lgtm-systems-programming | TODO |
+| 3 | Examples (~20–25): Docker demos + Lua verify.lua; NUMA/parallel in KVM lab | lgtm-docker-stack, lgtm-systems-programming | DONE (28/28: 27 Docker + ch16 NUMA) |
 | 4 | Diagrams (≥1/chapter, bespoke palette) | lgtm-diagram-generator | TODO |
 | 5 | Decks 100/101/201 | lgtm-presentation | TODO |
 | 6 | Professional-voice sweep site-wide | lgtm-professional-voice | TODO |

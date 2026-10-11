@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="760" height="330" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="46" width="700" height="100" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="66" font-size="12" font-weight="700" fill="#6b6b6b">closed-loop timer</text>
+<rect x="30" y="176" width="700" height="100" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="196" font-size="12" font-weight="700" fill="#6b6b6b">fixed-rate caller&#x27;s experience</text>
+<rect x="55" y="90" width="55" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="82.5" y="115.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">iter 1</text>
+<rect x="120" y="90" width="55" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="147.5" y="115.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">iter 2</text>
+<rect x="185" y="90" width="55" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="212.5" y="115.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">iter 3</text>
+<rect x="255" y="90" width="230" height="40" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="370.0" y="108.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">iteration 4: stall</text>
+<text x="370.0" y="125.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">page fault / migration</text>
+<rect x="55" y="220" width="55" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="82.5" y="245.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">iter 1</text>
+<rect x="120" y="220" width="55" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="147.5" y="245.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">iter 2</text>
+<rect x="185" y="220" width="55" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="212.5" y="245.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">iter 3</text>
+<rect x="255" y="220" width="230" height="40" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="370.0" y="238.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">iteration 4: stall</text>
+<text x="370.0" y="255.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">page fault / migration</text>
+<rect x="510" y="220" width="90" height="36" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="555.0" y="236.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">request 5</text>
+<text x="555.0" y="253.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">(queued)</text>
+<rect x="612" y="222" width="65" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="644.5" y="236.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">request 6</text>
+<text x="644.5" y="253.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">(queued)</text>
+<path d="M370,130 L370,220" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="398.0" y="175.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">same stall</text>
+<text x="398.0" y="175.0" font-size="11" fill="#2d2d2d" text-anchor="middle">same stall</text>
+<text x="380" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">Coordinated omission: one stall, many queued requests</text>
+<text x="380" y="300" font-size="11" fill="#6b6b6b" text-anchor="middle">the raw p99 sees one outlier; the corrected p99 backfills the requests queued behind it.</text>
+</svg>

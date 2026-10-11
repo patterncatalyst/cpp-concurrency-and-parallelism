@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 340" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="900" height="340" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="160" y="60" width="60" height="40" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="190.0" y="85.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">float</text>
+<rect x="270" y="55" width="110" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="325.0" y="78.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">ALU</text>
+<text x="325.0" y="95.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">addss</text>
+<rect x="430" y="60" width="60" height="40" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="460.0" y="85.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">float</text>
+<rect x="54" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="68.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="86" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="100.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="118" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="132.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="150" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="164.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="182" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="196.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="214" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="228.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="246" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="260.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="278" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="292.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="330" y="175" width="110" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="385.0" y="198.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Vector ALU</text>
+<text x="385.0" y="215.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">addps</text>
+<rect x="474" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="488.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="506" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="520.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="538" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="552.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="570" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="584.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="602" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="616.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="634" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="648.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="666" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="680.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="698" y="179" width="28" height="32" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="712.0" y="200.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">f</text>
+<rect x="50" y="270" width="680" height="40" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="390.0" y="295.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">same decode and dispatch cost either way</text>
+<path d="M220,80 L270,80" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M380,80 L430,80" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M310,200 L330,200" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M440,200 L470,200" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="450" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">Scalar vs. vector width: same cost, more lanes</text>
+<text x="300" y="130" font-size="11" fill="#6b6b6b" text-anchor="middle">addss: 1 lane, 1 cycle, 1 result</text>
+<text x="390" y="250" font-size="11" fill="#6b6b6b" text-anchor="middle">addps: 8 lanes, 1 cycle, 8 results</text>
+</svg>

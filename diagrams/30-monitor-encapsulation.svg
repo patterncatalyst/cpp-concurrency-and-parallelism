@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 430" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="920" height="430" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="20" y="46" width="430" height="320" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="470" y="46" width="430" height="320" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="50" y="90" width="210" height="80" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="155.0" y="120.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">class Data (public)</text>
+<text x="155.0" y="137.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">data_ : T</text>
+<text x="155.0" y="152.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">mutex_</text>
+<rect x="280" y="96" width="150" height="50" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="355.0" y="119.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">// protected by</text>
+<text x="355.0" y="136.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">mutex_</text>
+<rect x="50" y="230" width="120" height="48" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="110.0" y="259.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Caller A</text>
+<rect x="190" y="230" width="120" height="48" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="250.0" y="259.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Caller B</text>
+<rect x="330" y="230" width="120" height="48" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="390.0" y="259.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Caller C</text>
+<rect x="500" y="90" width="190" height="76" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="595.0" y="118.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Monitor&lt;T&gt; (sealed)</text>
+<text x="595.0" y="135.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">value_ : T (private)</text>
+<text x="595.0" y="150.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">mutex_ (private)</text>
+<rect x="500" y="196" width="190" height="42" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="595.0" y="215.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">lock() -&gt; Handle</text>
+<text x="595.0" y="232.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">only public entry</text>
+<rect x="500" y="268" width="190" height="42" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="595.0" y="294.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Caller</text>
+<rect x="730" y="196" width="160" height="42" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="810.0" y="215.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Handle</text>
+<text x="810.0" y="232.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">{ lock + T&amp; }</text>
+<path d="M110,230 L110,170" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="116.0" y="194.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">lock(mutex_)</text>
+<text x="116.0" y="194.0" font-size="11" fill="#2d2d2d" text-anchor="middle">lock(mutex_)</text>
+<path d="M250,230 L250,170" fill="none" stroke="#c0392b" stroke-width="2" marker-end="url(#am)"/>
+<text x="256.0" y="194.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">bypasses lock</text>
+<text x="256.0" y="194.0" font-size="11" fill="#c0392b" text-anchor="middle">bypasses lock</text>
+<path d="M390,230 L260,150" fill="none" stroke="#c0392b" stroke-width="2" marker-end="url(#am)"/>
+<text x="331.0" y="184.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">bypasses lock</text>
+<text x="331.0" y="184.0" font-size="11" fill="#c0392b" text-anchor="middle">bypasses lock</text>
+<path d="M595,166 L595,196" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M595,268 L595,238" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="601.0" y="247.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">call</text>
+<text x="601.0" y="247.0" font-size="11" fill="#2d2d2d" text-anchor="middle">call</text>
+<path d="M690,217 L730,217" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="716.0" y="211.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">returns</text>
+<text x="716.0" y="211.0" font-size="11" fill="#2d2d2d" text-anchor="middle">returns</text>
+<text x="460" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">Enforcement vs. Convention: Monitor&lt;T&gt; vs. Comment-Guarded Access</text>
+<text x="35" y="72" font-size="13" fill="#c0392b" text-anchor="start" font-weight="700">Comment-guarded (not enforced)</text>
+<text x="485" y="72" font-size="13" fill="#5a8870" text-anchor="start" font-weight="700">Monitor&lt;T&gt; (structurally enforced)</text>
+<text x="235" y="300" font-size="11" fill="#c0392b" text-anchor="middle">both bypasses compile fine</text>
+<text x="810" y="260" font-size="10.5" fill="#6b6b6b" text-anchor="middle">no path to value_ except</text>
+<text x="810" y="274" font-size="10.5" fill="#6b6b6b" text-anchor="middle">through the lock</text>
+<text x="460" y="404" font-size="12" fill="#1a1a1a" text-anchor="middle" font-weight="700">the compiler enforces the wrapper&#x27;s rule; it cannot enforce the comment.</text>
+</svg>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 400" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="840" height="400" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="20" y="50" width="800" height="180" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="32" y="70" font-size="12" font-weight="700" fill="#6b6b6b">Shared line (false sharing)</text>
+<rect x="245" y="92" width="230" height="64" rx="12" fill="#ffffff" stroke="#e8e1d3"/>
+<text x="257" y="112" font-size="12" font-weight="700" fill="#6b6b6b">cache line (64B)</text>
+<rect x="20" y="250" width="800" height="100" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="32" y="270" font-size="12" font-weight="700" fill="#6b6b6b">Padded (no false sharing)</text>
+<rect x="155" y="286" width="205" height="64" rx="12" fill="#ffffff" stroke="#e8e1d3"/>
+<text x="167" y="306" font-size="12" font-weight="700" fill="#6b6b6b">64B line</text>
+<rect x="495" y="286" width="205" height="64" rx="12" fill="#ffffff" stroke="#e8e1d3"/>
+<text x="507" y="306" font-size="12" font-weight="700" fill="#6b6b6b">64B line</text>
+<rect x="40" y="112" width="90" height="40" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="85.0" y="137.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Thread A</text>
+<rect x="255" y="110" width="105" height="44" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="307.5" y="130.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">atomic a</text>
+<text x="307.5" y="147.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">thread A</text>
+<rect x="360" y="110" width="105" height="44" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="412.5" y="130.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">atomic b</text>
+<text x="412.5" y="147.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">thread B</text>
+<rect x="690" y="112" width="90" height="40" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="735.0" y="137.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Thread B</text>
+<rect x="40" y="178" width="100" height="36" rx="9" fill="#f2efe9" stroke="#8a8172" stroke-width="1.5"/>
+<text x="90.0" y="201.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">core cache A</text>
+<rect x="680" y="178" width="100" height="36" rx="9" fill="#f2efe9" stroke="#8a8172" stroke-width="1.5"/>
+<text x="730.0" y="201.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">core cache B</text>
+<rect x="40" y="304" width="90" height="40" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="85.0" y="329.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Thread A</text>
+<rect x="165" y="304" width="90" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="210.0" y="322.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">atomic a</text>
+<text x="210.0" y="339.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">thread A</text>
+<rect x="265" y="304" width="85" height="40" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="307.5" y="322.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">padding</text>
+<text x="307.5" y="339.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">to line size</text>
+<rect x="505" y="304" width="85" height="40" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="547.5" y="322.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">padding</text>
+<text x="547.5" y="339.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">to line size</text>
+<rect x="600" y="304" width="90" height="40" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="645.0" y="322.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">atomic b</text>
+<text x="645.0" y="339.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">thread B</text>
+<rect x="710" y="304" width="90" height="40" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="755.0" y="329.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Thread B</text>
+<path d="M130,128 L255,125" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="198.5" y="120.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">write</text>
+<text x="198.5" y="120.5" font-size="11" fill="#2d2d2d" text-anchor="middle">write</text>
+<path d="M690,128 L465,125" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="583.5" y="120.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">write</text>
+<text x="583.5" y="120.5" font-size="11" fill="#2d2d2d" text-anchor="middle">write</text>
+<path d="M140,196 L680,196" fill="none" stroke="#c0392b" stroke-width="2" marker-start="url(#am)" marker-end="url(#am)"/>
+<text x="410.0" y="182.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">invalidate / re-fetch</text>
+<text x="410.0" y="182.0" font-size="11" fill="#c0392b" text-anchor="middle">invalidate / re-fetch</text>
+<path d="M130,324 L165,324" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="153.5" y="318.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">write</text>
+<text x="153.5" y="318.0" font-size="11" fill="#2d2d2d" text-anchor="middle">write</text>
+<path d="M710,324 L690,324" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="706.0" y="318.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">write</text>
+<text x="706.0" y="318.0" font-size="11" fill="#2d2d2d" text-anchor="middle">write</text>
+<text x="420" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">False sharing and the fix</text>
+<text x="420" y="380" font-size="11" fill="#6b6b6b" text-anchor="middle">same correctness, no cross-core eviction</text>
+</svg>

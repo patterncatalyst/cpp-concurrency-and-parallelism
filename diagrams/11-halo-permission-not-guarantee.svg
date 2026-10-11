@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 410" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="860" height="410" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="40" width="800" height="110" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="60" font-size="12" font-weight="700" fill="#6b6b6b">what the standard permits</text>
+<rect x="30" y="160" width="800" height="150" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="180" font-size="12" font-weight="700" fill="#6b6b6b">what a toolchain actually does — same source, same -O level</text>
+<rect x="60" y="66" width="740" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="430.0" y="81.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">[dcl.fct.def.coroutine]</text>
+<text x="430.0" y="98.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">&quot;MAY elide the frame when it can prove</text>
+<text x="430.0" y="113.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">the frame does not outlive the caller&quot;</text>
+<rect x="60" y="215" width="330" height="70" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="225.0" y="240.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Compiler A</text>
+<text x="225.0" y="257.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">allocates on the heap</text>
+<text x="225.0" y="272.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">every call</text>
+<rect x="430" y="215" width="330" height="70" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="595.0" y="240.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Compiler B</text>
+<text x="595.0" y="257.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">elides the frame</text>
+<text x="595.0" y="272.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">every call</text>
+<rect x="30" y="325" width="800" height="55" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="430.0" y="350.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">measure your own toolchain</text>
+<text x="430.0" y="367.5" font-size="11.5" fill="#6b6b6b" text-anchor="middle">overload operator new in promise_type and count</text>
+<path d="M390,250 L430,250" fill="none" stroke="#2d2d2d" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="430" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">HALO is a permission, not a guarantee</text>
+<text x="430" y="138" font-size="11" fill="#6b6b6b" text-anchor="middle">may — no conforming program may assume elision occurs</text>
+<text x="430" y="196" font-size="11" fill="#6b6b6b" text-anchor="middle">identical standard, identical optimization flag, different answer</text>
+</svg>

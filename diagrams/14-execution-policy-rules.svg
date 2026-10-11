@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="900" height="500" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="40" width="840" height="110" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="60" font-size="12" font-weight="700" fill="#6b6b6b">seq</text>
+<rect x="30" y="160" width="840" height="150" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="180" font-size="12" font-weight="700" fill="#6b6b6b">par</text>
+<rect x="30" y="320" width="840" height="160" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="340" font-size="12" font-weight="700" fill="#6b6b6b">par_unseq</text>
+<rect x="90" y="185" width="750" height="30" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="90" y="222" width="750" height="30" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="90" y="259" width="750" height="30" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="90" y="345" width="750" height="45" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="90" y="400" width="750" height="45" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="70" y="70" width="56" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="98.0" y="95.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">1</text>
+<rect x="160" y="70" width="56" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="188.0" y="95.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">2</text>
+<rect x="250" y="70" width="56" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="278.0" y="95.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">3</text>
+<rect x="340" y="70" width="56" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="368.0" y="95.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">4</text>
+<rect x="430" y="70" width="56" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="458.0" y="95.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">5</text>
+<rect x="140" y="189" width="46" height="22" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="163.0" y="205.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">3</text>
+<rect x="560" y="189" width="46" height="22" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="583.0" y="205.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">5</text>
+<rect x="300" y="226" width="46" height="22" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="323.0" y="242.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">1</text>
+<rect x="180" y="263" width="46" height="22" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="203.0" y="279.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">2</text>
+<rect x="480" y="263" width="46" height="22" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="503.0" y="279.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">4</text>
+<rect x="120" y="352" width="50" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="145.0" y="372.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">1</text>
+<rect x="150" y="352" width="50" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="175.0" y="372.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">2</text>
+<rect x="180" y="352" width="50" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="205.0" y="372.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">3</text>
+<rect x="450" y="407" width="50" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="475.0" y="427.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">4</text>
+<rect x="480" y="407" width="50" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="505.0" y="427.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">5</text>
+<rect x="620" y="407" width="40" height="30" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="640.0" y="427.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">lock</text>
+<path d="M126,90 L160,90" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M216,90 L250,90" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M306,90 L340,90" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M396,90 L430,90" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="450" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">What each execution policy permits — and forbids</text>
+<text x="450" y="128" font-size="11" fill="#6b6b6b" text-anchor="middle">no concurrency, no vectorization guarantee — the baseline</text>
+<text x="465" y="305" font-size="11" fill="#6b6b6b" text-anchor="middle">may run on multiple threads — callable must be concurrency-safe</text>
+<text x="465" y="472" font-size="11" fill="#6b6b6b" text-anchor="middle">may interleave within ONE thread — locking can deadlock against itself</text>
+<text x="640" y="430" font-size="18" fill="#c0392b" text-anchor="middle" font-weight="700">X</text>
+<text x="65" y="205" font-size="10" fill="#6b6b6b" text-anchor="end">T0</text>
+<text x="65" y="242" font-size="10" fill="#6b6b6b" text-anchor="end">T1</text>
+<text x="65" y="279" font-size="10" fill="#6b6b6b" text-anchor="end">T2</text>
+</svg>

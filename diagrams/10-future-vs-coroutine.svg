@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 400" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="920" height="400" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="46" width="410" height="260" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="66" font-size="12" font-weight="700" fill="#6b6b6b">future / promise (this chapter)</text>
+<rect x="460" y="46" width="410" height="260" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="472" y="66" font-size="12" font-weight="700" fill="#6b6b6b">coroutine co_await (next chapter)</text>
+<rect x="70" y="86" width="160" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="150.0" y="116.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">producer thread</text>
+<rect x="260" y="86" width="140" height="50" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="330.0" y="116.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">shared state</text>
+<rect x="70" y="220" width="160" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="150.0" y="250.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">consumer thread</text>
+<rect x="500" y="86" width="160" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="580.0" y="116.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">producer thread</text>
+<rect x="690" y="86" width="140" height="50" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="760.0" y="116.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">shared state</text>
+<rect x="500" y="220" width="160" height="50" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="580.0" y="250.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">awaiting coroutine</text>
+<path d="M230,111 L260,111" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="251.0" y="105.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">set_value() / set_exception()</text>
+<text x="251.0" y="105.0" font-size="11" fill="#2d2d2d" text-anchor="middle">set_value() / set_exception()</text>
+<path d="M150,220 L325,136" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#am)"/>
+<text x="243.5" y="172.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">get() blocks</text>
+<text x="243.5" y="172.0" font-size="11" fill="#c0392b" text-anchor="middle">get() blocks</text>
+<path d="M660,111 L690,111" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="681.0" y="105.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">set_value()</text>
+<text x="681.0" y="105.0" font-size="11" fill="#2d2d2d" text-anchor="middle">set_value()</text>
+<path d="M580,220 L755,136" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="673.5" y="172.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">co_await</text>
+<text x="673.5" y="172.0" font-size="11" fill="#2d2d2d" text-anchor="middle">co_await</text>
+<path d="M730,136 L605,220" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="673.5" y="172.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">resume on completion</text>
+<text x="673.5" y="172.0" font-size="11" fill="#2d2d2d" text-anchor="middle">resume on completion</text>
+<text x="460" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">Future::get() blocks; coroutine co_await attaches a continuation</text>
+<text x="245" y="296" font-size="10" fill="#6b6b6b" text-anchor="middle">one hop, no continuation -- chaining a second</text>
+<text x="245" y="310" font-size="10" fill="#6b6b6b" text-anchor="middle">async step means blocking here first</text>
+<text x="680" y="296" font-size="10" fill="#6b6b6b" text-anchor="middle">non-blocking continuation -- same exception</text>
+<text x="680" y="310" font-size="10" fill="#6b6b6b" text-anchor="middle">guarantee, no thread parked</text>
+</svg>

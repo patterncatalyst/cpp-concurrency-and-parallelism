@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 340" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="880" height="340" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="50" y="60" width="150" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="125.0" y="85.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Core 0</text>
+<rect x="230" y="60" width="150" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="305.0" y="85.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Core 1</text>
+<rect x="50" y="115" width="70" height="34" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="85.0" y="130.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">L1</text>
+<text x="85.0" y="147.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">~4 cycles</text>
+<rect x="130" y="115" width="70" height="34" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="165.0" y="130.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">L2</text>
+<text x="165.0" y="147.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">~12 cycles</text>
+<rect x="230" y="115" width="70" height="34" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="265.0" y="130.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">L1</text>
+<text x="265.0" y="147.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">~4 cycles</text>
+<rect x="310" y="115" width="70" height="34" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="345.0" y="130.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">L2</text>
+<text x="345.0" y="147.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">~12 cycles</text>
+<rect x="50" y="165" width="330" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="215.0" y="188.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Shared L3</text>
+<text x="215.0" y="205.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">~40 cycles</text>
+<rect x="50" y="230" width="330" height="50" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="215.0" y="253.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">DRAM</text>
+<text x="215.0" y="270.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">~100-300 cycles</text>
+<rect x="560" y="70" width="70" height="50" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="595.0" y="93.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">M</text>
+<text x="595.0" y="110.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">Modified</text>
+<rect x="700" y="70" width="70" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="735.0" y="93.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">E</text>
+<text x="735.0" y="110.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">Exclusive</text>
+<rect x="700" y="190" width="70" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="735.0" y="213.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">S</text>
+<text x="735.0" y="230.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">Shared</text>
+<rect x="560" y="190" width="70" height="50" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="595.0" y="213.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">I</text>
+<text x="595.0" y="230.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">Invalid</text>
+<path d="M120,100 L85,115" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M120,100 L165,115" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M300,100 L265,115" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M300,100 L345,115" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M85,149 L100,165" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M165,149 L200,165" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M265,149 L230,165" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M345,149 L330,165" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M215,215 L215,230" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M700,95 L630,95" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="665.0" y="87.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">local write</text>
+<text x="665.0" y="87.0" font-size="11" fill="#2d2d2d" text-anchor="middle">local write</text>
+<path d="M595,120 L595,190" fill="none" stroke="#c0392b" stroke-width="2" marker-end="url(#am)"/>
+<text x="595.0" y="155.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">remote write / invalidate</text>
+<text x="595.0" y="155.0" font-size="11" fill="#c0392b" text-anchor="middle">remote write / invalidate</text>
+<path d="M630,215 L700,215" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="665.0" y="207.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">local read (shared)</text>
+<text x="665.0" y="207.0" font-size="11" fill="#2d2d2d" text-anchor="middle">local read (shared)</text>
+<path d="M735,120 L735,190" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="765.0" y="155.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">remote read snoop</text>
+<text x="765.0" y="155.0" font-size="11" fill="#2d2d2d" text-anchor="middle">remote read snoop</text>
+<path d="M630,190 L700,120" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="665.0" y="145.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">local read (no sharers)</text>
+<text x="665.0" y="145.0" font-size="11" fill="#2d2d2d" text-anchor="middle">local read (no sharers)</text>
+<text x="440" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">Cache hierarchy and MESI coherence</text>
+<text x="215" y="48" font-size="11" fill="#6b6b6b" text-anchor="middle" font-weight="700">Cache hierarchy (rough latency)</text>
+<text x="660" y="48" font-size="11" fill="#6b6b6b" text-anchor="middle" font-weight="700">Cache-line states (MESI)</text>
+</svg>

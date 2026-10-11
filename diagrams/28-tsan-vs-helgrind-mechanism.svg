@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 410" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="860" height="410" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="40" y="55" width="340" height="190" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="52" y="75" font-size="12" font-weight="700" fill="#6b6b6b">ThreadSanitizer</text>
+<rect x="480" y="55" width="340" height="190" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="492" y="75" font-size="12" font-weight="700" fill="#6b6b6b">Helgrind</text>
+<rect x="60" y="90" width="300" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="210.0" y="115.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">compile-time instrumentation</text>
+<rect x="60" y="150" width="300" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="210.0" y="168.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">per-thread vector clock</text>
+<text x="210.0" y="185.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">updated at every sync point</text>
+<rect x="60" y="210" width="300" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="210.0" y="228.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">no happens-before edge found</text>
+<text x="210.0" y="245.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">between T1 write and T2 write</text>
+<rect x="500" y="90" width="300" height="40" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="650.0" y="115.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">binary re-translation (VEX IR)</text>
+<rect x="500" y="150" width="300" height="40" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="650.0" y="175.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">lockset per shared location</text>
+<rect x="500" y="210" width="300" height="40" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="650.0" y="228.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">location accessed under two</text>
+<text x="650.0" y="245.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">non-overlapping lock sets</text>
+<rect x="300" y="290" width="260" height="60" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="430.0" y="318.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">data race reported at racy_counter.cpp:14</text>
+<text x="430.0" y="335.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">independently derived</text>
+<path d="M210,130 L210,150" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M210,190 L210,210" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M650,130 L650,150" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M650,190 L650,210" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M210,250 L340,290" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M650,250 L520,290" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="430" y="26" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">ThreadSanitizer vs. Helgrind: Two Mechanisms, One Report</text>
+<text x="430" y="390" font-size="11" fill="#a06030" text-anchor="middle">TSan reports only a conflict this run executed; Helgrind&#x27;s lockset model can flag a lock-order risk no run has hit yet</text>
+</svg>

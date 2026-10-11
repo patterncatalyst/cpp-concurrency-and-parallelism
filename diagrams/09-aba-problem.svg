@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 420" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="940" height="420" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="100" width="890" height="96" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="120" font-size="12" font-weight="700" fill="#6b6b6b">Thread 1</text>
+<rect x="30" y="210" width="890" height="96" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="230" font-size="12" font-weight="700" fill="#6b6b6b">Thread 2</text>
+<rect x="440" y="40" width="160" height="40" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="520.0" y="58.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">head pointer</text>
+<text x="520.0" y="75.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">shared atomic&lt;Node*&gt;</text>
+<rect x="50" y="126" width="150" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="125.0" y="156.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">read head = A</text>
+<rect x="220" y="126" width="190" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="315.0" y="149.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">compute new_head</text>
+<text x="315.0" y="166.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">= A-&gt;next</text>
+<rect x="430" y="126" width="90" height="50" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="475.0" y="156.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">PREEMPTED</text>
+<rect x="540" y="126" width="330" height="50" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="705.0" y="149.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CAS(head, A, new_head)</text>
+<text x="705.0" y="166.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">succeeds!</text>
+<rect x="420" y="236" width="140" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="490.0" y="259.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">pop A</text>
+<text x="490.0" y="276.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">head = B</text>
+<rect x="580" y="236" width="170" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="665.0" y="259.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">pop B, free A</text>
+<text x="665.0" y="276.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">head = C</text>
+<rect x="770" y="236" width="170" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="855.0" y="259.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">push new node</text>
+<text x="855.0" y="276.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">reused addr A, head = A</text>
+<rect x="540" y="320" width="330" height="50" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="705.0" y="343.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">corruption</text>
+<text x="705.0" y="360.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">new_head points into memory T2 freed/reused</text>
+<path d="M520,80 L220,126" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="376.0" y="97.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">initial load</text>
+<text x="376.0" y="97.0" font-size="11" fill="#2d2d2d" text-anchor="middle">initial load</text>
+<path d="M200,151 L220,151" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M410,151 L430,151" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M520,151 L540,151" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M560,261 L580,261" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M750,261 L770,261" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M705,126 L520,80" fill="none" stroke="#c0392b" stroke-width="2" marker-end="url(#am)"/>
+<text x="618.5" y="97.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">numerically A, semantically a different stack</text>
+<text x="618.5" y="97.0" font-size="11" fill="#c0392b" text-anchor="middle">numerically A, semantically a different stack</text>
+<path d="M570,176 L570,320" fill="none" stroke="#c0392b" stroke-width="2" marker-end="url(#am)"/>
+<text x="470" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">The ABA problem: a reused address fools compare-and-swap</text>
+<text x="855" y="300" font-size="10" fill="#a06030" text-anchor="middle">allocator reuses freed address A</text>
+</svg>

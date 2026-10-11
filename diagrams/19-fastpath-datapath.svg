@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 400" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="880" height="400" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="20" y="40" width="840" height="165" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="32" y="60" font-size="12" font-weight="700" fill="#6b6b6b">unpinned, heap-allocating, blocking</text>
+<rect x="20" y="215" width="840" height="155" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="32" y="235" font-size="12" font-weight="700" fill="#6b6b6b">pinned, buffer reuse, busy-poll</text>
+<rect x="40" y="66" width="60" height="34" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="70.0" y="88.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">msg</text>
+<rect x="170" y="60" width="130" height="40" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="235.0" y="78.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">server</text>
+<text x="235.0" y="95.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">(unpinned)</text>
+<rect x="360" y="66" width="80" height="34" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="400.0" y="88.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">heap</text>
+<rect x="520" y="165" width="150" height="40" rx="9" fill="#f2efe9" stroke="#8a8172" stroke-width="1.5"/>
+<text x="595.0" y="190.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">kernel scheduler</text>
+<rect x="170" y="150" width="50" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="195.0" y="171.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU0</text>
+<rect x="230" y="150" width="50" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="255.0" y="171.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU1</text>
+<rect x="290" y="150" width="50" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="315.0" y="171.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU2</text>
+<rect x="350" y="150" width="50" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="375.0" y="171.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU3</text>
+<rect x="40" y="246" width="60" height="34" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="70.0" y="268.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">msg</text>
+<rect x="170" y="240" width="130" height="40" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="235.0" y="258.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">server</text>
+<text x="235.0" y="275.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">(pinned)</text>
+<rect x="360" y="246" width="90" height="34" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="405.0" y="261.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">stack buffer</text>
+<text x="405.0" y="278.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">(reused)</text>
+<rect x="170" y="330" width="50" height="38" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="195.0" y="354.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU0</text>
+<rect x="230" y="330" width="50" height="38" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="255.0" y="354.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU1</text>
+<rect x="290" y="330" width="50" height="38" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="315.0" y="347.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU2</text>
+<text x="315.0" y="364.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">(pinned)</text>
+<rect x="350" y="330" width="50" height="38" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="375.0" y="354.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU3</text>
+<path d="M100,83 L170,80" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="141.0" y="75.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">arrives</text>
+<text x="141.0" y="75.5" font-size="11" fill="#2d2d2d" text-anchor="middle">arrives</text>
+<path d="M300,72 L360,76" fill="none" stroke="#2d2d2d" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="336.0" y="68.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">heap alloc</text>
+<text x="336.0" y="68.0" font-size="11" fill="#2d2d2d" text-anchor="middle">heap alloc</text>
+<path d="M235,100 L235,150" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="241.0" y="119.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">any core</text>
+<text x="241.0" y="119.0" font-size="11" fill="#2d2d2d" text-anchor="middle">any core</text>
+<path d="M250,100 L545,165" fill="none" stroke="#c0392b" stroke-width="2" marker-end="url(#am)"/>
+<text x="337.5" y="192.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">blocking read -&gt; sleep</text>
+<text x="337.5" y="192.5" font-size="11" fill="#c0392b" text-anchor="middle">blocking read -&gt; sleep</text>
+<path d="M645,165 L295,100" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="565.0" y="102.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">wake (ctx switch)</text>
+<text x="565.0" y="102.5" font-size="11" fill="#2d2d2d" text-anchor="middle">wake (ctx switch)</text>
+<path d="M100,263 L170,260" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="141.0" y="255.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">arrives</text>
+<text x="141.0" y="255.5" font-size="11" fill="#2d2d2d" text-anchor="middle">arrives</text>
+<path d="M300,256 L360,260" fill="none" stroke="#2d2d2d" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="336.0" y="252.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">reused stack buffer</text>
+<text x="336.0" y="252.0" font-size="11" fill="#2d2d2d" text-anchor="middle">reused stack buffer</text>
+<path d="M290,280 L300,330" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="301.0" y="299.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">pinned to</text>
+<text x="301.0" y="299.0" font-size="11" fill="#2d2d2d" text-anchor="middle">pinned to</text>
+<path d="M300,245 L300,265" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="440" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">One round trip, two ways: blocking vs busy-poll fast path</text>
+<text x="440" y="378" font-size="11" fill="#6b6b6b" text-anchor="middle">same round trip, same frame — the difference is who the thread has to ask for its CPU back.</text>
+<text x="40" y="312" font-size="11" fill="#6b6b6b" text-anchor="start">busy-poll recv (EAGAIN) — never enters scheduler</text>
+</svg>

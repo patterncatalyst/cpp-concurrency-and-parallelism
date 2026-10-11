@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="900" height="450" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="50" width="560" height="260" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="70" font-size="12" font-weight="700" fill="#6b6b6b">Fedora host</text>
+<rect x="60" y="90" width="280" height="56" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="200.0" y="116.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">C++ toolchain</text>
+<text x="200.0" y="133.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">clang / gcc / cmake / ninja / gdb / valgrind / lua</text>
+<rect x="60" y="156" width="280" height="56" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="200.0" y="182.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Conan 2 (pip)</text>
+<text x="200.0" y="199.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">pins fmt, Boost, gRPC, opentelemetry-cpp per example</text>
+<rect x="60" y="222" width="280" height="56" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="200.0" y="248.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Docker engine + compose v2</text>
+<text x="200.0" y="265.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">runs every example in a container</text>
+<rect x="360" y="90" width="210" height="188" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="465.0" y="167.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">KVM lab (libvirt + qemu)</text>
+<text x="465.0" y="184.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">optional: NUMA / parallelism</text>
+<text x="465.0" y="199.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">chapters only -- host kernel</text>
+<text x="465.0" y="214.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">settings never touched</text>
+<rect x="630" y="110" width="220" height="56" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="740.0" y="136.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Editor</text>
+<text x="740.0" y="153.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">any CMake-aware; CLion preferred</text>
+<rect x="135" y="350" width="350" height="70" rx="9" fill="#2d2d2d" stroke="#1a1a1a" stroke-width="2"/>
+<text x="310.0" y="375.5" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">./demo.sh</text>
+<text x="310.0" y="392.5" font-size="11.5" fill="#d7d7d7" text-anchor="middle">builds image -&gt; runs -&gt; verify.lua</text>
+<text x="310.0" y="407.5" font-size="11.5" fill="#d7d7d7" text-anchor="middle">asserts the observable effect</text>
+<path d="M630,138 L340,118" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="491.0" y="122.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">see toolchain</text>
+<text x="491.0" y="122.0" font-size="11" fill="#2d2d2d" text-anchor="middle">see toolchain</text>
+<path d="M310,310 L310,350" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="450" y="26" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">The prerequisite stack</text>
+</svg>

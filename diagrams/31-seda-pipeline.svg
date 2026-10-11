@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 400" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="940" height="400" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="60" width="110" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="85.0" y="83.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Parse</text>
+<text x="85.0" y="100.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">pool •••</text>
+<rect x="150" y="65" width="70" height="40" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="185.0" y="83.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">queue</text>
+<text x="185.0" y="100.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">depth metric</text>
+<rect x="230" y="60" width="110" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="285.0" y="83.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Validate</text>
+<text x="285.0" y="100.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">pool •••</text>
+<rect x="350" y="65" width="70" height="40" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="385.0" y="83.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">queue</text>
+<text x="385.0" y="100.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">depth metric</text>
+<rect x="430" y="60" width="110" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="485.0" y="83.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Compute</text>
+<text x="485.0" y="100.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">pool •••</text>
+<rect x="330" y="160" width="110" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="385.0" y="183.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Compute</text>
+<text x="385.0" y="200.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">replica 1</text>
+<rect x="460" y="160" width="110" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="515.0" y="183.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Compute</text>
+<text x="515.0" y="200.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">replica 2</text>
+<rect x="590" y="160" width="110" height="50" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="645.0" y="183.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Compute</text>
+<text x="645.0" y="200.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">replica 3</text>
+<rect x="460" y="260" width="150" height="50" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="535.0" y="283.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Join</text>
+<text x="535.0" y="300.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">latch N=3</text>
+<rect x="650" y="265" width="70" height="40" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
+<text x="685.0" y="283.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">queue</text>
+<text x="685.0" y="300.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">depth metric</text>
+<rect x="760" y="260" width="120" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="820.0" y="283.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Persist</text>
+<text x="820.0" y="300.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">pool •••</text>
+<path d="M140,85 L150,85" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M220,85 L230,85" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M340,85 L350,85" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M420,85 L430,85" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M485,110 L385,160" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="441.0" y="129.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">fan-out (N=3)</text>
+<text x="441.0" y="129.0" font-size="11" fill="#2d2d2d" text-anchor="middle">fan-out (N=3)</text>
+<path d="M485,110 L515,160" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M485,110 L645,160" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M385,210 L480,260" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="438.5" y="229.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">fan-in</text>
+<text x="438.5" y="229.0" font-size="11" fill="#2d2d2d" text-anchor="middle">fan-in</text>
+<path d="M515,210 L535,260" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M645,210 L590,260" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M610,285 L650,285" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M720,285 L760,285" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="470" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">SEDA: Staged Event-Driven Architecture with a Fan-Out/Fan-In Detour</text>
+<text x="470" y="345" font-size="11.5" fill="#c0392b" text-anchor="middle" font-weight="700">each queue boundary = context switch + cold cache for the next stage</text>
+</svg>

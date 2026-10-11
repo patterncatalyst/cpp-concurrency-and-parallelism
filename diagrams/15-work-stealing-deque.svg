@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 290" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="900" height="290" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="40" y="130" width="180" height="40" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="250" y="130" width="180" height="40" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="460" y="130" width="180" height="40" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="670" y="130" width="180" height="40" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<rect x="40" y="60" width="180" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="130.0" y="90.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Worker 0</text>
+<rect x="250" y="60" width="180" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="340.0" y="90.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Worker 1</text>
+<rect x="460" y="60" width="180" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="550.0" y="90.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Worker 2</text>
+<rect x="670" y="60" width="180" height="50" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="760.0" y="90.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Worker 3</text>
+<rect x="48" y="137" width="38" height="26" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="67.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">T1</text>
+<rect x="92" y="137" width="38" height="26" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="111.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">T2</text>
+<rect x="136" y="137" width="38" height="26" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="155.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">T3</text>
+<rect x="256" y="135" width="168" height="30" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="340.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">empty</text>
+<rect x="468" y="137" width="38" height="26" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="487.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">T1</text>
+<rect x="512" y="137" width="38" height="26" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="531.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">T2</text>
+<rect x="676" y="137" width="38" height="26" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="695.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">task</text>
+<rect x="718" y="137" width="38" height="26" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="737.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">task</text>
+<rect x="760" y="137" width="38" height="26" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="779.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">task</text>
+<rect x="802" y="137" width="38" height="26" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="821.0" y="155.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">oldest</text>
+<path d="M340,110 L821,137" fill="none" stroke="#c0392b" stroke-width="2" marker-end="url(#am)"/>
+<text x="586.5" y="117.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">steal: lift oldest task</text>
+<text x="586.5" y="117.5" font-size="11" fill="#c0392b" text-anchor="middle">steal: lift oldest task</text>
+<path d="M130,110 L67,137" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="104.5" y="117.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">local pop: no lock needed</text>
+<text x="104.5" y="117.5" font-size="11" fill="#2d2d2d" text-anchor="middle">local pop: no lock needed</text>
+<text x="450" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">Work-stealing deques: push/pop the bottom, steal the top</text>
+<text x="46" y="182" font-size="9" fill="#6b6b6b" text-anchor="start">bottom (owner push/pop, LIFO)</text>
+<text x="854" y="182" font-size="9" fill="#6b6b6b" text-anchor="end">top (thief steal, FIFO)</text>
+<text x="450" y="260" font-size="11" fill="#6b6b6b" text-anchor="middle">owner and thief touch opposite ends; they only collide when one task remains.</text>
+</svg>

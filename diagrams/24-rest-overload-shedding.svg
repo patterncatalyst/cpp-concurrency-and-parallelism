@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 400" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="880" height="400" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="50" width="180" height="230" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="70" font-size="12" font-weight="700" fill="#6b6b6b">inbound requests</text>
+<rect x="560" y="50" width="290" height="120" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="572" y="70" font-size="12" font-weight="700" fill="#6b6b6b">below capacity</text>
+<rect x="60" y="84" width="120" height="40" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="120.0" y="109.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">request</text>
+<rect x="60" y="140" width="120" height="40" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="120.0" y="165.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">request</text>
+<rect x="60" y="196" width="120" height="40" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="120.0" y="221.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">request</text>
+<rect x="260" y="140" width="110" height="44" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="315.0" y="167.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">accept</text>
+<rect x="410" y="140" width="120" height="48" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
+<text x="470.0" y="162.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">in-flight gate</text>
+<text x="470.0" y="179.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">847 / 1000</text>
+<rect x="590" y="74" width="110" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="645.0" y="99.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">handler</text>
+<rect x="590" y="124" width="110" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="645.0" y="149.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">handler</text>
+<rect x="730" y="99" width="100" height="40" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="780.0" y="124.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">200 OK</text>
+<rect x="590" y="270" width="160" height="46" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="670.0" y="291.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">503 + Retry-After</text>
+<text x="670.0" y="308.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">no handler work</text>
+<path d="M180,104 L260,152" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M180,160 L260,162" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M180,216 L260,172" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M370,162 L410,164" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M530,152 L590,94" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="566.0" y="117.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">below capacity</text>
+<text x="566.0" y="117.0" font-size="11" fill="#2d2d2d" text-anchor="middle">below capacity</text>
+<path d="M530,158 L590,144" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M700,94 L730,110" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M700,144 L730,128" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M470,188 L670,270" fill="none" stroke="#c0392b" stroke-width="2" marker-end="url(#am)"/>
+<text x="576.0" y="223.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">at capacity</text>
+<text x="576.0" y="223.0" font-size="11" fill="#c0392b" text-anchor="middle">at capacity</text>
+<text x="440" y="26" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">Overload Shedding at the Capacity Gate</text>
+<text x="440" y="382" font-size="11" fill="#6b6b6b" text-anchor="middle">the shed path never touches a handler — it answers from the gate itself</text>
+</svg>

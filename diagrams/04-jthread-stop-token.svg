@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 470" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="880" height="470" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="40" y="60" width="260" height="140" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="52" y="80" font-size="12" font-weight="700" fill="#6b6b6b">std::jthread t</text>
+<rect x="560" y="60" width="260" height="140" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="572" y="80" font-size="12" font-weight="700" fill="#6b6b6b">worker thread</text>
+<rect x="70" y="100" width="200" height="60" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="170.0" y="128.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">stop_source</text>
+<text x="170.0" y="145.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">(owned by jthread)</text>
+<rect x="590" y="100" width="200" height="60" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="690.0" y="128.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">stop_token</text>
+<text x="690.0" y="145.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">while (!tok.stop_requested())</text>
+<rect x="300" y="260" width="220" height="60" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="410.0" y="288.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">~jthread()</text>
+<text x="410.0" y="305.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">runs at scope exit</text>
+<rect x="40" y="350" width="240" height="50" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="160.0" y="373.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">std::thread</text>
+<text x="160.0" y="390.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">still joinable at destruction</text>
+<rect x="40" y="410" width="240" height="50" rx="9" fill="#2d2d2d" stroke="#1a1a1a" stroke-width="2"/>
+<text x="160.0" y="433.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">std::terminate()</text>
+<text x="160.0" y="450.0" font-size="11.5" fill="#d7d7d7" text-anchor="middle">no stack unwind</text>
+<path d="M270,130 L590,130" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="436.0" y="124.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">get_token()</text>
+<text x="436.0" y="124.0" font-size="11" fill="#2d2d2d" text-anchor="middle">get_token()</text>
+<path d="M360,260 L170,160" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="245.0" y="210.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">1. request_stop()</text>
+<text x="245.0" y="210.0" font-size="11" fill="#2d2d2d" text-anchor="middle">1. request_stop()</text>
+<path d="M460,260 L690,160" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="595.0" y="210.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">2. join()</text>
+<text x="595.0" y="210.0" font-size="11" fill="#2d2d2d" text-anchor="middle">2. join()</text>
+<path d="M160,400 L160,410" fill="none" stroke="#c0392b" stroke-width="2" marker-end="url(#am)"/>
+<text x="440" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">jthread&#x27;s stop_token wiring and automatic cleanup</text>
+<text x="410" y="338" font-size="11" fill="#6b6b6b" text-anchor="middle">both happen even if the caller never calls either by hand</text>
+</svg>

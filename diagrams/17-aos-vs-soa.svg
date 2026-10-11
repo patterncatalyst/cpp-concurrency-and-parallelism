@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 290" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="880" height="290" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="50" width="390" height="180" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="70" font-size="12" font-weight="700" fill="#6b6b6b">Array of Structs (AoS)</text>
+<rect x="460" y="50" width="390" height="180" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="472" y="70" font-size="12" font-weight="700" fill="#6b6b6b">Struct of Arrays (SoA)</text>
+<rect x="50" y="144" width="300" height="42" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="200.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle"></text>
+<rect x="55" y="150" width="26" height="30" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="68.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">x</text>
+<rect x="81" y="150" width="26" height="30" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="94.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">y</text>
+<rect x="107" y="150" width="26" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="120.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">z</text>
+<rect x="133" y="150" width="26" height="30" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="146.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">m</text>
+<rect x="174" y="150" width="26" height="30" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="187.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">x</text>
+<rect x="200" y="150" width="26" height="30" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="213.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">y</text>
+<rect x="226" y="150" width="26" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="239.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">z</text>
+<rect x="252" y="150" width="26" height="30" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="265.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">m</text>
+<rect x="293" y="150" width="26" height="30" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="306.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">x</text>
+<rect x="319" y="150" width="26" height="30" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="332.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">y</text>
+<rect x="345" y="150" width="26" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="358.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">z</text>
+<rect x="371" y="150" width="26" height="30" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="384.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">m</text>
+<rect x="476" y="146" width="80" height="38" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="516.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle"></text>
+<rect x="480" y="150" width="24" height="30" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="492.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">x</text>
+<rect x="504" y="150" width="24" height="30" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="516.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">x</text>
+<rect x="528" y="150" width="24" height="30" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="540.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">x</text>
+<rect x="570" y="150" width="24" height="30" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="582.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">y</text>
+<rect x="594" y="150" width="24" height="30" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="606.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">y</text>
+<rect x="618" y="150" width="24" height="30" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="630.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">y</text>
+<rect x="660" y="150" width="24" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="672.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">z</text>
+<rect x="684" y="150" width="24" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="696.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">z</text>
+<rect x="708" y="150" width="24" height="30" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="720.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">z</text>
+<rect x="750" y="150" width="24" height="30" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="762.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">m</text>
+<rect x="774" y="150" width="24" height="30" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="786.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">m</text>
+<rect x="798" y="150" width="24" height="30" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="810.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">m</text>
+<text x="440" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">AoS scatters a field; SoA packs it contiguous</text>
+<text x="440" y="260" font-size="11" fill="#6b6b6b" text-anchor="middle">a vector load wants the boxed region contiguous — SoA gives it for free; AoS never does.</text>
+</svg>

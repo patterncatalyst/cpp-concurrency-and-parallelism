@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="900" height="320" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="20" y="48" width="420" height="192" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="32" y="68" font-size="12" font-weight="700" fill="#6b6b6b">cpu.max = 200000 100000 (a time budget)</text>
+<rect x="460" y="48" width="420" height="192" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="472" y="68" font-size="12" font-weight="700" fill="#6b6b6b">cpuset.cpus = 4-5 (a fixed core set)</text>
+<rect x="442" y="48" width="16" height="192" rx="12" fill="#a06030" stroke="#e8e1d3"/>
+<rect x="35" y="72" width="40" height="32" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="55.0" y="93.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 0</text>
+<rect x="84" y="72" width="40" height="32" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="104.0" y="93.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 1</text>
+<rect x="133" y="72" width="40" height="32" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="153.0" y="93.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 2</text>
+<rect x="182" y="72" width="40" height="32" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="202.0" y="93.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 3</text>
+<rect x="231" y="72" width="40" height="32" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="251.0" y="93.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 4</text>
+<rect x="280" y="72" width="40" height="32" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="300.0" y="93.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 5</text>
+<rect x="329" y="72" width="40" height="32" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="349.0" y="93.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 6</text>
+<rect x="378" y="72" width="40" height="32" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="398.0" y="93.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 7</text>
+<rect x="475" y="72" width="40" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="495.0" y="86.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 0</text>
+<text x="495.0" y="103.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">excluded</text>
+<rect x="524" y="72" width="40" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="544.0" y="86.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 1</text>
+<text x="544.0" y="103.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">excluded</text>
+<rect x="573" y="72" width="40" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="593.0" y="86.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 2</text>
+<text x="593.0" y="103.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">excluded</text>
+<rect x="622" y="72" width="40" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="642.0" y="86.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 3</text>
+<text x="642.0" y="103.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">excluded</text>
+<rect x="671" y="72" width="40" height="32" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="691.0" y="86.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 4</text>
+<text x="691.0" y="103.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">usable</text>
+<rect x="720" y="72" width="40" height="32" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="740.0" y="86.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 5</text>
+<text x="740.0" y="103.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">usable</text>
+<rect x="769" y="72" width="40" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="789.0" y="86.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 6</text>
+<text x="789.0" y="103.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">excluded</text>
+<rect x="818" y="72" width="40" height="32" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="838.0" y="86.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CPU 7</text>
+<text x="838.0" y="103.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">excluded</text>
+<rect x="35" y="136" width="70" height="44" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="70.0" y="156.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">RUN</text>
+<text x="70.0" y="173.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">20ms</text>
+<rect x="115" y="136" width="300" height="44" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
+<text x="265.0" y="156.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">THROTTLED</text>
+<text x="265.0" y="173.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">80ms</text>
+<text x="450" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">cpu.max Throttling vs. cpuset.cpus Pinning: Same Host, Two Core Counts</text>
+<text x="35" y="120" font-size="10.5" fill="#6b6b6b" text-anchor="start">one 100ms period (repeats)</text>
+<text x="35" y="200" font-size="10.5" fill="#c0392b" text-anchor="start">aggregate runtime across ALL used</text>
+<text x="35" y="213" font-size="10.5" fill="#c0392b" text-anchor="start">cores counted against one quota</text>
+<text x="718" y="122" font-size="10.5" fill="#5a8870" text-anchor="middle" font-weight="700">100% usable, no throttling</text>
+<text x="670" y="165" font-size="10.5" fill="#6b6b6b" text-anchor="middle">scheduler excludes every other core</text>
+<text x="670" y="178" font-size="10.5" fill="#6b6b6b" text-anchor="middle">outright — no period, no budget to exhaust</text>
+<text x="450" y="270" font-size="11" fill="#a06030" text-anchor="middle" font-weight="700">same &#x27;--cpus=2&#x27; request, two different enforcement mechanisms</text>
+</svg>

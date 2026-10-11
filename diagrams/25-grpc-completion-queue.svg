@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<rect x="0" y="0" width="900" height="480" fill="#fdfbf7"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2d2d2d"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect x="30" y="50" width="270" height="380" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="42" y="70" font-size="12" font-weight="700" fill="#6b6b6b">CallData state machines</text>
+<rect x="330" y="170" width="190" height="120" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="342" y="190" font-size="12" font-weight="700" fill="#6b6b6b">CompletionQueue</text>
+<rect x="590" y="50" width="270" height="380" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
+<text x="602" y="70" font-size="12" font-weight="700" fill="#6b6b6b">worker threads</text>
+<rect x="50" y="80" width="70" height="36" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="85.0" y="103.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CREATE</text>
+<rect x="150" y="80" width="70" height="36" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="185.0" y="103.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">PROCESS</text>
+<rect x="100" y="140" width="70" height="36" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="135.0" y="163.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">FINISH</text>
+<rect x="205" y="205" width="90" height="36" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="250.0" y="221.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CREATE</text>
+<text x="250.0" y="238.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">(new)</text>
+<rect x="70" y="255" width="160" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="150.0" y="273.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CallData #2</text>
+<text x="150.0" y="290.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">CREATE → PROCESS → FINISH</text>
+<rect x="70" y="315" width="160" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
+<text x="150.0" y="333.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">CallData #3</text>
+<text x="150.0" y="350.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">CREATE → PROCESS → FINISH</text>
+<rect x="345" y="195" width="55" height="32" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="372.5" y="216.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">T1</text>
+<rect x="420" y="195" width="55" height="32" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="447.5" y="216.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">T2</text>
+<rect x="380" y="245" width="55" height="32" rx="9" fill="#faf0e6" stroke="#a06030" stroke-width="2"/>
+<text x="407.5" y="266.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">T3</text>
+<rect x="660" y="90" width="150" height="40" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="735.0" y="115.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">worker thread</text>
+<rect x="660" y="200" width="150" height="40" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="735.0" y="225.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">worker thread</text>
+<rect x="660" y="310" width="150" height="40" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
+<text x="735.0" y="335.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">worker thread</text>
+<path d="M120,98 L150,98" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M175,116 L135,140" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M135,176 L250,205" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="198.5" y="182.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">spawns replacement on PROCESS</text>
+<text x="198.5" y="182.5" font-size="11" fill="#2d2d2d" text-anchor="middle">spawns replacement on PROCESS</text>
+<path d="M295,223 L345,205" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="326.0" y="208.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">tag = this</text>
+<text x="326.0" y="208.0" font-size="11" fill="#2d2d2d" text-anchor="middle">tag = this</text>
+<path d="M230,275 L420,211" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M230,335 L380,261" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<path d="M475,200 L660,97" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="573.5" y="138.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">cq-&gt;Next(&amp;tag, &amp;ok)</text>
+<text x="573.5" y="138.5" font-size="11" fill="#2d2d2d" text-anchor="middle">cq-&gt;Next(&amp;tag, &amp;ok)</text>
+<path d="M660,123 L475,222" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
+<text x="573.5" y="188.5" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">tag-&gt;Proceed(ok)</text>
+<text x="573.5" y="188.5" font-size="11" fill="#2d2d2d" text-anchor="middle">tag-&gt;Proceed(ok)</text>
+<path d="M400,211 L660,210" fill="none" stroke="#2d2d2d" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<path d="M435,261 L660,320" fill="none" stroke="#2d2d2d" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="450" y="26" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">gRPC CompletionQueue: Tag-Based Dispatch</text>
+<text x="450" y="462" font-size="11" fill="#6b6b6b" text-anchor="middle">the tag is the only link between an event and the state machine that issued it</text>
+</svg>

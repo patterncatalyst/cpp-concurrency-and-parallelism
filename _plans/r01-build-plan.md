@@ -89,7 +89,7 @@ order: 1
 > it. KEPT lsp-specific systems chapters (24=Networking, 39/40 perf, **41 systems-capstone-fleet** — the plan's
 > literal list would have wrongly removed 41). Branch docs/extract-cpp-concurrency @ 999222e, validate.py OK;
 > **PR linux-systems-programming#29 open (squash-merge by user).**
-> **PR #29 MERGED (2026-10-11): lsp Pages live, 11 stubs point to the new book, 41-capstone-fleet kept intact, ~5884 lines of duplicated concurrency content removed.** ALL 8 PHASES + both gates COMPLETE. Only optional remaining: ch33 occupancy-assert flake.
+> **PR #29 MERGED (2026-10-11): lsp Pages live, 11 stubs point to the new book, 41-capstone-fleet kept intact, ~5884 lines of duplicated concurrency content removed.** ALL 8 PHASES + both gates COMPLETE. ch33 occupancy-assert flake FIXED (commit e3ee43f: clamp occ_before+1 to capacity; peak now reports 64 at capacity, verify PASS). Nothing outstanding.
 > **ch29 observing-concurrency DONE (commit 631e271):** three fixes — (a) static otel-archive link cycle
 > (`undefined reference to opentelemetry::sdk::common::Base64Escape`) resolved with a CMAKE_CXX_LINK_EXECUTABLE
 > `--start-group/--end-group` wrapper, same as ch25 (LINK_GROUP:RESCAN does NOT work: Conan exposes the otel

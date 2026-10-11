@@ -19,7 +19,11 @@ growpart:
   mode: auto
   devices: ['/']
 
-package_update: true
+# Do NOT run a full `dnf upgrade` on first boot: it is a heavy I/O storm on the
+# fresh overlay that can wedge the guest for many minutes. refresh metadata only
+# (handled by the install) and install just what the demo needs.
+package_update: false
+package_upgrade: false
 packages:
   - gcc
   - gcc-c++

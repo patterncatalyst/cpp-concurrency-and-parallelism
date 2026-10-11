@@ -32,7 +32,11 @@ source "$REPO_ROOT/scripts/lib/_helpers.sh"
 
 export LIBVIRT_DEFAULT_URI="${LIBVIRT_DEFAULT_URI:-qemu:///system}"
 VM_NAME="${VM_NAME:-cpp-conc-numa}"
-SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=5"
+# ServerAlive* drops a session that authenticates but then hangs post-auth --
+# which happens while cloud-init + dnf saturate the guest's disk and PAM/login
+# stalls. ConnectTimeout only bounds the TCP connect, not that hang, so every
+# guest command below also runs under an explicit `timeout`.
+SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=10 -o ServerAliveInterval=10 -o ServerAliveCountMax=3"
 REMOTE_DIR="/home/fedora/ch16"
 
 if [[ "${1:-}" == "--clean" ]]; then
@@ -85,7 +89,7 @@ log_ok "guest IP: $IP"
 log_step "Waiting for cloud-init to finish installing the toolchain + libnuma"
 ready=0
 for _ in $(seq 1 100); do
-    if ssh $SSH_OPTS "fedora@$IP" 'grep -q CH16_LAB_READY /var/log/lab-ready 2>/dev/null'; then
+    if timeout 25 ssh $SSH_OPTS "fedora@$IP" 'grep -q CH16_LAB_READY /var/log/lab-ready 2>/dev/null'; then
         ready=1; break
     fi
     sleep 5

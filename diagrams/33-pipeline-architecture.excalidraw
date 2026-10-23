@@ -2129,13 +2129,13 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "end-to-end latency = publish_ts - ingest_ts \u2014 measured ch18-style (warmed, percentile, not mean)",
+   "text": "end-to-end latency = publish_ts - ingest_ts :  measured ch18-style (warmed, percentile, not mean)",
    "fontSize": 11,
    "fontFamily": 1,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "end-to-end latency = publish_ts - ingest_ts \u2014 measured ch18-style (warmed, percentile, not mean)",
+   "originalText": "end-to-end latency = publish_ts - ingest_ts :  measured ch18-style (warmed, percentile, not mean)",
    "lineHeight": 1.25,
    "baseline": 11
   }

@@ -46,7 +46,7 @@ collections:
         output: true
         permalink: /examples/:name/
     plans:
-        output: true
+        output: false
         permalink: /plans/:name/
 
 defaults:

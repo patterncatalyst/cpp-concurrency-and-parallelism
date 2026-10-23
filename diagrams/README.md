@@ -2,7 +2,7 @@
 
 Figures for this book are pairs of files in this directory:
 `<name>.svg` (rendered, embedded in the site) and `<name>.excalidraw`
-(editable source). No diagrams exist yet — this phase only documents
+(editable source). No diagrams exist yet: this phase only documents
 the palette so later figures stay consistent.
 
 ## Palette
@@ -26,7 +26,7 @@ Each figure is named `<NN>-<slug>` (chapter number plus a short slug,
 e.g. `02-futex-wakeup`) and embedded in a chapter's Markdown body via:
 
 ```liquid
-{% include excalidraw.html name="NN-slug" caption="Figure N.x — ..." %}
+{% include excalidraw.html name="NN-slug" caption="Figure N.x: ..." %}
 ```
 
 The include resolves the SVG at `/diagrams/<name>.svg` and offers the
@@ -37,6 +37,6 @@ page doesn't break.
 ## Generating figures
 
 When generating figures with `lgtm-diagram-generator`, pass this
-palette explicitly — do not use the generator's amber default. Keep
+palette explicitly: do not use the generator's amber default. Keep
 background, ink, and muted-text values exact so figures read
 consistently against this site's `site.css` light theme.

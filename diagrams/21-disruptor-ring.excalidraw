@@ -1103,13 +1103,13 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "gating sequence = min(C1, C2) \u2014 back-pressure when ring is full",
+   "text": "gating sequence = min(C1, C2) :  back-pressure when ring is full",
    "fontSize": 11,
    "fontFamily": 1,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "gating sequence = min(C1, C2) \u2014 back-pressure when ring is full",
+   "originalText": "gating sequence = min(C1, C2) :  back-pressure when ring is full",
    "lineHeight": 1.25,
    "baseline": 11
   }

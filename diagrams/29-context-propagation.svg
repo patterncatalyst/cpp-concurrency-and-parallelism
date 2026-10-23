@@ -6,7 +6,7 @@
 <rect x="30" y="270" width="860" height="180" rx="12" fill="#fbfaf6" stroke="#e8e1d3"/>
 <text x="42" y="290" font-size="12" font-weight="700" fill="#6b6b6b">Coroutine suspend/resume</text>
 <rect x="55" y="80" width="240" height="40" rx="9" fill="#e8f0fb" stroke="#4a73b8" stroke-width="2"/>
-<text x="175.0" y="105.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Thread A — submitting request</text>
+<text x="175.0" y="105.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Thread A: submitting request</text>
 <rect x="55" y="130" width="115" height="26" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
 <text x="112.5" y="148.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">parent span (open)</text>
 <rect x="180" y="130" width="115" height="26" rx="9" fill="#ffffff" stroke="#b9b2a4" stroke-width="1.5"/>
@@ -14,7 +14,7 @@
 <rect x="450" y="95" width="140" height="50" rx="9" fill="#ffffff" stroke="#2d2d2d" stroke-width="2"/>
 <text x="520.0" y="125.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">task queue</text>
 <rect x="660" y="80" width="210" height="70" rx="9" fill="#d8e8df" stroke="#5a8870" stroke-width="2"/>
-<text x="765.0" y="113.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Thread B — worker</text>
+<text x="765.0" y="113.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">Thread B: worker</text>
 <text x="765.0" y="130.0" font-size="11.5" fill="#6b6b6b" text-anchor="middle">install Scope(ctx) → child span</text>
 <rect x="660" y="175" width="210" height="50" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
 <text x="765.0" y="198.0" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">✗ no Scope installed</text>

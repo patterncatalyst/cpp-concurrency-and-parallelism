@@ -10,6 +10,22 @@ duration: "15 min"
 
 <!-- PROVENANCE: SEED from linux-systems-programming/_docs/25-shared-state-and-the-futex.md | anchor books: Williams, Tanenbaum -->
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Explain what a Linux `std::mutex` actually is underneath the standard library: a 32-bit word plus the `futex(2)` syscall.
+- Trace the futex fast path (a single userspace compare-and-swap) and slow path (`FUTEX_WAIT`/`FUTEX_WAKE`), and identify which one a given acquisition takes.
+- Quantify the cost gap between an uncontended lock and a contended one using futex call counts and voluntary context switches.
+- Distinguish kernel-space work from user-space work during lock acquisition and release.
+- Account for how containerization (ptrace restrictions, cgroup CPU quotas) changes what you can observe about futex behavior without changing the mechanism itself.
+
+## Why this matters
+
+Most engineers carry a rule of thumb that locks are expensive, so the instinct is to minimize their use. That rule measures the wrong variable: an uncontended `std::mutex` costs one atomic instruction and ownership of one cache line, not a syscall. Understanding the futex mechanism replaces that vague caution with a precise one: contention is what is expensive, not the presence of a lock.
+
+This matters directly for debugging and capacity planning. When a service stalls under load, knowing that only a lost compare-and-swap ever touches the kernel tells you exactly where to look: futex call counts and voluntary context switches, not a profiler guess. The same mechanism also underlies every other coordination primitive in this book, so the fast-path/slow-path split introduced here reappears, unchanged, in condition variables, latches, barriers, and semaphores.
+
 ## What we'll cover
 
 - Show that a Linux mutex is, underneath, a fast userspace path backed by the futex syscall.
@@ -20,7 +36,7 @@ duration: "15 min"
 ## What a Lock Is Underneath
 
 `std::mutex` on Linux is a thin wrapper over `pthread_mutex_t`, which is in
-turn a thin wrapper over a **futex** — a 32-bit word in your process's address
+turn a thin wrapper over a **futex**: a 32-bit word in your process's address
 space, plus exactly one syscall, `futex(2)`, that the kernel only touches when
 two threads actually collide over it. The name is a contraction of "fast
 userspace mutex," and the "fast" is not marketing: the entire point of the
@@ -37,7 +53,7 @@ the kernel to park it. `std::lock_guard`, `std::unique_lock`, and
 `std::scoped_lock` all bottom out at this same word through
 `pthread_mutex_lock`; none of them add a second mechanism underneath.
 
-{% include excalidraw.html name="05-futex-fast-slow-path" caption="Figure 5.1 — one lock word, two paths: the uncontended compare-exchange never leaves user space; only a lost compare-exchange descends into the kernel" %}
+{% include excalidraw.html name="05-futex-fast-slow-path" caption="Figure 5.1: one lock word, two paths: the uncontended compare-exchange never leaves user space; only a lost compare-exchange descends into the kernel" %}
 <!-- DIAGRAM SPEC: bespoke palette cream #fdfbf7 bg, blue #4a73b8, green #5a8870, red #c0392b, orange #a06030. Upper band labeled "user space (glibc pthread / libstdc++ std::mutex)": a green box "lock word == 0" with an arrow labeled "cmpxchg 0 -> 1 (one instruction)" into a blue box "lock held, no syscall". Lower band labeled "kernel (entered only on a lost compare-exchange)": a red box "lock word == 1, CAS fails" with an orange arrow labeled "futex(FUTEX_WAIT, &word, 1)" descending into a red "wait queue keyed by address" box; a second orange arrow labeled "futex(FUTEX_WAKE, &word)" rising from an "unlock()" box back up to the wait queue, with a dashed arrow returning the woken thread to user space. Footer note: "uncontended: compare-exchange succeeds, nothing below this line runs." -->
 
 ## The Futex: Fast Path and Slow Path
@@ -47,7 +63,7 @@ precise about why it is cheap: a single atomic instruction, retiring in a few
 nanoseconds, touching one cache line. No system call, no context switch, no
 involvement from the scheduler. This is the path every uncontended
 `lock()`/`unlock()` pair takes, and under light contention it is also the path
-most *contended* acquisitions take — not because glibc's default mutex spins
+most *contended* acquisitions take, not because glibc's default mutex spins
 in userspace before falling back (it doesn't: `std::mutex` maps to
 `PTHREAD_MUTEX_NORMAL`, whose glibc implementation performs exactly one
 compare-and-swap and, on failure, goes straight to `__lll_lock_wait`, the
@@ -69,13 +85,13 @@ the parking, the kernel can verify the precondition and commit to sleeping as
 one atomic step, with nothing before it for a stray write to slip into.
 
 On the unlocking side, a thread that finds no one is waiting on the word
-clears it and returns — still entirely in user space. Only when the
+clears it and returns, still entirely in user space. Only when the
 unlocking thread knows (or the futex's internal bookkeeping believes) a
 waiter exists does it call `futex(FUTEX_WAKE, &word)`, which moves one parked
 thread back onto the run queue. Condition variables, `std::latch`,
 `std::barrier`, `std::counting_semaphore`, and `std::atomic<T>::wait`/
 `notify_one` all reduce to this same pair of calls on Linux. They look like
-five distinct facilities; underneath, a thread that must sleep until some
+five distinct facilities: underneath, a thread that must sleep until some
 other thread acts has exactly one way to be descheduled, and that way is a
 syscall, because only the kernel can take a thread off the CPU.
 
@@ -116,13 +132,13 @@ wake each other. Breaking that count down by operation shows the mechanism
 described above actually at work: in that same reference measurement, only
 on the order of a few hundred of the 200,000 lock operations under
 contention ever reached an actual `FUTEX_WAIT` sleep. The rest found the
-compare-and-swap already succeeding — the lock had already been released by
-the time they attempted it — and never left user space at all. Contention
+compare-and-swap already succeeding (the lock had already been released by
+the time they attempted it), and never left user space at all. Contention
 raises the cost by orders of magnitude and the kernel still handles only a
 small minority of the operations involved.
 
 The number that matters here is the *shape* of the comparison, not any single
-run's count — futex counts under contention are scheduling-dependent and will
+run's count; futex counts under contention are scheduling-dependent and will
 differ from one run to the next on the same machine. "More than two orders of
 magnitude between uncontended and contended" is a statement that holds up
 every time; the exact figure from one run is not a thing to hard-code into a
@@ -141,7 +157,7 @@ and the thing worth minimizing is contention, not the presence of a lock.
 Collecting the boundary in one place: the compare-and-swap that acquires an
 uncontended lock and the compare-and-swap that releases it when no one is
 waiting both run entirely in user space, touching no kernel data structure
-and costing no mode switch — the default `std::mutex` does not spin in
+and costing no mode switch; the default `std::mutex` does not spin in
 userspace beyond that single compare-and-swap attempt before falling to the
 futex path. The kernel enters the picture in exactly two
 calls: `futex(FUTEX_WAIT, ...)` when a thread must sleep, and
@@ -154,7 +170,7 @@ An independent way to see the same boundary is to count **voluntary context
 switches**, which `getrusage` (and therefore `/usr/bin/time -v`) reports per
 process and which the kernel also exposes live per thread under
 `/proc/<pid>/task/*/status`. Every `FUTEX_WAIT` that actually parks a thread
-is one voluntary context switch — the thread choosing to give up the CPU
+is one voluntary context switch: the thread choosing to give up the CPU
 rather than being preempted from it. An uncontended run produces a context
 switch count in the low hundreds, almost entirely startup and teardown; the
 same work made heavily contended across eight threads can push that count
@@ -204,8 +220,8 @@ language itself: `std::atomic<T>::wait`, `notify_one`, and `notify_all` are a
 direct, standardized expression of `FUTEX_WAIT`/`FUTEX_WAKE` on a bare atomic,
 with none of the platform-specific syscall plumbing exposed. `std::latch`,
 `std::barrier`, and `std::counting_semaphore` also land in C++20, and on
-Linux every one of them is this same mechanism wearing a different type name
-— each is a shape of "block until another thread acts," and that shape has
+Linux every one of them is this same mechanism wearing a different type name:
+each is a shape of "block until another thread acts," and that shape has
 exactly one implementation available to it.
 
 **C++23** adds no new blocking primitive and changes nothing about the futex
@@ -266,7 +282,7 @@ int read_without_blocking(std::atomic<Node*>& head) {
 reclamation mechanism that sidesteps it for a specific, important case:
 `std::hazard_pointer` and the RCU facilities from P2530 and P2545 let a
 reader traverse a shared, concurrently-mutated structure without taking any
-lock and without ever reaching `futex(2)` — the protection comes from
+lock and without ever reaching `futex(2)`: the protection comes from
 deferring reclamation of memory a reader might still be looking at, not from
 excluding other threads. This does not replace `std::mutex` for the general
 case; it targets read-mostly data structures where even an uncontended
@@ -282,7 +298,7 @@ implementation.
   compare-and-swap that never leaves user space.
 - The fast path is the common case even under moderate contention, because
   critical sections are typically so brief that the lock is usually already
-  free again by the time a second thread's compare-and-swap runs — not
+  free again by the time a second thread's compare-and-swap runs, not
   because glibc's default mutex spins in userspace before calling into the
   kernel (that's `PTHREAD_MUTEX_ADAPTIVE_NP`, not the `std::mutex` default).
 - An uncontended lock's futex call count matches a program with no mutex at
@@ -294,7 +310,7 @@ implementation.
   in user space because the critical section was already free again by the
   time the compare-and-swap ran.
 - Measure the *shape* of a comparison (orders of magnitude), not a single
-  run's exact count — contended futex counts are scheduling-dependent and
+  run's exact count; contended futex counts are scheduling-dependent and
   will vary between runs on identical hardware.
 - `FUTEX_WAIT` re-checks the expected value as part of the same syscall that
   parks the thread, closing the lost-wakeup race; `std::atomic<T>::wait(old)`

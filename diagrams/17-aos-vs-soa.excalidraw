@@ -1827,13 +1827,13 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "a vector load wants the boxed region contiguous \u2014 SoA gives it for free; AoS never does.",
+   "text": "a vector load wants the boxed region contiguous :  SoA provides it; AoS never does.",
    "fontSize": 11,
    "fontFamily": 1,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "a vector load wants the boxed region contiguous \u2014 SoA gives it for free; AoS never does.",
+   "originalText": "a vector load wants the boxed region contiguous :  SoA provides it; AoS never does.",
    "lineHeight": 1.25,
    "baseline": 11
   }

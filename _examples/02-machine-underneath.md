@@ -1,5 +1,5 @@
 ---
-title: "Chapter 02 — Cache-Hierarchy Latency Probe"
+title: "Chapter 02: Cache-Hierarchy Latency Probe"
 description: "A random pointer-chase benchmark across five working-set sizes shows that memory-access cost tracks the cache hierarchy, not anything that looks like contention."
 order: 202
 card_eyebrow: "Chapter · <strong>02</strong>"
@@ -12,9 +12,9 @@ demo_dir: concurrency/02-machine-underneath
 github_path: examples/concurrency/02-machine-underneath
 ---
 
-> The full source for this example lives in [`examples/concurrency/02-machine-underneath/`](https://github.com/{{ site.github_username }}/{{ site.github_repo }}/tree/main/examples/concurrency/02-machine-underneath) — clone the repo, `cd` in, and `./demo.sh`.
+> The full source for this example lives in [`examples/concurrency/02-machine-underneath/`](https://github.com/{{ site.github_username }}/{{ site.github_repo }}/tree/main/examples/concurrency/02-machine-underneath); clone the repo, `cd` in, and `./demo.sh`.
 
-Chapter reference: [Doc 02 — The Machine Underneath]({{ '/docs/02-the-machine-underneath/' | relative_url }})
+Chapter reference: [Doc 02: The Machine Underneath]({{ '/docs/02-the-machine-underneath/' | relative_url }})
 
 ## What it shows
 

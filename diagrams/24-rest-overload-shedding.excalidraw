@@ -1283,13 +1283,13 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "the shed path never touches a handler \u2014 it answers from the gate itself",
+   "text": "the shed path never touches a handler :  it answers from the gate itself",
    "fontSize": 11,
    "fontFamily": 1,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "the shed path never touches a handler \u2014 it answers from the gate itself",
+   "originalText": "the shed path never touches a handler :  it answers from the gate itself",
    "lineHeight": 1.25,
    "baseline": 11
   }

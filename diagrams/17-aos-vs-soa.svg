@@ -58,5 +58,5 @@
 <rect x="798" y="150" width="24" height="30" rx="9" fill="#fef3f0" stroke="#c0392b" stroke-width="2"/>
 <text x="810.0" y="170.5" font-size="13.5" font-weight="700" fill="#1a1a1a" text-anchor="middle">m</text>
 <text x="440" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">AoS scatters a field; SoA packs it contiguous</text>
-<text x="440" y="260" font-size="11" fill="#6b6b6b" text-anchor="middle">a vector load wants the boxed region contiguous — SoA gives it for free; AoS never does.</text>
+<text x="440" y="260" font-size="11" fill="#6b6b6b" text-anchor="middle">a vector load wants the boxed region contiguous: SoA provides it; AoS never does.</text>
 </svg>

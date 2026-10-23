@@ -48,10 +48,10 @@
 <path d="M216,90 L250,90" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
 <path d="M306,90 L340,90" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
 <path d="M396,90 L430,90" fill="none" stroke="#2d2d2d" stroke-width="2" marker-end="url(#a)"/>
-<text x="450" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">What each execution policy permits — and forbids</text>
-<text x="450" y="128" font-size="11" fill="#6b6b6b" text-anchor="middle">no concurrency, no vectorization guarantee — the baseline</text>
-<text x="465" y="305" font-size="11" fill="#6b6b6b" text-anchor="middle">may run on multiple threads — callable must be concurrency-safe</text>
-<text x="465" y="472" font-size="11" fill="#6b6b6b" text-anchor="middle">may interleave within ONE thread — locking can deadlock against itself</text>
+<text x="450" y="24" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">What each execution policy permits: and forbids</text>
+<text x="450" y="128" font-size="11" fill="#6b6b6b" text-anchor="middle">no concurrency, no vectorization guarantee: the baseline</text>
+<text x="465" y="305" font-size="11" fill="#6b6b6b" text-anchor="middle">may run on multiple threads: callable must be concurrency-safe</text>
+<text x="465" y="472" font-size="11" fill="#6b6b6b" text-anchor="middle">may interleave within ONE thread: locking can deadlock against itself</text>
 <text x="640" y="430" font-size="18" fill="#c0392b" text-anchor="middle" font-weight="700">X</text>
 <text x="65" y="205" font-size="10" fill="#6b6b6b" text-anchor="end">T0</text>
 <text x="65" y="242" font-size="10" fill="#6b6b6b" text-anchor="end">T1</text>

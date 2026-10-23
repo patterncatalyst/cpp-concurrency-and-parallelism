@@ -1,5 +1,5 @@
 ---
-title: "Chapter 20 — False Sharing vs. Cache-Line Padding"
+title: "Chapter 20: False Sharing vs. Cache-Line Padding"
 description: "Two threads that touch completely disjoint data can still serialize on each other if that data shares a 64-byte cache line."
 order: 220
 card_eyebrow: "Chapter · <strong>20</strong>"
@@ -12,9 +12,9 @@ demo_dir: concurrency/20-mechanical-sympathy
 github_path: examples/concurrency/20-mechanical-sympathy
 ---
 
-> The full source for this example lives in [`examples/concurrency/20-mechanical-sympathy/`](https://github.com/{{ site.github_username }}/{{ site.github_repo }}/tree/main/examples/concurrency/20-mechanical-sympathy) — clone the repo, `cd` in, and `./demo.sh`.
+> The full source for this example lives in [`examples/concurrency/20-mechanical-sympathy/`](https://github.com/{{ site.github_username }}/{{ site.github_repo }}/tree/main/examples/concurrency/20-mechanical-sympathy): clone the repo, `cd` in, and `./demo.sh`.
 
-Chapter reference: [Doc 20 — Mechanical Sympathy]({{ '/docs/20-mechanical-sympathy/' | relative_url }})
+Chapter reference: [Doc 20: Mechanical Sympathy]({{ '/docs/20-mechanical-sympathy/' | relative_url }})
 
 ## What it shows
 

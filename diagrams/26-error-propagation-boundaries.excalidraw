@@ -1216,13 +1216,13 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "all three start from the identical throw \u2014 only the destination differs, and only two of three are safe by default",
+   "text": "all three start from the identical throw :  only the destination differs, and only two of three are safe by default",
    "fontSize": 11,
    "fontFamily": 1,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "all three start from the identical throw \u2014 only the destination differs, and only two of three are safe by default",
+   "originalText": "all three start from the identical throw :  only the destination differs, and only two of three are safe by default",
    "lineHeight": 1.25,
    "baseline": 11
   }

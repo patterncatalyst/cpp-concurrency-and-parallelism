@@ -41,5 +41,5 @@
 <text x="736.0" y="214.0" font-size="11" fill="#fdfbf7" stroke="#fdfbf7" stroke-width="3" paint-order="stroke" text-anchor="middle">awaiter&#x27;s get() rethrows</text>
 <text x="736.0" y="214.0" font-size="11" fill="#2d2d2d" text-anchor="middle">awaiter&#x27;s get() rethrows</text>
 <text x="450" y="26" font-size="14" fill="#1a1a1a" text-anchor="middle" font-weight="700">Exception Propagation Across Concurrency Boundaries</text>
-<text x="450" y="348" font-size="11" fill="#6b6b6b" text-anchor="middle">all three start from the identical throw — only the destination differs, and only two of three are safe by default</text>
+<text x="450" y="348" font-size="11" fill="#6b6b6b" text-anchor="middle">all three start from the identical throw: only the destination differs, and only two of three are safe by default</text>
 </svg>

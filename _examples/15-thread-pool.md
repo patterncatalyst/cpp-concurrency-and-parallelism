@@ -1,5 +1,5 @@
 ---
-title: "Chapter 15 — Single Shared Queue vs. Work-Stealing Deques"
+title: "Chapter 15: Single Shared Queue vs. Work-Stealing Deques"
 description: "A single shared queue turns every worker into a competitor for one lock, and hardware_concurrency() never knows about a container's CPU quota."
 order: 215
 card_eyebrow: "Chapter · <strong>15</strong>"
@@ -12,9 +12,9 @@ demo_dir: concurrency/15-thread-pool
 github_path: examples/concurrency/15-thread-pool
 ---
 
-> The full source for this example lives in [`examples/concurrency/15-thread-pool/`](https://github.com/{{ site.github_username }}/{{ site.github_repo }}/tree/main/examples/concurrency/15-thread-pool) — clone the repo, `cd` in, and `./demo.sh`.
+> The full source for this example lives in [`examples/concurrency/15-thread-pool/`](https://github.com/{{ site.github_username }}/{{ site.github_repo }}/tree/main/examples/concurrency/15-thread-pool): clone the repo, `cd` in, and `./demo.sh`.
 
-Chapter reference: [Doc 15 — Thread Pools and Work Scheduling]({{ '/docs/15-thread-pools-and-work-scheduling/' | relative_url }})
+Chapter reference: [Doc 15: Thread Pools and Work Scheduling]({{ '/docs/15-thread-pools-and-work-scheduling/' | relative_url }})
 
 ## What it shows
 

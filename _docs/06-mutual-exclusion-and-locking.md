@@ -10,6 +10,22 @@ duration: "15 min"
 
 <!-- PROVENANCE: NEW (adapted from linux-systems-programming/_docs/50-pthreads.md, 51-std-threading.md) | anchor books: Williams, Grimm -->
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Choose among `mutex`, `recursive_mutex`, `timed_mutex`, and `shared_mutex` based on the specific capability a critical section actually needs.
+- Pick the right RAII wrapper (`lock_guard`, `unique_lock`, or `scoped_lock`) for a given acquisition pattern, including multi-mutex locking.
+- Apply a lock-ordering convention, or `std::scoped_lock`'s try-all-and-back-off algorithm, to prevent circular-wait deadlock.
+- Diagnose a deadlock from outside a process using `/proc/<pid>/task/*/wchan`, without a debugger attached.
+- Justify RAII locking as the default and treat a bare `lock()`/`unlock()` pair as a finding that needs explicit justification in review.
+
+## Why this matters
+
+A two-mutex deadlock produces no exception, no error code, and no log line. The program stops producing observable behavior and sits there, and nothing short of inspecting kernel-level thread state from outside the process reveals why. That failure mode is unforgiving in production: it surfaces under load, on an interleaving nobody's test exercised, often weeks after the code that introduced it shipped.
+
+The fix is mostly discipline rather than cleverness: pick the right mutex type for the job, wrap every acquisition in RAII so an exception or early return cannot strand a lock, and either enforce a global lock order or let `scoped_lock` handle multi-mutex acquisition safely by construction. Each of those choices is cheap to make correctly up front and expensive to retrofit once a deadlock has already shipped to production.
+
 ## What we'll cover
 
 - Survey the mutex family: `mutex`, `recursive_mutex`, `timed_mutex`, and `shared_mutex`, and when each is the right choice.
@@ -22,14 +38,14 @@ duration: "15 min"
 `std::mutex` is the default for a reason: it is non-recursive, exclusive, and
 as cheap as the previous chapter demonstrated when it is not contended.
 Everything else in the family trades some of that simplicity for a specific
-capability, and the trade is worth naming precisely, because reaching for the
+capability, and the trade deserves a precise accounting, because reaching for the
 wrong family member is a common source of subtle bugs.
 
 `std::recursive_mutex` permits the same thread to lock it more than once
 without deadlocking itself, decrementing an internal count on each matching
 `unlock()`. It exists for one legitimate reason: a call graph where a locked
 function may re-enter itself or call another function that needs the same
-lock, typically in code you cannot restructure cleanly — virtual dispatch
+lock, typically in code you cannot restructure cleanly: virtual dispatch
 through a base class that also takes the lock, for instance. It is not a
 convenience for "I didn't want to think about who already holds this." A
 recursive mutex that is reached for to paper over an unclear locking
@@ -72,7 +88,7 @@ the payoff only appears once reader concurrency is real.
 
 A mutex acquired with a bare `lock()` call is correct only until the first
 exception, early return, or `break` statement between that call and the
-matching `unlock()` — any of which skips the unlock and leaves the mutex
+matching `unlock()`, any of which skips the unlock and leaves the mutex
 held forever, with every other thread that wants it blocking silently. RAII
 wrapper types exist to make that failure mode unreachable by construction:
 the lock is acquired in a constructor and released in a destructor, so the
@@ -93,7 +109,7 @@ that scope's lifetime and no longer.
 early with an explicit `.unlock()` and later re-`.lock()` within the same
 scope, and it is movable, so ownership of a held lock can be transferred out
 of a function. Every one of those capabilities is also a way to reintroduce
-the bug `lock_guard` makes impossible — an early `.unlock()` call followed by
+the bug `lock_guard` makes impossible: an early `.unlock()` call followed by
 code that assumes the lock is still held is exactly the bare-`unlock()`
 mistake, just spelled with an RAII type standing nearby. Reach for
 `unique_lock` when you need one of its specific capabilities, not as a
@@ -124,14 +140,14 @@ The textbook deadlock needs only two mutexes and two threads. Thread one
 locks `a` then `b`; thread two locks `b` then `a`; if each acquires its first
 lock before either attempts its second, each now holds exactly what the
 other is waiting for, and neither can proceed. Nothing about this raises an
-exception, returns an error code, or sets `errno` — the two threads
+exception, returns an error code, or sets `errno`; the two threads
 stop, forever, and the only external evidence is that `/proc/<pid>/task/*/wchan`
 reads the kernel's futex-parked function for every thread involved, since
 Chapter 5's mechanism applies to a deadlocked wait exactly as it does to any
 other one. A deadlocked program is not a failing program; it is a program
 that has stopped producing observable behavior.
 
-{% include excalidraw.html name="06-lock-ordering-deadlock" caption="Figure 6.1 — the same opposing acquisition order, fatal with lock_guard and safe with scoped_lock" %}
+{% include excalidraw.html name="06-lock-ordering-deadlock" caption="Figure 6.1: the same opposing acquisition order, fatal with lock_guard and safe with scoped_lock" %}
 <!-- DIAGRAM SPEC: bespoke palette cream #fdfbf7 bg, blue #4a73b8, green #5a8870, red #c0392b, orange #a06030. Upper band titled "std::lock_guard, opposing order": Thread 1 box with ordered steps "lock_guard x(a)" then "lock_guard y(b)"; Thread 2 box with ordered steps "lock_guard x(b)" then "lock_guard y(a)"; two red arrows cross between the boxes labeled "each holds what the other needs"; a red outcome box reads "deadlock -- no error, no exception, program simply stops". Lower band titled "std::scoped_lock, same opposing order": Thread 1 box "scoped_lock lock(a, b)"; Thread 2 box "scoped_lock lock(b, a)"; a green arrow loops between them labeled "try-all, back off, retry -- not argument order"; a green outcome box reads "both complete -- order does not matter to scoped_lock". -->
 
 The two independent fixes are a global lock-ordering convention and
@@ -154,14 +170,14 @@ if any attempt fails, it releases everything it has acquired so far and
 retries from a different starting point, using the same algorithm
 `std::lock()` exposes directly. `scoped_lock(a, b)` on one thread and
 `scoped_lock(b, a)` on another, run concurrently and indefinitely, cannot
-deadlock each other — not "deadlock rarely" or "deadlock less often than
+deadlock each other, not "deadlock rarely" or "deadlock less often than
 with `lock_guard`," but cannot, because the acquisition order the argument
 list specifies is not the order the implementation actually uses.
 
 That guarantee has a scope worth being precise about: it covers the mutexes
 named in one `scoped_lock` construction. It says nothing about a thread that
 holds a lock from one `scoped_lock` and then, inside that scope, constructs a
-second `scoped_lock` (or a bare `lock_guard`) naming an overlapping mutex —
+second `scoped_lock` (or a bare `lock_guard`) naming an overlapping mutex:
 that reintroduces exactly the ordering problem `scoped_lock` was solving for
 its own argument list. The practical rule this leaves: use `scoped_lock` for
 every point in the program where two or more mutexes are acquired together,
@@ -174,7 +190,7 @@ not made at all.
 
 A bare `mu.lock()` / `mu.unlock()` pair, with no RAII type anywhere between
 them, is correct only for as long as nothing between those two calls can
-throw, return, `break`, `continue`, or `goto` out of the block — a
+throw, return, `break`, `continue`, or `goto` out of the block, a
 constraint that holds today and is one refactor away from not holding
 tomorrow. The function that called `transfer()` safely for two years breaks
 the moment someone adds a bounds check that throws on an invalid account
@@ -237,7 +253,7 @@ stretches that gap to microseconds or milliseconds under load. Testing lock
 ordering under a representative CPU quota, not just on bare metal, is the
 practical consequence.
 
-A deliberately induced deadlock is also easier to diagnose from outside a
+An induced deadlock is also easier to diagnose from outside a
 container than from inside one, because the diagnostic path is procfs rather
 than a debugger attached to the process. `cat /proc/<pid>/task/*/wchan` from
 the host (or from a debug container sharing the target's PID namespace, via
@@ -265,7 +281,7 @@ critical sections the lock already guarded.
 enables a pattern this chapter's discipline argument benefits from directly:
 a writer can construct a completion closure that owns non-copyable state
 while holding the lock, store it in a `move_only_function`, release the lock,
-and invoke the closure afterward — shrinking the critical section to exactly
+and invoke the closure afterward, shrinking the critical section to exactly
 the work that needs the lock, without first smuggling the closure through a
 `shared_ptr` to satisfy `std::function`'s copy requirement.
 
@@ -357,13 +373,13 @@ standard, available answer for reader/writer splitting until it does.
   `shared_mutex` is for read-heavy state where concurrent readers are worth
   a more expensive lock operation.
 - RAII lock types tie lock lifetime to scope lifetime, so an exception or
-  early return cannot leave a mutex held — a failure mode a bare
+  early return cannot leave a mutex held: a failure mode a bare
   `lock()`/`unlock()` pair cannot defend against by construction.
 - `lock_guard` is minimal and non-movable by design; `unique_lock` adds
   deferred locking, early release, and move support, each of which can
   reintroduce the bug `lock_guard` prevents if used carelessly.
 - The textbook two-mutex deadlock produces no error, no exception, and no
-  return code — only `/proc/<pid>/task/*/wchan` from outside the process
+  return code: only `/proc/<pid>/task/*/wchan` from outside the process
   shows every thread parked on the kernel's futex-wait path.
 - A global lock-ordering convention prevents the circular wait from forming;
   `std::scoped_lock` solves the same problem without requiring one, by

@@ -10,6 +10,22 @@ duration: "16 min"
 
 <!-- PROVENANCE: SEED from linux-systems-programming/_docs/51-std-threading.md | anchor books: Williams, Grimm -->
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Choose between `std::thread` and `std::jthread` for a given piece of code, and explain why `jthread` should be the default.
+- Use `stop_source`/`stop_token` to cancel a polling worker cooperatively, and recognize the cases (a thread blocked in a syscall) where that mechanism cannot help.
+- State the lifetime rule that governs a thread's captured state, and design a thread's scope so its captures can never dangle.
+- Choose `join()` over `detach()` in service code, and justify why detaching gives up every means of observing a thread's exit.
+- Size a thread pool correctly under a cgroup CPU quota versus a cpuset restriction, which `hardware_concurrency()` reports differently depending on the glibc version.
+
+## Why this matters
+
+Threading bugs in C++ rarely announce themselves at the call site that causes them. A `std::thread` destroyed while still joinable calls `std::terminate()` with no unwinding, and the branch that forgot to join it might be the fifth early return added six months after the function was written. A worker that captures a local variable by reference is correct for as long as the enclosing frame happens to outlive it, right up until a refactor changes that lifetime relationship and nothing before the crash says why.
+
+`std::jthread` and `stop_token` close the gap between what the type system enforces and what correct threading actually requires: a destructor that joins unconditionally, and a standard vocabulary for asking a worker to stop instead of inventing an atomic flag per codebase. Getting the defaults right here (`jthread` over `thread`, `join()` over `detach()`, deliberate scoping over implicit lifetime assumptions) removes an entire class of bugs that otherwise surface as a crash in production with no local explanation.
+
 ## What we'll cover
 
 - Compare `std::thread` and C++20's `std::jthread`, including `jthread`'s automatic request-and-join on destruction.
@@ -64,9 +80,9 @@ subject of the next section.
 
 Given both types exist, the practical rule is short: default to `jthread`.
 Reach for `std::thread` only when you have a concrete reason to manage the
-stop/join contract by hand — interoperating with an API that expects a bare
+stop/join contract by hand: interoperating with an API that expects a bare
 `std::thread`, for instance, or building your own thread-pool primitive where
-you want the termination behavior to be explicit rather than implicit.
+you want visible control over the termination behavior rather than an implicit one.
 
 ## stop_token and stop_source
 
@@ -74,7 +90,7 @@ Before C++20, cancelling a running thread cooperatively meant inventing the
 mechanism yourself: an `std::atomic<bool>` flag, captured by reference, polled
 in the worker's loop, set by whoever wants the thread to stop. It works, and
 it has worked in C++ codebases for two decades, but every team reinvents its
-own flavor — some wrap it in a class, some pass it raw, some forget to make it
+own flavor: some wrap it in a class, some pass it raw, some forget to make it
 atomic and get a loop that never notices the flag changed underneath an
 optimizer that cached the read.
 
@@ -86,7 +102,7 @@ no-ops that return `false`). A `stop_token`, obtained from a `stop_source` via
 state, and `stop_possible()` reports whether any `stop_source` capable of
 requesting a stop still exists. The two sides share reference-counted state
 behind the scenes, so a `stop_token` remains valid and answerable even after
-every `stop_source` that could have produced it has gone out of scope — it
+every `stop_source` that could have produced it has gone out of scope; it
 reports `stop_possible() == false` from then on.
 
 A `jthread` owns a `stop_source` internally and threads a `stop_token` from it
@@ -158,7 +174,7 @@ low-latency pipeline wants to avoid on every request. `std::execution`'s
 `inplace_stop_source` trades that generality for a token whose state lives
 wherever its owner places it (on the stack, inside another object) at the
 cost of a stricter lifetime contract: the source must outlive every token and
-callback derived from it, with no refcounting to paper over a mistake.
+callback derived from it, with no reference counting to paper over a mistake.
 
 A `stop_token` is cooperative, and that limitation shows up the first time a
 thread is blocked rather than looping. A thread parked inside `read(2)`,
@@ -174,7 +190,7 @@ itself. `stop_token` does not pretend to replace them.
 A `std::thread` or `std::jthread` object is the only handle a program has to a
 running operating-system thread, and that handle is move-only: copying it
 would leave two objects claiming ownership of one thread, which the type
-system refuses to allow. Moving transfers ownership cleanly — the source
+system refuses to allow. Moving transfers ownership cleanly: the source
 object becomes non-joinable, the destination becomes responsible for the
 thread's eventual `join()` or `detach()`.
 
@@ -184,7 +200,7 @@ immediately, with no unwinding, no destructors further up the stack, nothing.
 This is not a defect to work around with a `try`/`catch`; `std::terminate()`
 is specifically not an exception, so catching around the scope changes
 nothing. The only ways to avoid it are to `join()`, to `detach()`, or to move
-the thread object somewhere that will do one of those for you — which is
+the thread object somewhere that will do one of those for you, which is
 precisely what `std::jthread`'s destructor does automatically.
 
 The ownership question that actually causes outages is not the destructor
@@ -199,8 +215,8 @@ point at a short-lived stack frame, enforces nothing: the references dangle
 the moment the original frame returns, and the worker reads freed memory with
 no indication anything went wrong until it crashes somewhere unrelated.
 
-The safe default is to make captured state outlive the thread by construction
-— capture by value, hold shared state in a `shared_ptr`, or keep the thread
+The safe default is to make captured state outlive the thread by construction:
+capture by value, hold shared state in a `shared_ptr`, or keep the thread
 object itself scoped tightly enough that its lifetime visibly bounds its
 captures' lifetime. Reviewing a thread's captures and reviewing its join
 discipline are the same review.
@@ -234,7 +250,7 @@ clean, `detach()` is close to never the right call. Prefer `join()`, and
 prefer `jthread` so that the join happens whether or not the code that wrote
 the function remembered to ask for it.
 
-{% include excalidraw.html name="04-jthread-stop-token" caption="Figure 4.1 — jthread's owned stop_source, the stop_token handed to the worker, and the destructor's automatic request_stop-then-join" %}
+{% include excalidraw.html name="04-jthread-stop-token" caption="Figure 4.1: jthread's owned stop_source, the stop_token handed to the worker, and the destructor's automatic request_stop-then-join" %}
 <!-- DIAGRAM SPEC: bespoke palette cream #fdfbf7 bg, blue #4a73b8, green #5a8870, red #c0392b, orange #a06030. Left: a blue box "std::jthread t" containing a nested orange box "stop_source (owned)". An arrow labeled "get_token()" runs from stop_source to a green box "stop_token" held by a "worker thread" box on the right, which loops on "while (!tok.stop_requested())". Below, a red box "~jthread()" with two ordered arrows into it: "1. request_stop()" into stop_source, "2. join()" waiting on the worker thread box, captioned "both happen even if the caller never calls either by hand". A dashed comparison box to the side: "std::thread, still joinable at destruction" with a red arrow straight to a box "std::terminate() -- no unwind". -->
 
 ## Running in a container
@@ -245,7 +261,7 @@ container limited to `cpus: "2"` on a 64-core host still reports
 `hardware_concurrency() == 64`, because the function reads `/proc/cpuinfo` and
 affinity masks, not `cpu.max`. A thread pool sized naively off that return
 value will happily create sixty-four `jthread`s, all of which the scheduler
-then time-slices across two CPU-quota's worth of runtime — more context
+then time-slices across two CPU-quota's worth of runtime: more context
 switching, not more throughput. Size pools from `cpu.max` (or, if you control
 the orchestrator, from a fixed, explicitly-injected worker count) rather than
 trusting `hardware_concurrency()` inside a quota-limited container.
@@ -262,7 +278,7 @@ systems. That is the opposite of the CFS-quota case above: a `cpuset`
 affinity change is visible to `hardware_concurrency()` on modern glibc, while
 a CFS bandwidth quota (`cpu.max`, or `docker --cpus=N`, which is implemented
 as a quota rather than a cpuset) never is, because quota throttling doesn't
-touch the affinity mask at all — every CPU stays reachable, and the quota
+touch the affinity mask at all: every CPU stays reachable, and the quota
 only limits how much wall-clock time the cgroup gets to run on them. The
 practical rule: know which kind of limit a container enforces before
 trusting `hardware_concurrency()` under it, and on an older glibc (pre-2.36,
@@ -276,7 +292,7 @@ grace period, `SIGKILL`. A process whose signal handler calls
 `request_stop()` on every outstanding `jthread` and then returns lets each
 worker's `stop_token` loop notice on its next poll and exit cleanly, and lets
 `main()`'s `jthread` destructors join them all before the process exits on
-its own — well inside the grace period, with no forced kill and no resources
+its own, well inside the grace period, with no forced kill and no resources
 abandoned mid-write.
 
 The runnable version of that shutdown path lives in
@@ -305,7 +321,7 @@ ergonomics of what you can hand to it improved.
 **C++26** has no shipping change to `jthread` or `stop_token` either, but
 `std::execution` (the sender/receiver framework from P2300, voted for C++26)
 introduces `std::inplace_stop_source` and `std::inplace_stop_token` as a
-deliberately lower-level sibling: the same `request_stop()` /
+purpose-built lower-level sibling: the same `request_stop()` /
 `stop_requested()` contract, without the heap allocation and atomic
 reference counting behind `std::jthread`'s version. As of this writing it is
 proposed and experimental: mainline GCC and clang have not shipped a
@@ -315,7 +331,7 @@ described above remains the one to reach for until that changes.
 ## What we learned
 
 - `std::thread` starts running at construction, is move-only, and calls
-  `std::terminate()` if it is destroyed while still joinable — a design that
+  `std::terminate()` if it is destroyed while still joinable: a design that
   turns a forgotten join into a crash rather than a leak.
 - `std::jthread` closes that gap: its destructor requests a stop and joins,
   unconditionally, which is why it should be the default and `std::thread`
